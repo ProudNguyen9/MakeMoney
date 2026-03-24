@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Liên hệ | Phế Liệu Thành Trung</title>
+  <meta
+    content="Liên hệ Phế Liệu Thành Trung để được khảo sát tận nơi, báo giá nhanh và thu mua phế liệu số lượng lớn tại TP.HCM, Bình Dương, Đồng Nai."
+    name="description">
+  <meta content="liên hệ phế liệu, báo giá phế liệu, thu mua phế liệu tận nơi" name="keywords">
+
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Work+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+    rel="stylesheet">
+
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --scrap-green: #15803d;
+      --scrap-green-dark: #166534;
+      --scrap-green-soft: #f0fdf4;
+      --scrap-orange: #fbbf24;
+      --scrap-orange-soft: #fef3c7;
+      --scrap-slate: #20343f;
+      --scrap-text: #455a64;
+    }
+
+    body {
+      color: var(--scrap-text);
+      background: linear-gradient(180deg, #f7fbf8 0%, #ffffff 100%);
+    }
+
+    .header {
+      background: linear-gradient(90deg, rgba(24, 112, 71, 0.98), rgba(34, 136, 89, 0.96)) !important;
+      padding: 8px 0 10px;
+      box-shadow: 0 10px 24px rgba(6, 33, 23, 0.14);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .home-wide-shell,
+    .contact-page-shell {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding-left: 72px;
+      padding-right: 72px;
+    }
+
+    .header .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      flex: 0 1 224px;
+      width: min(100%, 224px);
+      max-width: 224px;
+      height: 66px;
+      padding: 0;
+      overflow: visible;
+    }
+
+    .header .logo img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: left center;
+      transform: scaleX(2.8) scaleY(1.9);
+      transform-origin: left center;
+      filter: drop-shadow(0 10px 18px rgba(7, 24, 17, 0.24));
+      transition: transform 0.12s ease-out, filter 0.12s ease-out;
+    }
+
+    .header .logo:hover img {
+      transform: scaleX(2.8) scaleY(2);
+      filter: drop-shadow(0 12px 18px rgba(7, 24, 17, 0.25));
+    }
+
+    .header-main-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-width: 0;
+      overflow: visible;
+      padding: 1px 0;
+    }
+
+    .header-main-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1 1 auto;
+      min-width: 0;
+      gap: 10px;
+    }
+
+    .header-main-actions .navbar {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .header-top-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding: 0 0 8px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .header-top-left {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 18px;
+      flex: 1;
+    }
+
+    .header-top-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 7px 12px;
+      min-height: 42px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .header-top-item:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 222, 112, 0.34);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(8, 27, 19, 0.16);
+    }
+
+    .header-top-item i {
+      flex: 0 0 30px;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255, 239, 160, 0.26), rgba(255, 213, 59, 0.12));
+      color: #fff3bf;
+      font-size: 12px;
+      border: 1px solid rgba(255, 226, 122, 0.18);
+    }
+
+    .header-top-item a,
+    .header-top-item span {
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+
+    .header-social {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      padding-left: 0;
+    }
+
+    .header-social a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .header-social a:hover {
+      background: #fbbf24;
+      color: #173326;
+      border-color: #fbbf24;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(251, 191, 36, 0.22);
+    }
+
+    .navbar a,
+    .navbar a:focus {
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.1px;
+    }
+
+    .navbar a:hover,
+    .navbar .active,
+    .navbar .active:focus,
+    .navbar li:hover>a {
+      color: #ffd166;
+    }
+
+    .header-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #fff07a 0%, #ffd84d 42%, #f4b400 100%);
+      color: #173326;
+      padding: 9px 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 12.5px;
+      transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, color 0.35s ease;
+      white-space: nowrap;
+      box-shadow: 0 12px 24px rgba(244, 180, 0, 0.24), 0 0 0 3px rgba(255, 216, 77, 0.14);
+      border: 1px solid rgba(255, 240, 122, 0.88);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      animation: ctaPulse 2.4s ease-in-out infinite;
+    }
+
+    .header-cta i {
+      font-size: 15px;
+      transition: transform 0.35s ease;
+    }
+
+    .header-cta::before {
+      content: '';
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.46), rgba(255, 255, 255, 0.08));
+      z-index: -1;
+    }
+
+    .header-cta::after {
+      content: '';
+      position: absolute;
+      top: -24%;
+      left: -38%;
+      width: 38%;
+      height: 150%;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0));
+      transform: rotate(18deg);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .header-cta:hover {
+      background: linear-gradient(135deg, #fff59a 0%, #ffe066 42%, #ffc107 100%);
+      color: #10281d;
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 18px 34px rgba(255, 193, 7, 0.34), 0 0 0 6px rgba(255, 224, 102, 0.2);
+    }
+
+    .header-cta:hover i {
+      transform: rotate(-8deg) scale(1.08);
+    }
+
+    .header-cta:hover::after {
+      left: 112%;
+    }
+
+    .contact-page-section {
+      padding: 80px 0;
+    }
+
+    .contact-intro {
+      padding-top: 50px;
+      background: linear-gradient(180deg, #f7fbf8 0%, #ffffff 100%);
+    }
+
+    .section-header h2 {
+      color: var(--scrap-green-dark);
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .section-header p {
+      color: #42574e;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.75;
+    }
+
+    .section-header h2:after {
+      background: var(--scrap-orange);
+    }
+
+    .contact-card {
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 16px 36px rgba(15, 32, 24, 0.08);
+      border: 1px solid #edf2ee;
+      background: #fff;
+      padding: 32px;
+      height: 100%;
+      position: relative;
+      transition: all 0.4s ease;
+    }
+
+    .contact-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #fbbf24, #15803d, #0ea5e9);
+      opacity: 0.8;
+    }
+
+    .contact-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 40px rgba(21, 128, 61, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
+      border-color: rgba(21, 128, 61, 0.18);
+    }
+
+    .contact-card h3,
+    .contact-card h4 {
+      color: var(--scrap-green-dark);
+      font-weight: 800;
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .contact-card p {
+      color: #64748b;
+      line-height: 1.75;
+      margin-bottom: 0;
+    }
+
+    .contact-highlight {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--scrap-orange-soft);
+      color: #9a6700;
+      font-weight: 800;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    .contact-list {
+      list-style: none;
+      margin: 24px 0 0;
+      padding: 0;
+      display: grid;
+      gap: 16px;
+    }
+
+    .contact-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 16px 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #ffffff 0%, #f9fdfb 100%);
+      border: 1px solid rgba(21, 128, 61, 0.1);
+    }
+
+    .contact-list i,
+    .contact-mini-card .icon,
+    .contact-map-box .icon-badge {
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(21, 128, 61, 0.12), rgba(15, 165, 233, 0.08));
+      color: var(--scrap-green);
+      font-size: 20px;
+      border: 1px solid rgba(21, 128, 61, 0.14);
+      box-shadow: 0 4px 12px rgba(21, 128, 61, 0.08);
+    }
+
+    .contact-list strong,
+    .contact-mini-card h4 {
+      display: block;
+      color: var(--scrap-green-dark);
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .contact-list a {
+      color: #4b6359;
+    }
+
+    .contact-mini-card {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .contact-mini-card p {
+      font-size: 14px;
+    }
+
+    .contact-form-card .lead {
+      margin-bottom: 24px;
+      color: #5b6f67;
+    }
+
+    .contact-form-card .form-control,
+    .contact-form-card .form-select {
+      border-radius: 16px;
+      padding: 14px 16px;
+      border: 1px solid rgba(21, 128, 61, 0.12);
+      box-shadow: none;
+      background: #fff;
+      color: #344e41;
+    }
+
+    .contact-form-card .form-control:focus,
+    .contact-form-card .form-select:focus {
+      border-color: rgba(21, 128, 61, 0.38);
+      box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.08);
+    }
+
+    .php-email-form button,
+    .scrap-btn {
+      background: var(--scrap-green);
+      border: 0;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: 0.3s ease;
+    }
+
+    .php-email-form button:hover,
+    .scrap-btn:hover {
+      background: var(--scrap-green-dark);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(21, 128, 61, 0.18);
+    }
+
+    .contact-map-box {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .contact-map-head {
+      padding: 28px 32px 0;
+    }
+
+    .contact-map-embed {
+      position: relative;
+      padding: 0 20px 20px;
+    }
+
+    .contact-map-embed iframe {
+      width: 100%;
+      height: 360px;
+      border: 0;
+      border-radius: 20px;
+    }
+
+    .contact-hours {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .contact-hours .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: #f7fbf8;
+      border: 1px solid #edf2ee;
+      color: #486258;
+      font-weight: 600;
+    }
+
+    .contact-cta-bar {
+      margin-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .contact-cta-bar a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .contact-cta-primary {
+      background: linear-gradient(135deg, #fff3a6 0%, #ffd84d 35%, #f4b400 68%, #cb8f00 100%);
+      color: #173326;
+      box-shadow: 0 12px 24px rgba(244, 180, 0, 0.22);
+    }
+
+    .contact-cta-secondary {
+      background: #f0fdf4;
+      color: var(--scrap-green-dark);
+      border: 1px solid rgba(21, 128, 61, 0.14);
+    }
+
+    .footer {
+      background: #0f2f22;
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .footer:before {
+      background: #0f2f22;
+    }
+
+    .footer .footer-info h3,
+    .footer .footer-links h4,
+    .footer .copyright,
+    .footer .credits,
+    .footer .footer-links ul a {
+      color: #fff;
+    }
+
+    .footer .footer-links ul a:hover,
+    .footer .social-links a:hover {
+      color: var(--scrap-orange);
+    }
+
+    .footer .social-links a {
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .scroll-top {
+      background: var(--scrap-green);
+    }
+
+    .scroll-top:hover {
+      background: var(--scrap-orange);
+    }
+
+    .social-button {
+      position: fixed;
+      right: 22px;
+      bottom: 82px;
+      z-index: 996;
+      display: inline-grid;
+    }
+
+    .social-button-content {
+      display: grid;
+      gap: 14px;
+    }
+
+    .social-button a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .social-button i,
+    .social-button .social-button-zalo-text {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 700;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+    }
+
+    .social-button .social-button-zalo-text {
+      font-size: 11px;
+    }
+
+    .social-button span {
+      display: none;
+    }
+
+    .social-button .call-icon i,
+    .social-button .call-icon .social-button-zalo-text {
+      background: #ff4d4f;
+    }
+
+    .social-button .mes i,
+    .social-button .mes .social-button-zalo-text {
+      background: #1877f2;
+    }
+
+    .social-button .zalo i,
+    .social-button .zalo .social-button-zalo-text {
+      background: #2d9cff;
+    }
+
+    @keyframes ctaPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 14px 30px rgba(255, 191, 31, 0.34), 0 0 0 0 rgba(255, 226, 122, 0.1);
+      }
+
+      50% {
+        box-shadow: 0 20px 40px rgba(255, 191, 31, 0.44), 0 0 0 9px rgba(255, 226, 122, 0.08);
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .header-main-actions {
+        gap: 8px;
+      }
+
+      .header-main-actions .navbar {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .header-main-actions .navbar ul {
+        justify-content: flex-end;
+      }
+
+      .header-main-actions .navbar>ul>li {
+        padding: 10px 0 10px 14px;
+      }
+    }
+
+    @media (max-width: 1279px) {
+      .header-main-actions {
+        flex: 0 0 auto;
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 1199px) {
+
+      .home-wide-shell,
+      .contact-page-shell {
+        padding-left: 52px;
+        padding-right: 52px;
+      }
+    }
+
+    @media (max-width: 991px) {
+      .header-top-left {
+        gap: 12px 18px;
+      }
+
+      .contact-intro {
+        padding-top: 64px;
+      }
+
+      .contact-map-embed iframe {
+        height: 300px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-top-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .header-top-left {
+        width: 100%;
+        gap: 12px;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-top-item {
+        width: 100%;
+        padding: 2px 0;
+      }
+
+      .header-social {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .header .logo {
+        flex-basis: 270px;
+        width: min(100%, 270px);
+        max-width: 270px;
+        height: 82px;
+        overflow: visible;
+      }
+
+      .header .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transform: scaleX(2.54) scaleY(1.22);
+        transform-origin: left center;
+      }
+
+      .home-wide-shell,
+      .contact-page-shell {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .contact-page-section {
+        padding: 56px 0;
+      }
+
+      .contact-card {
+        padding: 24px 20px;
+      }
+
+      .contact-map-head {
+        padding: 24px 20px 0;
+      }
+
+      .contact-map-embed {
+        padding: 0 14px 14px;
+      }
+
+      .contact-map-embed iframe {
+        height: 260px;
+      }
+
+      .social-button {
+        right: 12px;
+        bottom: 76px;
+      }
+
+      .social-button-content {
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 575px) {
+      .contact-intro {
+        padding-top: 56px;
+      }
+
+      .contact-list li,
+      .contact-hours .item {
+        padding: 14px;
+      }
+
+      .contact-cta-bar {
+        flex-direction: column;
+      }
+
+      .social-button {
+        right: 10px;
+      }
+
+      .social-button-content {
+        gap: 10px;
+      }
+
+      .social-button i,
+      .social-button .social-button-zalo-text {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header id="header" class="header">
+    <div class="container-fluid home-wide-shell">
+      <div class="header-top-content">
+        <div class="header-top-left">
+          <div class="header-top-item">
+            <i class="bi bi-telephone-fill"></i>
+            <a href="tel:0909123456">Hotline: 0909 123 456</a>
+          </div>
+          <div class="header-top-item">
+            <i class="bi bi-envelope-fill"></i>
+            <a href="mailto:info@phelieuhoangdoanh.com">info@phelieuhoangdoanh.com</a>
+          </div>
+          <div class="header-top-item">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>Phục vụ TP.HCM, Bình Dương, Đồng Nai</span>
+          </div>
+        </div>
+        <div class="header-social">
+          <a href="#" title="Facebook" target="_blank"><i class="bi bi-facebook"></i></a>
+          <a href="#" title="Zalo" target="_blank"><i class="bi bi-chat-dots"></i></a>
+          <a href="#" title="YouTube" target="_blank"><i class="bi bi-youtube"></i></a>
+          <a href="#" title="Instagram" target="_blank"><i class="bi bi-instagram"></i></a>
+        </div>
+      </div>
+
+      <div class="header-main-bar">
+        <a href="index.html" class="logo d-flex align-items-center" aria-label="Trang chủ">
+          <img src="assets/img/logo01.png" alt="Logo Phế Liệu Hoàng Doanh">
+        </a>
+
+        <div class="header-main-actions">
+          <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+          <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+          <nav id="navbar" class="navbar">
+            <ul>
+              <li><a href="index.html">Trang chủ</a></li>
+              <li><a href="about.html">Giới thiệu</a></li>
+              <li class="dropdown">
+                <a href="services.html">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                <ul>
+                  <li><a href="services.html">Khảo sát tận nơi</a></li>
+                  <li><a href="services.html">Thu mua số lượng lớn</a></li>
+                  <li><a href="services.html">Bốc xếp & vận chuyển</a></li>
+                  <li><a href="services.html">Dọn kho thanh lý</a></li>
+                  <li><a href="services.html">Thu gom định kỳ</a></li>
+                </ul>
+              </li>
+              <li><a href="projects.html">Mặt hàng</a></li>
+              <li><a href="blog.html">Tin tức</a></li>
+              <li><a href="contact.html" class="active">Liên hệ</a></li>
+            </ul>
+          </nav>
+          <a href="#contact-form" class="header-cta d-none d-lg-inline-flex">
+            <i class="bi bi-lightning-charge-fill"></i>
+            Báo giá ngay
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="contact-page-section contact-intro">
+      <div class="container-fluid contact-page-shell" data-aos="fade-up">
+        <div class="section-header">
+          <h2>Kết nối nhanh với Phế Liệu Hoàng Doanh</h2>
+          <p>
+            Chúng tôi nhận khảo sát tận nơi, hỗ trợ báo giá nhanh cho kho xưởng, công trình, cửa hàng và hộ gia đình có nhu cầu thanh lý phế liệu.
+          </p>
+        </div>
+
+        <div class="row g-4 align-items-stretch">
+          <div class="col-lg-5">
+            <div class="contact-card contact-company-card">
+              <span class="contact-highlight"><i class="bi bi-stars"></i> Hỗ trợ phản hồi nhanh trong ngày</span>
+              <h3>Thông tin liên hệ</h3>
+              <p>
+                Phế Liệu Hoàng Doanh chuyên thu mua phế liệu giá cao tại TP.HCM, Bình Dương, Đồng Nai với quy trình khảo sát rõ ràng, thanh toán minh bạch và hỗ trợ bốc xếp tận nơi.
+              </p>
+
+              <ul class="contact-list">
+                <li>
+                  <i class="bi bi-geo-alt-fill"></i>
+                  <div>
+                    <strong>Địa chỉ</strong>
+                    <span>88 Quốc lộ 1A, P. An Phú Đông, Quận 12, TP. Hồ Chí Minh</span>
+                  </div>
+                </li>
+                <li>
+                  <i class="bi bi-telephone-fill"></i>
+                  <div>
+                    <strong>Hotline</strong>
+                    <a href="tel:0909123456">0909 123 456</a>
+                  </div>
+                </li>
+                <li>
+                  <i class="bi bi-envelope-fill"></i>
+                  <div>
+                    <strong>Email</strong>
+                    <a href="mailto:info@phelieuhoangdoanh.com">info@phelieuhoangdoanh.com</a>
+                  </div>
+                </li>
+                <li>
+                  <i class="bi bi-truck"></i>
+                  <div>
+                    <strong>Khu vực phục vụ</strong>
+                    <span>TP.HCM, Bình Dương, Đồng Nai, Long An, Tây Ninh</span>
+                  </div>
+                </li>
+              </ul>
+
+              <div class="contact-cta-bar">
+                <a href="tel:0909123456" class="contact-cta-primary"><i class="bi bi-telephone-outbound-fill"></i> Gọi ngay</a>
+                <a href="#contact-form" class="contact-cta-secondary"><i class="bi bi-chat-dots-fill"></i> Gửi yêu cầu</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="contact-card contact-form-card" id="contact-form">
+              <h3>Để lại yêu cầu thu mua</h3>
+              <p class="lead">
+                Điền thông tin bên dưới để chúng tôi chủ động liên hệ, tư vấn phương án thu gom và báo giá phù hợp với số lượng hàng của bạn.
+              </p>
+
+              <form action="forms/contact.php" method="post" class="php-email-form">
+                <div class="row gy-3">
+                  <div class="col-md-6">
+                    <input type="text" name="name" class="form-control" placeholder="Họ và tên" required>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="text" name="phone" class="form-control" placeholder="Số điện thoại" required>
+                  </div>
+                  <div class="col-md-6">
+                    <input type="email" class="form-control" name="email" placeholder="Email">
+                  </div>
+                  <div class="col-md-6">
+                    <select class="form-select" name="service">
+                      <option selected>Chọn nhu cầu</option>
+                      <option>Thu mua phế liệu tận nơi</option>
+                      <option>Khảo sát kho xưởng</option>
+                      <option>Dọn kho thanh lý</option>
+                      <option>Thu gom định kỳ</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <input type="text" name="subject" class="form-control" placeholder="Địa chỉ hoặc khu vực cần thu mua">
+                  </div>
+                  <div class="col-12">
+                    <textarea class="form-control" name="message" rows="6"
+                      placeholder="Mô tả loại hàng, số lượng ước tính, thời gian cần thu mua..."></textarea>
+                  </div>
+                  <div class="col-12 text-center">
+                    <div class="loading">Đang gửi</div>
+                    <div class="error-message"></div>
+                    <div class="sent-message">Thông tin của bạn đã được gửi. Chúng tôi sẽ liên hệ lại sớm nhất.</div>
+
+                    <button type="submit">Gửi yêu cầu ngay</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-page-section pt-0">
+      <div class="container-fluid contact-page-shell" data-aos="fade-up" data-aos-delay="100">
+        <div class="row g-4 align-items-stretch">
+          <div class="col-lg-7">
+            <div class="contact-card contact-map-box h-100">
+              <div class="contact-map-head">
+                <span class="contact-highlight"><i class="bi bi-pin-map-fill"></i> Khảo sát và thu mua tận nơi</span>
+                <h3>Bản đồ khu vực liên hệ</h3>
+                <p>Đội ngũ của chúng tôi linh hoạt di chuyển để khảo sát nhanh tại nội thành và các khu vực lân cận.</p>
+              </div>
+              <div class="contact-map-embed">
+                <iframe
+                  src="https://maps.google.com/maps?q=88%20Qu%E1%BB%91c%20l%E1%BB%99%201A%2C%20Qu%E1%BA%ADn%2012%2C%20TP.%20H%E1%BB%93%20Ch%C3%AD%20Minh&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                  loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="row g-4 h-100">
+              <div class="col-12">
+                <div class="contact-card contact-mini-card h-100">
+                  <span class="icon"><i class="bi bi-clock-history"></i></span>
+                  <div>
+                    <h4>Thời gian làm việc</h4>
+                    <p>Hỗ trợ tiếp nhận yêu cầu linh hoạt và ưu tiên khảo sát nhanh cho đơn hàng số lượng lớn.</p>
+                    <div class="contact-hours">
+                      <div class="item"><span>Thứ 2 - Thứ 7</span><strong>07:00 - 20:00</strong></div>
+                      <div class="item"><span>Chủ nhật</span><strong>08:00 - 17:00</strong></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="contact-card contact-mini-card h-100">
+                  <span class="icon"><i class="bi bi-shield-check"></i></span>
+                  <div>
+                    <h4>Cam kết dịch vụ</h4>
+                    <p>Khảo sát đúng hẹn, báo giá minh bạch, cân đo rõ ràng và thanh toán nhanh ngay sau khi hoàn tất thu mua.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="footer-content position-relative">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-4 col-md-6">
+            <div class="footer-info">
+              <h3>Phế Liệu Hoàng Doanh</h3>
+              <p>
+                88 Quốc lộ 1A, P. An Phú Đông <br>
+                Quận 12, TP. Hồ Chí Minh<br><br>
+                <strong>Hotline:</strong> 0909 123 456<br>
+                <strong>Email:</strong> info@phelieuhoangdoanh.com<br>
+              </p>
+              <div class="social-links d-flex mt-3">
+                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-youtube"></i></a>
+                <a href="tel:0909123456" class="d-flex align-items-center justify-content-center"><i class="bi bi-telephone"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Liên kết nhanh</h4>
+           <ul class="fs-4">
+            <li><a href="index.html">Trang chủ</a></li>
+            <li><a href="about.html">Giới thiệu</a></li>
+            <li><a href="services.html">Dịch vụ</a></li>
+            <li><a href="projects.html">Mặt hàng</a></li>
+            <li><a href="contact.html">Liên hệ</a></li>
+          </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Mặt hàng</h4>
+            <ul>
+              <li><a href="projects.html">Sắt thép phế liệu</a></li>
+              <li><a href="projects.html">Đồng, nhôm, inox</a></li>
+              <li><a href="projects.html">Giấy carton</a></li>
+              <li><a href="projects.html">Nhựa công nghiệp</a></li>
+              <li><a href="projects.html">Máy móc cũ</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Dịch vụ</h4>
+            <ul>
+              <li><a href="services.html">Khảo sát tận nơi</a></li>
+              <li><a href="services.html">Thu mua số lượng lớn</a></li>
+              <li><a href="services.html">Bốc xếp, vận chuyển</a></li>
+              <li><a href="services.html">Dọn kho thanh lý</a></li>
+              <li><a href="services.html">Thu gom định kỳ</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Khu vực phục vụ</h4>
+            <ul>
+              <li><a href="contact.html">TP. Hồ Chí Minh</a></li>
+              <li><a href="contact.html">Bình Dương</a></li>
+              <li><a href="contact.html">Đồng Nai</a></li>
+              <li><a href="contact.html">Long An</a></li>
+              <li><a href="contact.html">Tây Ninh</a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-legal text-center position-relative">
+      <div class="container">
+        <div class="copyright">
+          &copy; Copyright <strong><span>Phế Liệu Hoàng Doanh</span></strong>. All Rights Reserved
+        </div>
+        <div class="credits">
+          Giao diện trang liên hệ đã được đồng bộ theo phong cách của trang chủ.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div class="social-button is-open">
+    <div class="social-button-content">
+      <a href="tel:0909123456" class="call-icon" rel="nofollow" aria-label="Hotline 0909 123 456">
+        <i class="fas fa-phone-alt" aria-hidden="true"></i>
+        <span>Hotline: 0909 123 456</span>
+      </a>
+      <a href="#" class="mes" aria-label="Nhắn tin Facebook">
+        <i class="fab fa-facebook-messenger" aria-hidden="true"></i>
+        <span>Nhắn tin Facebook</span>
+      </a>
+      <a href="#" class="zalo" aria-label="Zalo 0909 123 456">
+        <span class="social-button-zalo-text">Zalo</span>
+        <span>Zalo: 0909 123 456</span>
+      </a>
+    </div>
+  </div>
+
+  <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <div id="preloader"></div>
+
+  <script>
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
+    function resetContactScrollPosition() {
+      if (!window.location.hash) {
+        window.scrollTo(0, 0);
+      }
+    }
+
+    window.addEventListener('load', resetContactScrollPosition);
+    window.addEventListener('pageshow', resetContactScrollPosition);
+  </script>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
