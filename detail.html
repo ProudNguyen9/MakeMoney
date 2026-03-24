@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Chi tiết mặt hàng - Phế Liệu Thành Phát</title>
+  <meta content="Chi tiết mặt hàng thu mua phế liệu tại Phế Liệu Thành Phát với thông tin về đồng đỏ, dây cáp điện, mô tơ, cách phân loại, yếu tố định giá và quy trình thu gom tận nơi." name="description">
+  <meta content="chi tiết mặt hàng phế liệu, thu mua đồng đỏ, thu mua dây cáp điện, thu mua mô tơ, định giá phế liệu" name="keywords">
+
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Roboto:300,400,500,700&display=swap" rel="stylesheet">
+
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --scrap-green: #1f5f43;
+      --scrap-green-dark: #123c2a;
+      --scrap-green-soft: #e9f5ef;
+      --scrap-orange: #f39c12;
+      --scrap-orange-soft: #fff2de;
+      --scrap-slate: #20343f;
+      --scrap-text: #53656e;
+      --scrap-border: rgba(31, 95, 67, 0.12);
+      --scrap-shadow: 0 18px 42px rgba(18, 60, 42, 0.08);
+    }
+
+    body {
+      color: var(--scrap-text);
+    }
+
+    .header .logo h1,
+    .footer-info h3,
+    .detail-card h2,
+    .section-header h2,
+    .info-panel h4,
+    .note-card h4,
+    .side-card h4,
+    .contact-card h4,
+    .cta-box h3 {
+      color: var(--scrap-slate);
+    }
+
+    .detail-card,
+    .info-panel,
+    .note-card,
+    .side-card,
+    .contact-card,
+    .cta-box {
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .detail-card:hover,
+    .info-panel:hover,
+    .note-card:hover,
+    .side-card:hover,
+    .contact-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 22px 50px rgba(18, 60, 42, 0.12);
+    }
+
+    .btn-main,
+    .btn-alt {
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .btn-main:hover,
+    .btn-alt:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(18, 60, 42, 0.16);
+    }
+
+    .header .logo h1 span,
+    .section-header h2::after,
+    .meta-list i,
+    .check-list i,
+    .info-panel i,
+    .note-card i,
+    .contact-card i,
+    .tag-item,
+    .social-links a:hover,
+    .side-card .tag:hover {
+      color: var(--scrap-orange);
+    }
+
+    .breadcrumbs {
+      min-height: 320px;
+      position: relative;
+      background:
+        linear-gradient(135deg, rgba(18, 60, 42, 0.94), rgba(31, 95, 67, 0.9)),
+        radial-gradient(circle at top right, rgba(243, 156, 18, 0.18), transparent 30%);
+    }
+
+    .breadcrumbs:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+      background-size: 34px 34px;
+      opacity: .45;
+    }
+
+    .breadcrumbs .container {
+      z-index: 2;
+    }
+
+    .breadcrumbs h2,
+    .breadcrumbs p,
+    .breadcrumbs ol,
+    .breadcrumbs ol a {
+      color: #fff;
+    }
+
+    .breadcrumbs p {
+      max-width: 760px;
+      margin: 14px auto 0;
+      line-height: 1.75;
+    }
+
+    .section-header {
+      position: relative;
+      padding: 30px 34px;
+      margin-bottom: 30px;
+      border-radius: 28px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(243, 156, 18, 0.14), transparent 26%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(241, 248, 244, 0.96));
+      border: 1px solid rgba(31, 95, 67, 0.08);
+      box-shadow: 0 22px 45px rgba(18, 60, 42, 0.08);
+    }
+
+    .section-header:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(31, 95, 67, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 95, 67, 0.03) 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: .55;
+      pointer-events: none;
+    }
+
+    .section-header > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .detail-section,
+    .feature-section,
+    .tips-section,
+    .cta-section {
+      padding: 80px 0;
+    }
+
+    .feature-section,
+    .cta-section {
+      background: #f7faf8;
+    }
+
+    .detail-card,
+    .info-panel,
+    .note-card,
+    .side-card,
+    .contact-card,
+    .cta-box {
+      background: #fff;
+      border: 1px solid var(--scrap-border);
+      border-radius: 22px;
+      box-shadow: var(--scrap-shadow);
+    }
+
+    .detail-card,
+    .cta-box,
+    .side-card {
+      overflow: hidden;
+    }
+
+    .hero-slider {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(243, 156, 18, 0.14), transparent 28%),
+        linear-gradient(180deg, #f8fbf9, #edf7f1);
+    }
+
+    .hero-slider:after {
+      content: "";
+      position: absolute;
+      inset: auto auto -80px -60px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(31, 95, 67, 0.16), transparent 68%);
+      filter: blur(6px);
+      animation: floatGlow 8s ease-in-out infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-slider:before {
+      content: "";
+      position: absolute;
+      inset: 14px;
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .hero-slide {
+      position: relative;
+      padding: 26px;
+      background:
+        radial-gradient(circle at bottom left, rgba(31, 95, 67, 0.08), transparent 26%),
+        linear-gradient(180deg, #fdfefe, #edf7f1);
+      border-bottom: 1px solid rgba(31, 95, 67, 0.08);
+      animation: floatCard 7s ease-in-out infinite;
+    }
+
+    .hero-slide:after {
+      content: "";
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(243, 156, 18, 0.2), transparent 68%);
+    }
+
+    .detail-body,
+    .side-card,
+    .info-panel,
+    .note-card,
+    .contact-card,
+    .cta-box {
+      padding: 30px;
+    }
+
+    .detail-body {
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(243, 156, 18, 0.08), transparent 20%),
+        linear-gradient(180deg, #ffffff, #fbfefd);
+    }
+
+    .detail-card h2 {
+      font-size: 42px;
+      line-height: 1.18;
+      margin-bottom: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .article-hero {
+      position: relative;
+      padding: 32px;
+      margin-bottom: 28px;
+      border-radius: 28px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(243, 156, 18, 0.24), transparent 30%),
+        linear-gradient(135deg, rgba(18, 60, 42, 0.98), rgba(31, 95, 67, 0.94));
+      box-shadow: 0 26px 50px rgba(18, 60, 42, 0.18);
+    }
+
+    .article-hero:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: .35;
+    }
+
+    .article-hero > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .article-hero h2,
+    .article-hero p,
+    .article-hero .meta-list,
+    .article-hero .meta-list i {
+      color: #fff;
+    }
+
+    .article-hero .meta-list {
+      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    .article-lead {
+      font-size: 17px;
+      line-height: 1.95;
+      color: rgba(255, 255, 255, 0.88);
+      max-width: 92%;
+    }
+
+    .meta-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 24px;
+      color: #70828b;
+      font-size: 14px;
+    }
+
+    .meta-list span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .detail-body p,
+    .detail-body li,
+    .info-panel p,
+    .note-card p,
+    .side-card p,
+    .contact-card p,
+    .cta-box p {
+      line-height: 1.85;
+      margin-bottom: 16px;
+    }
+
+    .detail-body p:last-child,
+    .info-panel p:last-child,
+    .note-card p:last-child,
+    .side-card p:last-child,
+    .contact-card p:last-child,
+    .cta-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-body h3 {
+      color: var(--scrap-slate);
+      font-size: 28px;
+      margin: 34px 0 18px;
+      padding-left: 18px;
+      position: relative;
+    }
+
+    .detail-body h3:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 6px;
+      bottom: 6px;
+      width: 5px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--scrap-orange), var(--scrap-green));
+      box-shadow: 0 8px 18px rgba(243, 156, 18, 0.2);
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin: 28px 0;
+    }
+
+    .overview-card {
+      position: relative;
+      padding: 24px;
+      border-radius: 22px;
+      border: 1px solid rgba(31, 95, 67, 0.1);
+      background: linear-gradient(180deg, #ffffff, #f8fbf9);
+      box-shadow: 0 18px 34px rgba(18, 60, 42, 0.07);
+      overflow: hidden;
+    }
+
+    .overview-card:before {
+      content: "";
+      position: absolute;
+      top: -40px;
+      right: -20px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(243, 156, 18, 0.16), transparent 65%);
+    }
+
+    .overview-card span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: var(--scrap-green);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .overview-card h4 {
+      color: var(--scrap-slate);
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .overview-card p {
+      margin-bottom: 0;
+      line-height: 1.8;
+    }
+
+    .check-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 18px;
+    }
+
+    .check-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .check-list i {
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    .stats-grid,
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .stat-box,
+    .contact-card {
+      position: relative;
+      border-radius: 22px;
+      padding: 22px;
+      border: 1px solid rgba(31, 95, 67, 0.08);
+      background: linear-gradient(180deg, #ffffff, #f7fbf9);
+      box-shadow: 0 16px 32px rgba(18, 60, 42, 0.06);
+      overflow: hidden;
+      color: var(--scrap-text);
+    }
+
+    .stat-box:before,
+    .contact-card:before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--scrap-orange), rgba(31, 95, 67, 0.8));
+    }
+
+    .stat-box strong,
+    .contact-card strong {
+      display: block;
+      color: var(--scrap-green-dark);
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .contact-card p {
+      color: var(--scrap-text);
+      margin-bottom: 0;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(31, 95, 67, 0.15);
+    }
+
+    .tag-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--scrap-orange-soft);
+      font-size: 13px;
+      font-weight: 700;
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .tag-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(18, 60, 42, 0.12);
+    }
+
+    .side-card .tag {
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .side-card .tag:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(18, 60, 42, 0.12);
+    }
+
+    .portfolio-info-card {
+      padding: 0;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, #ffffff, #f7fbf9);
+    }
+
+    .portfolio-info-card h4 {
+      padding: 30px 30px 0;
+      margin-bottom: 20px;
+    }
+
+    .portfolio-info-card ul {
+      list-style: none;
+      padding: 0 30px 30px;
+      margin: 0;
+    }
+
+    .portfolio-info-card li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px dashed rgba(31, 95, 67, 0.12);
+    }
+
+    .portfolio-info-card li:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .portfolio-info-card strong {
+      color: var(--scrap-slate);
+    }
+
+    .portfolio-info-card .btn-main {
+      margin: 0 30px 30px;
+      display: inline-flex;
+    }
+
+    .info-panel,
+    .note-card,
+    .contact-card {
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 250, 246, 0.96));
+      box-shadow: 0 20px 38px rgba(18, 60, 42, 0.08);
+    }
+
+    .info-panel:before,
+    .note-card:before {
+      content: "";
+      position: absolute;
+      top: -70px;
+      right: -50px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(243, 156, 18, 0.12), transparent 70%);
+    }
+
+    .info-panel i,
+    .note-card i,
+    .contact-card i {
+      font-size: 32px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    .side-card {
+      margin-bottom: 24px;
+      position: relative;
+      background:
+        linear-gradient(180deg, #ffffff, #f8fbfa);
+    }
+
+    .side-card:before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, rgba(31, 95, 67, 0.9), rgba(243, 156, 18, 0.9));
+    }
+
+    .side-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .side-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .side-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px dashed rgba(31, 95, 67, 0.12);
+    }
+
+    .side-list li:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .side-list a {
+      color: var(--scrap-slate);
+      font-weight: 600;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .side-card .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: var(--scrap-green-soft);
+      color: var(--scrap-green-dark);
+      font-size: 13px;
+      font-weight: 700;
+      transition: .3s;
+    }
+
+    .swiper-button-next,
+    .swiper-button-prev {
+      color: var(--scrap-green);
+    }
+
+    .swiper-pagination-bullet-active {
+      background: var(--scrap-orange);
+    }
+
+    .detail-card,
+    .info-panel,
+    .note-card,
+    .side-card,
+    .contact-card,
+    .cta-box,
+    .overview-card,
+    .stat-box {
+      position: relative;
+      isolation: isolate;
+    }
+
+    .detail-card:before,
+    .info-panel:before,
+    .note-card:before,
+    .side-card:before,
+    .contact-card:before,
+    .cta-box:before,
+    .overview-card:after,
+    .stat-box:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.1) 35%, rgba(255, 255, 255, 0.34) 50%, transparent 65%);
+      transform: translateX(-130%);
+      transition: transform .9s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .detail-card:hover:before,
+    .info-panel:hover:before,
+    .note-card:hover:before,
+    .side-card:hover:before,
+    .contact-card:hover:before,
+    .cta-box:hover:before,
+    .overview-card:hover:after,
+    .stat-box:hover:before {
+      transform: translateX(130%);
+    }
+
+    .detail-body > *,
+    .info-panel > *,
+    .note-card > *,
+    .side-card > *,
+    .contact-card > *,
+    .cta-box > *,
+    .overview-card > *,
+    .stat-box > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .float-in {
+      opacity: 0;
+      transform: translateY(26px);
+      animation: softReveal .8s cubic-bezier(.22, 1, .36, 1) forwards;
+    }
+
+    .float-in.delay-1 {
+      animation-delay: .08s;
+    }
+
+    .float-in.delay-2 {
+      animation-delay: .16s;
+    }
+
+    .float-in.delay-3 {
+      animation-delay: .24s;
+    }
+
+    .float-in.delay-4 {
+      animation-delay: .32s;
+    }
+
+    @keyframes floatCard {
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes floatGlow {
+      0%,
+      100% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+
+      50% {
+        transform: translate3d(16px, -14px, 0) scale(1.06);
+      }
+    }
+
+    @keyframes softReveal {
+      0% {
+        opacity: 0;
+        transform: translateY(26px) scale(.985);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .cta-box {
+      padding: 38px;
+      background: linear-gradient(135deg, rgba(18, 60, 42, 0.98), rgba(31, 95, 67, 0.96));
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box:before {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      right: -40px;
+      top: -50px;
+      background: rgba(243, 156, 18, 0.14);
+      border-radius: 50%;
+    }
+
+    .cta-box>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-box h3,
+    .cta-box p {
+      color: #fff;
+    }
+
+    .cta-box p {
+      color: rgba(255, 255, 255, 0.86);
+      margin-bottom: 24px;
+    }
+
+    .cta-box .contact-card,
+    .cta-box .contact-card strong,
+    .cta-box .contact-card p {
+      color: var(--scrap-slate);
+    }
+
+    .cta-box .contact-card p {
+      margin-bottom: 0;
+    }
+
+    .cta-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .btn-main,
+    .btn-alt {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 24px;
+      border-radius: 999px;
+      font-weight: 700;
+      transition: .3s;
+      border: none;
+    }
+
+    .btn-main {
+      background: var(--scrap-orange);
+      color: #fff;
+    }
+
+    .btn-main:hover {
+      background: #dd8b08;
+      color: #fff;
+    }
+
+    .btn-alt {
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-alt:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .footer {
+      background: linear-gradient(180deg, #163126, #10241d);
+    }
+
+    .footer a:hover {
+      color: #fff;
+    }
+
+    @media (max-width: 991px) {
+      .detail-section,
+      .feature-section,
+      .tips-section,
+      .cta-section {
+        padding: 60px 0;
+      }
+
+      .breadcrumbs {
+        min-height: 280px;
+      }
+
+      .section-header,
+      .detail-body,
+      .side-card,
+      .info-panel,
+      .note-card,
+      .contact-card,
+      .cta-box {
+        padding: 24px;
+      }
+
+      .detail-card h2 {
+        font-size: 32px;
+      }
+
+      .article-hero {
+        padding: 26px;
+        border-radius: 24px;
+      }
+
+      .article-lead {
+        max-width: 100%;
+      }
+
+      .swiper-button-next,
+      .swiper-button-prev {
+        width: 42px;
+        height: 42px;
+        margin-top: -21px;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 50%;
+        box-shadow: 0 10px 24px rgba(18, 60, 42, 0.12);
+      }
+
+      .swiper-button-next:after,
+      .swiper-button-prev:after {
+        font-size: 18px;
+        font-weight: 800;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .breadcrumbs {
+        min-height: 240px;
+        padding: 100px 0 48px;
+      }
+
+      .breadcrumbs p {
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .section-header {
+        padding: 22px 20px;
+        border-radius: 22px;
+        margin-bottom: 22px;
+      }
+
+      .hero-slide {
+        padding: 14px;
+      }
+
+      .hero-slide svg {
+        min-height: 220px;
+      }
+
+      .detail-body {
+        padding: 22px 18px;
+      }
+
+      .detail-card h2 {
+        font-size: 28px;
+        line-height: 1.25;
+      }
+
+      .detail-body h3 {
+        font-size: 22px;
+        margin: 28px 0 14px;
+      }
+
+      .meta-list {
+        gap: 10px;
+        font-size: 13px;
+      }
+
+      .meta-list span {
+        width: 100%;
+      }
+
+      .overview-grid,
+      .stats-grid,
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .overview-card,
+      .stat-box,
+      .info-panel,
+      .note-card,
+      .side-card,
+      .contact-card {
+        padding: 20px;
+        border-radius: 18px;
+      }
+
+      .side-list li {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .side-list li span {
+        margin-top: 4px;
+      }
+
+      .cta-box {
+        padding: 24px 20px;
+        border-radius: 22px;
+      }
+
+      .cta-actions {
+        flex-direction: column;
+      }
+
+      .btn-main,
+      .btn-alt {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .swiper-button-next,
+      .swiper-button-prev {
+        display: none;
+      }
+    }
+
+    @media (max-width: 575px) {
+      .detail-card,
+      .info-panel,
+      .note-card,
+      .side-card,
+      .contact-card,
+      .cta-box {
+        border-radius: 18px;
+      }
+
+      .hero-kicker {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+        padding: 9px 14px;
+      }
+
+      .article-hero {
+        padding: 22px 18px;
+        border-radius: 20px;
+        margin-bottom: 22px;
+      }
+
+      .article-lead {
+        font-size: 15px;
+        line-height: 1.8;
+      }
+
+      .tag-list,
+      .tag-cloud {
+        gap: 8px;
+      }
+
+      .tag-item,
+      .side-card .tag {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .float-in {
+        animation-duration: .65s;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header id="header" class="header d-flex align-items-center">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+      <a href="index.html" class="logo d-flex align-items-center">
+        <h1>Phế Liệu Thành Phát<span>.</span></h1>
+      </a>
+
+      <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+      <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a href="index.html">Trang chủ</a></li>
+          <li><a href="about.html">Giới thiệu</a></li>
+          <li class="dropdown">
+            <a href="services.html">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+            <ul>
+              <li><a href="services.html">Khảo sát tận nơi</a></li>
+              <li><a href="services.html">Thu mua số lượng lớn</a></li>
+              <li><a href="services.html">Bốc xếp & vận chuyển</a></li>
+              <li><a href="services.html">Dọn kho thanh lý</a></li>
+              <li><a href="services.html">Thu gom định kỳ</a></li>
+            </ul>
+          </li>
+          <li><a href="projects.html" class="active">Mặt hàng</a></li>
+          <li><a href="blog.html">Tin tức</a></li>
+          <li><a href="contact.html">Liên hệ</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <div class="breadcrumbs d-flex align-items-center">
+      <div class="container position-relative d-flex flex-column align-items-center text-center" data-aos="fade">
+        <h2>Chi tiết danh mục thu mua</h2>
+        <p>Một bố cục dùng chung để trình bày cả mặt hàng thu mua chính lẫn danh mục thu mua thực tế, giúp nội dung rõ ràng hơn, đồng nhất hơn và dễ mở rộng khi cập nhật thêm nhóm hàng mới.</p>
+        <ol>
+          <li><a href="index.html">Trang chủ</a></li>
+          <li><a href="projects.html">Mặt hàng</a></li>
+          <li>Chi tiết danh mục</li>
+        </ol>
+      </div>
+    </div>
+
+    <section class="detail-section">
+      <div class="container" data-aos="fade-up">
+        <div class="row gy-5">
+          <div class="col-lg-8" data-aos="fade-right" data-aos-delay="80">
+            <article class="detail-card">
+              <div class="hero-slider">
+                <div class="slides-1 swiper portfolio-details-slider">
+                  <div class="swiper-wrapper align-items-center">
+                    <div class="swiper-slide hero-slide">
+                      <svg viewBox="0 0 820 380" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Đồng đỏ và dây cáp điện">
+                        <rect width="820" height="380" rx="28" fill="#edf7f1" />
+                        <circle cx="126" cy="82" r="42" fill="#fff2de" />
+                        <circle cx="688" cy="80" r="56" fill="#dcecdf" />
+                        <circle cx="278" cy="208" r="88" fill="#d99a48" />
+                        <circle cx="278" cy="208" r="48" fill="#edd8b0" />
+                        <circle cx="466" cy="180" r="62" fill="#bf7b32" />
+                        <circle cx="466" cy="180" r="32" fill="#efd9ae" />
+                        <path d="M120 274 C204 198 288 306 372 220 S520 196 642 276" stroke="#a86721" stroke-width="26" fill="none" stroke-linecap="round" />
+                        <path d="M144 302 C236 228 304 320 406 250 S544 228 676 302" stroke="#cf8a34" stroke-width="16" fill="none" stroke-linecap="round" />
+                      </svg>
+                    </div>
+                    <div class="swiper-slide hero-slide">
+                      <svg viewBox="0 0 820 380" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mô tơ đồng và linh kiện điện">
+                        <rect width="820" height="380" rx="28" fill="#edf7f1" />
+                        <circle cx="128" cy="84" r="40" fill="#fff2de" />
+                        <circle cx="684" cy="82" r="54" fill="#dcecdf" />
+                        <rect x="186" y="144" width="246" height="126" rx="20" fill="#1f5f43" />
+                        <rect x="236" y="170" width="54" height="54" rx="10" fill="#dceee6" />
+                        <rect x="306" y="172" width="74" height="16" rx="8" fill="#dceee6" />
+                        <rect x="306" y="198" width="58" height="16" rx="8" fill="#dceee6" />
+                        <rect x="470" y="126" width="132" height="144" rx="18" fill="#2d5d49" />
+                        <circle cx="536" cy="198" r="42" fill="#f39c12" />
+                        <circle cx="536" cy="198" r="18" fill="#fff2de" />
+                        <rect x="280" y="112" width="72" height="24" rx="12" fill="#f6c464" />
+                      </svg>
+                    </div>
+                    <div class="swiper-slide hero-slide">
+                      <svg viewBox="0 0 820 380" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cân hàng phế liệu">
+                        <rect width="820" height="380" rx="28" fill="#edf7f1" />
+                        <circle cx="126" cy="82" r="42" fill="#fff2de" />
+                        <circle cx="680" cy="74" r="56" fill="#dcecdf" />
+                        <rect x="190" y="262" width="420" height="16" rx="8" fill="#c9d9d1" />
+                        <rect x="228" y="146" width="82" height="116" rx="18" fill="#ffffff" />
+                        <rect x="250" y="174" width="38" height="12" rx="6" fill="#1f5f43" />
+                        <rect x="250" y="198" width="26" height="12" rx="6" fill="#1f5f43" />
+                        <rect x="368" y="168" width="218" height="66" rx="18" fill="#2a5b47" />
+                        <path d="M412 202 h130" stroke="#dcefe6" stroke-width="12" stroke-linecap="round" />
+                        <text x="474" y="154" text-anchor="middle" font-size="34" font-weight="800" fill="#f39c12">KG</text>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="swiper-pagination"></div>
+                </div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+              </div>
+
+              <div class="detail-body">
+                <h2>Một trang chi tiết dùng chung cho mặt hàng chính và danh mục thực tế</h2>
+
+                <div class="meta-list">
+                  <span><i class="bi bi-grid-1x2-fill"></i> Dùng chung một bố cục</span>
+                  <span><i class="bi bi-list-check"></i> Dễ phân nhóm nội dung</span>
+                  <span><i class="bi bi-truck-front-fill"></i> Phù hợp mở rộng nhiều loại hàng</span>
+                </div>
+
+                <p>Thay vì tách riêng hai kiểu nội dung gần giống nhau, trang này được tổ chức lại để có thể dùng chung cho cả “Mặt hàng thu mua chính” và “Danh mục thu mua thực tế”. Cách trình bày này giúp khách xem hiểu nhanh đâu là nhóm nổi bật, đâu là các loại hàng phát sinh thực tế và đâu là các thông tin cần thiết để báo giá.</p>
+
+                <p>Với một cấu trúc rõ ràng, mỗi danh mục có thể chỉ cần thay ảnh minh họa, tiêu đề chính, mô tả ngắn và các nhóm thông tin phụ bên phải mà vẫn giữ được tính thống nhất trên toàn website. Điều này cũng giúp việc cập nhật nội dung sau này nhanh hơn và gọn hơn.</p>
+
+                <div class="overview-grid">
+                  <div class="overview-card">
+                    <span><i class="bi bi-star-fill"></i> Mặt hàng thu mua chính</span>
+                    <h4>Nhóm hàng nổi bật, xuất hiện thường xuyên</h4>
+                    <p>Phù hợp để giới thiệu các nhóm chủ lực như đồng, nhôm, inox, sắt thép hoặc máy móc cũ với mô tả rõ về giá trị, cách phân loại và lợi thế thu mua.</p>
+                  </div>
+                  <div class="overview-card">
+                    <span><i class="bi bi-diagram-3-fill"></i> Danh mục thu mua thực tế</span>
+                    <h4>Nhóm hàng phát sinh đa dạng ngoài thực tế</h4>
+                    <p>Phù hợp để gom các loại hàng có liên quan như dây điện, mô tơ, bo mạch, tủ điện, vật tư công trình hoặc hàng kho xưởng theo từng cụm dễ theo dõi.</p>
+                  </div>
+                </div>
+
+                <h3>Cấu trúc nội dung nên giữ cho cả hai loại trang</h3>
+                <ul class="check-list">
+                  <li><i class="bi bi-check-circle-fill"></i><span>Tiêu đề rõ ràng, cho biết đây là nhóm hàng chính hay danh mục thực tế.</span></li>
+                  <li><i class="bi bi-check-circle-fill"></i><span>Mô tả ngắn về đặc điểm hàng hóa, mức độ thu mua phổ biến và phạm vi tiếp nhận.</span></li>
+                  <li><i class="bi bi-check-circle-fill"></i><span>Danh sách các loại hàng tiêu biểu để khách hàng đối chiếu nhanh với hàng đang có.</span></li>
+                  <li><i class="bi bi-check-circle-fill"></i><span>Thông tin phụ như khu vực phục vụ, hình thức thu gom, hỗ trợ khảo sát và CTA liên hệ.</span></li>
+                </ul>
+
+                <div class="stats-grid">
+                  <div class="stat-box">
+                    <strong>Gọn hơn khi quản lý nội dung</strong>
+                    <p>Một mẫu chung giúp chỉ cần thay dữ liệu, không phải làm lại nhiều bố cục khác nhau cho từng nhóm hàng.</p>
+                  </div>
+                  <div class="stat-box">
+                    <strong>Dễ hiểu hơn cho người xem</strong>
+                    <p>Khách có thể nhận ra ngay đâu là nhóm hàng chính và đâu là danh mục con hoặc nhóm hàng thực tế liên quan.</p>
+                  </div>
+                  <div class="stat-box">
+                    <strong>Đẹp hơn về mặt trình bày</strong>
+                    <p>Nội dung được chia thành các khối rõ ràng, giảm cảm giác trùng lặp giữa hai phần gần giống nhau.</p>
+                  </div>
+                  <div class="stat-box">
+                    <strong>Dễ mở rộng sau này</strong>
+                    <p>Khi thêm mặt hàng mới, chỉ cần cập nhật nội dung thay vì thiết kế thêm một kiểu trang riêng.</p>
+                  </div>
+                </div>
+
+                <h3>Nội dung gợi ý để áp dụng thực tế</h3>
+                <p>Nếu dùng cho nhóm chủ lực, phần mô tả nên nhấn vào giá trị thu mua, tần suất tiếp nhận, quy mô hàng và cách định giá. Nếu dùng cho danh mục thực tế, phần mô tả nên thiên về liệt kê nhóm hàng liên quan, tình huống phát sinh phổ biến và cách gửi thông tin để báo giá nhanh.</p>
+
+                <p>Nhờ đó, cùng một bố cục vẫn phục vụ được hai mục đích: vừa làm nổi bật nhóm hàng chiến lược, vừa bao quát được các danh mục phát sinh mà khách hàng thường gặp ngoài thực tế.</p>
+
+                <h3>Những phần nên ưu tiên làm nổi bật</h3>
+                <ul class="check-list">
+                  <li><i class="bi bi-check-circle-fill"></i><span>Nhóm hàng tiêu biểu hoặc nhóm hàng có giá trị cao để tăng khả năng chuyển đổi.</span></li>
+                  <li><i class="bi bi-check-circle-fill"></i><span>Danh mục liên quan để khách hàng mở rộng nhu cầu và xem thêm các loại hàng tương tự.</span></li>
+                  <li><i class="bi bi-check-circle-fill"></i><span>Thông tin báo giá nhanh như hình ảnh, số lượng, địa điểm và hình thức thu gom.</span></li>
+                  <li><i class="bi bi-check-circle-fill"></i><span>Nút liên hệ rõ ràng để dẫn thẳng đến tư vấn hoặc dịch vụ thu gom tận nơi.</span></li>
+                </ul>
+
+                <div class="tag-list">
+                  <span class="tag-item"><i class="bi bi-tag-fill"></i> mặt hàng thu mua chính</span>
+                  <span class="tag-item"><i class="bi bi-tag-fill"></i> danh mục thu mua thực tế</span>
+                  <span class="tag-item"><i class="bi bi-tag-fill"></i> nhóm hàng liên quan</span>
+                  <span class="tag-item"><i class="bi bi-tag-fill"></i> báo giá nhanh</span>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-lg-4" data-aos="fade-left" data-aos-delay="140">
+            <div class="side-card portfolio-info-card">
+              <h4>Thông tin bố cục</h4>
+              <ul>
+                <li><strong>Loại trang</strong> <span>Chi tiết dùng chung</span></li>
+                <li><strong>Áp dụng cho</strong> <span>Mặt hàng chính và danh mục thực tế</span></li>
+                <li><strong>Hiển thị tốt</strong> <span>Nhóm nổi bật, nhóm liên quan, CTA</span></li>
+                <li><strong>Khu vực phục vụ</strong> <span>TP.HCM, Bình Dương, Đồng Nai</span></li>
+                <li><strong>Hỗ trợ</strong> <span>Khảo sát, bốc xếp, cân minh bạch</span></li>
+              </ul>
+              <a href="contact.html" class="btn-main"><i class="bi bi-telephone-fill"></i> Liên hệ báo giá</a>
+            </div>
+
+            <div class="side-card">
+              <h4>Gợi ý nhóm nội dung liên quan</h4>
+              <ul class="side-list">
+                <li><a href="projects.html">Sắt thép phế liệu</a><span>Nhóm chính</span></li>
+                <li><a href="projects.html">Nhôm, inox, chì</a><span>Kim loại màu</span></li>
+                <li><a href="projects.html">Dây điện, mô tơ, tủ điện</a><span>Danh mục thực tế</span></li>
+                <li><a href="projects.html">Bo mạch điện tử</a><span>Giá trị cao</span></li>
+                <li><a href="services.html">Thu gom kho xưởng</a><span>Trọn gói</span></li>
+              </ul>
+            </div>
+
+            <div class="side-card">
+              <h4>Từ khóa nổi bật</h4>
+              <div class="tag-cloud">
+                <a href="projects.html" class="tag">mặt hàng chính</a>
+                <a href="projects.html" class="tag">danh mục thực tế</a>
+                <a href="projects.html" class="tag">nhóm hàng liên quan</a>
+                <a href="projects.html" class="tag">thu mua tận nơi</a>
+                <a href="projects.html" class="tag">giao diện đồng bộ</a>
+                <a href="contact.html" class="tag">báo giá nhanh</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="cta-section">
+      <div class="container" data-aos="fade-up">
+        <div class="cta-box">
+          <div class="row gy-4 align-items-center">
+            <div class="col-lg-8">
+              <h3>Cần tư vấn cách trình bày nhóm hàng hoặc muốn báo giá nhanh?</h3>
+              <p>Bạn có thể dùng cùng mẫu trang này cho nhiều nhóm phế liệu khác nhau, sau đó chỉ thay nội dung thực tế theo từng danh mục để vừa đẹp mắt vừa đồng bộ trên toàn website.</p>
+              <div class="cta-actions">
+                <a href="contact.html" class="btn-main"><i class="bi bi-telephone-fill"></i> Liên hệ ngay</a>
+                <a href="services.html" class="btn-alt"><i class="bi bi-truck-front-fill"></i> Xem dịch vụ thu gom</a>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="contact-grid">
+                <div class="contact-card">
+                  <i class="bi bi-layout-text-window-reverse"></i>
+                  <strong>Bố cục linh hoạt</strong>
+                  <p>Dễ thay tiêu đề, ảnh và nhóm hàng theo từng trang.</p>
+                </div>
+                <div class="contact-card">
+                  <i class="bi bi-lightning-charge-fill"></i>
+                  <strong>Cập nhật nhanh</strong>
+                  <p>Phù hợp khi cần thêm mới hoặc đổi danh mục thu mua thường xuyên.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="footer" class="footer">
+    <div class="footer-content position-relative">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-lg-4 col-md-6">
+            <div class="footer-info">
+              <h3>Phế Liệu Thành Phát</h3>
+              <p>
+                Thu mua phế liệu giá cao tận nơi<br>
+                Phục vụ nhanh tại TP.HCM, Bình Dương, Đồng Nai<br><br>
+                <strong>Hotline:</strong> 0909 686 889<br>
+                <strong>Email:</strong> info@phelieuthanhphat.vn<br>
+              </p>
+              <div class="social-links d-flex mt-3">
+                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-chat-dots"></i></a>
+                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-youtube"></i></a>
+                <a href="#" class="d-flex align-items-center justify-content-center"><i class="bi bi-telephone"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Điều hướng</h4>
+            <ul>
+              <li><a href="index.html">Trang chủ</a></li>
+              <li><a href="about.html">Giới thiệu</a></li>
+              <li><a href="services.html">Dịch vụ</a></li>
+              <li><a href="projects.html">Mặt hàng</a></li>
+              <li><a href="contact.html">Liên hệ</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Nhóm hàng</h4>
+            <ul>
+              <li><a href="projects.html">Sắt thép phế liệu</a></li>
+              <li><a href="project-details.html">Đồng đỏ - dây cáp</a></li>
+              <li><a href="projects.html">Nhôm, inox, chì</a></li>
+              <li><a href="projects.html">Máy móc cũ</a></li>
+              <li><a href="projects.html">Giấy, nhựa</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Dịch vụ</h4>
+            <ul>
+              <li><a href="services.html">Khảo sát tận nơi</a></li>
+              <li><a href="services.html">Thu gom kho xưởng</a></li>
+              <li><a href="services.html">Tháo dỡ hàng nặng</a></li>
+              <li><a href="contact.html">Báo giá nhanh</a></li>
+              <li><a href="service-details.html">Chi tiết dịch vụ</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-3 footer-links">
+            <h4>Thông tin</h4>
+            <ul>
+              <li><a href="about.html">Năng lực vận hành</a></li>
+              <li><a href="blog.html">Tin thị trường</a></li>
+              <li><a href="contact.html">Hỗ trợ 24/7</a></li>
+              <li><a href="contact.html">Liên hệ ngay</a></li>
+              <li><a href="index.html">Trang chủ</a></li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-legal text-center position-relative">
+      <div class="container">
+        <div class="copyright">
+          © Bản quyền <strong><span>Phế Liệu Thành Phát</span></strong>. Giao diện đã được chuyển đổi sang chủ đề thu mua phế liệu.
+        </div>
+        <div class="credits">
+          Thiết kế nền tảng từ mẫu Bootstrap, nội dung đã được tùy biến theo thương hiệu thu mua phế liệu.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <div id="preloader"></div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script>
+    (() => {
+      const revealBlocks = () => {
+        document.querySelectorAll('.detail-body > *, .side-card, .info-panel, .note-card, .cta-box .col-lg-8, .cta-box .contact-card').forEach((element, index) => {
+          element.classList.add('float-in', `delay-${Math.min(index % 5, 4)}`);
+        });
+      };
+
+      const item = new URLSearchParams(window.location.search).get('item');
+      if (!item) {
+        revealBlocks();
+        return;
+      }
+
+      const detailConfigs = {
+        'sat-thep': {
+          pageTitle: 'Sắt thép phế liệu - Phế Liệu Thành Phát',
+          heroTitle: 'Chi tiết sắt thép phế liệu',
+          heroText: 'Thông tin chi tiết về sắt công trình, thép cây dư, tôn vụn, khung kèo và các loại kim loại đen được thu mua thường xuyên tại Phế Liệu Thành Phát.',
+          articleTitle: 'Sắt thép phế liệu - nhóm hàng thu mua phổ biến số lượng lớn',
+          meta: ['Thu mua thường xuyên', 'Phù hợp công trình & nhà xưởng', 'Có xe và đội bốc xếp tận nơi'],
+          intro: [
+            'Sắt thép phế liệu là nhóm hàng xuất hiện rất thường xuyên tại công trình, kho xưởng, nhà dân và các điểm cải tạo mặt bằng. Đây cũng là nhóm dễ phát sinh số lượng lớn nên cần cách phân loại và thu gom nhanh, gọn, rõ ràng.',
+            'Chúng tôi thu mua sắt cây dư, sắt hộp, tôn cũ, khung kèo, cửa sắt, giá kệ, thép tấm và nhiều kết cấu kim loại đen khác với quy trình khảo sát, cân hàng và bốc xếp minh bạch.'
+          ],
+          overview: [
+            ['Nhóm hàng chính', 'Sắt công trình, thép cây, sắt hộp, xà gồ, khung sắt và nhiều loại kết cấu kim loại đen phát sinh từ xây dựng hoặc thanh lý.'],
+            ['Danh mục thực tế', 'Tôn vụn, hàng tháo dỡ, cửa cổng, lan can, giá kệ, máy khung sắt và các lô hàng hỗn hợp cần phân loại tại chỗ.']
+          ],
+          checklistTitle: 'Những loại sắt thép thường được thu mua',
+          checklist: [
+            'Sắt công trình, thép cây dư, thép hộp, thép hình và xà gồ.',
+            'Khung kèo nhà xưởng, cửa sắt, lan can, hàng tháo dỡ cải tạo.',
+            'Tôn cũ, tôn vụn, giá kệ kho, kệ siêu thị và vật tư kim loại đen.',
+            'Hàng kết cấu nặng, cồng kềnh cần xe cẩu hoặc đội tháo dỡ hỗ trợ.'
+          ],
+          stats: [
+            ['Xử lý được lô lớn', 'Phù hợp nhà xưởng, công trình và điểm thanh lý cần giải phóng mặt bằng nhanh.'],
+            ['Dễ cân đối khối lượng', 'Nhóm hàng kim loại đen thường dễ gom cụm và đối chiếu số lượng hơn.'],
+            ['Thu gom tận nơi', 'Có xe tải và nhân lực hỗ trợ bốc xếp với nhiều quy mô khác nhau.'],
+            ['Báo giá sát thực tế', 'Giá phụ thuộc độ dày, độ sạch, chủng loại và vị trí thu gom cụ thể.']
+          ],
+          tipsTitle: 'Lưu ý khi bán sắt thép phế liệu',
+          tips: [
+            ['Tách hàng nặng và hàng nhẹ', 'Nên tách riêng sắt dày, sắt mỏng, tôn và thép để báo giá nhanh hơn.'],
+            ['Báo trước điều kiện bốc xếp', 'Nếu hàng ở tầng cao, trong hẻm nhỏ hoặc cần cắt hạ, hãy thông báo trước.'],
+            ['Gửi ảnh tổng thể lô hàng', 'Ảnh chụp toàn cảnh giúp ước lượng nhanh phương án xe và nhân công phù hợp.']
+          ],
+          tags: ['sắt thép phế liệu', 'tôn vụn', 'khung kèo cũ', 'thanh lý công trình'],
+          sidebarTitle: 'Thông tin mặt hàng',
+          sidebarInfo: [
+            ['Nhóm hàng', 'Kim loại đen'],
+            ['Danh mục chính', 'Sắt thép - tôn - kết cấu'],
+            ['Hình thức thu mua', 'Tận nơi hoặc tại điểm tập kết'],
+            ['Khu vực phục vụ', 'TP.HCM, Bình Dương, Đồng Nai'],
+            ['Hỗ trợ', 'Bốc xếp, cắt hạ, khảo sát thực tế']
+          ],
+          related: [
+            ['projects.html', 'Đồng đỏ, dây cáp điện', 'Kim loại màu'],
+            ['projects.html', 'Máy móc cũ', 'Hàng nặng'],
+            ['projects.html', 'Kho xưởng thanh lý', 'Trọn gói'],
+            ['services.html', 'Thu gom tận nơi', 'Nhanh gọn']
+          ],
+          ctaTitle: 'Bạn đang có sắt thép phế liệu cần bán?',
+          ctaText: 'Gửi hình ảnh hoặc khối lượng ước tính để chúng tôi tư vấn nhanh phương án thu gom, bốc xếp và báo giá phù hợp.'
+        },
+        'dong-cap': {
+          pageTitle: 'Đồng đỏ, cáp điện - Phế Liệu Thành Phát',
+          heroTitle: 'Chi tiết đồng đỏ, đồng vàng, cáp điện',
+          heroText: 'Nhóm hàng giá trị cao gồm đồng đỏ, đồng vàng, dây cáp điện, cuộn dây mô tơ và linh kiện chứa đồng được cập nhật giá thường xuyên.',
+          articleTitle: 'Đồng đỏ, đồng vàng, cáp điện - nhóm phế liệu giá trị cao',
+          meta: ['Giá trị thu mua cao', 'Cần phân loại rõ', 'Có xe thu gom tận nơi'],
+          intro: [
+            'Đồng và cáp điện là một trong những nhóm hàng có giá trị tái chế cao, được nhiều khách hàng quan tâm khi cần bán phế liệu điện, vật tư công trình hoặc hàng thanh lý kỹ thuật.',
+            'Tùy vào độ sạch, tỷ lệ lẫn nhựa, tình trạng cháy, chủng loại cáp và khối lượng thực tế mà giá thu mua có thể khác nhau đáng kể.'
+          ],
+          overview: [
+            ['Mặt hàng chính', 'Đồng đỏ nguyên chất, đồng vàng, đồng thanh, dây đồng và các nhóm vật liệu chứa đồng có giá trị cao.'],
+            ['Danh mục thực tế', 'Dây cáp điện, lõi điện, cuộn dây mô tơ, dây điện dân dụng hoặc công nghiệp, thiết bị điện chứa đồng.']
+          ],
+          checklistTitle: 'Các loại hàng thường gặp trong nhóm này',
+          checklist: [
+            'Đồng đỏ nguyên chất, đồng dây, đồng thanh, đồng tấm.',
+            'Dây cáp điện lõi đồng, dây điện công trình, cáp điện dân dụng và công nghiệp.',
+            'Cuộn dây mô tơ, mô tơ điện, máy phát điện và thiết bị có lõi đồng.',
+            'Linh kiện điện, tủ điện, bo mạch và các bộ phận có khả năng thu hồi kim loại màu.'
+          ],
+          stats: [
+            ['Giá tốt hơn khi hàng sạch', 'Hàng ít lẫn nhựa, ít tạp chất và được tách riêng sẽ dễ báo giá sát hơn.'],
+            ['Phân loại rõ giúp nhanh hơn', 'Tách đồng, cáp và mô tơ riêng giúp quá trình đối chiếu diễn ra nhanh.'],
+            ['Nhận số lượng nhỏ đến lớn', 'Từ hộ gia đình, cửa hàng điện đến kho vật tư và nhà xưởng.'],
+            ['Có hỗ trợ khảo sát trực tiếp', 'Phù hợp với lô hỗn hợp, thiết bị khó tháo hoặc cần định giá tại chỗ.']
+          ],
+          tipsTitle: 'Cách chuẩn bị để bán được giá tốt hơn',
+          tips: [
+            ['Tách riêng từng cụm hàng', 'Nên tách đồng đỏ, cáp điện, mô tơ và bo mạch để báo giá sát thực tế.'],
+            ['Giữ hàng khô ráo', 'Hạn chế để lẫn bùn đất, nước hoặc rác công nghiệp làm giảm giá trị.'],
+            ['Gửi ảnh cận cảnh', 'Ảnh rõ từng nhóm hàng giúp định giá sơ bộ nhanh và chính xác hơn.']
+          ],
+          tags: ['đồng đỏ', 'dây cáp điện', 'mô tơ đồng', 'kim loại màu'],
+          sidebarTitle: 'Thông tin mặt hàng',
+          sidebarInfo: [
+            ['Nhóm hàng', 'Kim loại màu'],
+            ['Danh mục chính', 'Đồng đỏ - dây cáp - mô tơ'],
+            ['Hình thức thu mua', 'Tận nơi hoặc tại điểm tập kết'],
+            ['Khu vực phục vụ', 'TP.HCM, Bình Dương, Đồng Nai'],
+            ['Hỗ trợ', 'Khảo sát, bốc xếp, cân minh bạch']
+          ],
+          related: [
+            ['projects.html', 'Nhôm, inox, chì', 'Kim loại màu'],
+            ['projects.html', 'Bo mạch điện tử', 'Giá trị cao'],
+            ['projects.html', 'Máy móc cũ', 'Có mô tơ'],
+            ['services.html', 'Thu gom kho xưởng', 'Trọn gói']
+          ],
+          ctaTitle: 'Bạn đang có đồng đỏ, dây cáp hoặc mô tơ cũ cần bán?',
+          ctaText: 'Gửi hình ảnh qua Zalo hoặc gọi trực tiếp để được tư vấn cách phân loại, báo giá sơ bộ và sắp xếp thu gom phù hợp.'
+        },
+        'nhom-inox': {
+          pageTitle: 'Nhôm, inox, chì - Phế Liệu Thành Phát',
+          heroTitle: 'Chi tiết nhôm, inox, chì và hợp kim',
+          heroText: 'Nhóm kim loại màu phổ biến trong nhà dân, công trình và xưởng gia công như nhôm, inox, chì và nhiều loại hợp kim khác.',
+          articleTitle: 'Nhôm, inox, chì, hợp kim - nhóm kim loại màu phổ biến',
+          meta: ['Kim loại màu phổ biến', 'Nhà dân & công trình', 'Hỗ trợ tháo dỡ'],
+          intro: ['Nhôm, inox, chì và hợp kim là các nhóm hàng được phát sinh thường xuyên khi cải tạo nhà ở, tháo dỡ cửa nhôm kính, thay bếp inox hoặc thanh lý vật tư công trình.', 'Giá thu mua phụ thuộc loại vật liệu, độ sạch, độ dày, mức độ lẫn tạp chất và số lượng thực tế.'],
+          overview: [['Mặt hàng chính', 'Khung nhôm, cửa nhôm kính, inox bếp, ống inox, chì và hợp kim.'], ['Danh mục thực tế', 'Phế liệu phát sinh từ sửa nhà, cải tạo công trình, xưởng cơ khí và kho vật tư.']],
+          checklistTitle: 'Các loại hàng thường gặp',
+          checklist: ['Khung nhôm, cửa nhôm kính, nẹp và vật tư nhôm xây dựng.', 'Inox bếp, bàn ghế inox, ống inox, máng inox và vật tư dân dụng.', 'Chì, hợp kim, vật liệu pha kim loại phát sinh từ sản xuất hoặc tháo dỡ.', 'Các cụm hàng hỗn hợp cần phân loại tại chỗ trước khi chốt giá.'],
+          stats: [['Linh hoạt nguồn hàng', 'Nhận hàng từ hộ gia đình, cửa hàng, công trình và xưởng sản xuất.'], ['Giá sát theo chủng loại', 'Phân biệt nhôm, inox, chì và hợp kim để tránh báo giá gộp thiếu chính xác.'], ['Có hỗ trợ tháo dỡ', 'Phù hợp cửa nhôm kính, khung inox hoặc cụm hàng gắn cố định.'], ['Dễ kết hợp cùng nhóm khác', 'Thường đi cùng sắt thép, điện nước hoặc hàng thanh lý tổng hợp.']],
+          tipsTitle: 'Lưu ý trước khi liên hệ',
+          tips: [['Tách nhôm và inox riêng', 'Việc này giúp định giá nhanh và tránh nhầm lẫn khi cân hàng.'], ['Báo rõ tình trạng lẫn kính hoặc phụ kiện', 'Khung nhôm kính có thể cần tháo tách trước khi thu gom.'], ['Gửi ảnh theo từng đống hàng', 'Giúp nhận biết nhanh chủng loại và khối lượng tương đối.']],
+          tags: ['nhôm phế liệu', 'inox cũ', 'chì hợp kim', 'cửa nhôm kính'],
+          sidebarTitle: 'Thông tin mặt hàng',
+          sidebarInfo: [['Nhóm hàng', 'Kim loại màu'], ['Danh mục chính', 'Nhôm - inox - chì - hợp kim'], ['Hình thức thu mua', 'Tận nơi hoặc theo lô'], ['Khu vực phục vụ', 'TP.HCM, Bình Dương, Đồng Nai'], ['Hỗ trợ', 'Tháo dỡ và phân loại']],
+          related: [['projects.html', 'Sắt thép phế liệu', 'Công trình'], ['projects.html', 'Đồng đỏ, cáp điện', 'Kim loại màu'], ['projects.html', 'Kho xưởng thanh lý', 'Tổng hợp'], ['services.html', 'Khảo sát tận nơi', 'Nhanh gọn']],
+          ctaTitle: 'Cần báo giá nhôm, inox hoặc hợp kim?',
+          ctaText: 'Gửi hình ảnh thực tế để được tư vấn nhanh cách tách nhóm hàng và phương án thu gom phù hợp.'
+        },
+        'may-moc': {
+          pageTitle: 'Máy móc cũ - Phế Liệu Thành Phát', heroTitle: 'Chi tiết máy móc cũ, mô tơ, thiết bị hỏng', heroText: 'Thu mua máy móc thanh lý, mô tơ đồng, máy phát điện, thiết bị cơ khí và nhiều loại hàng nặng cồng kềnh khác.', articleTitle: 'Máy móc cũ, mô tơ, thiết bị hỏng - nhóm hàng công nghiệp cần khảo sát', meta: ['Hàng nặng cồng kềnh', 'Có đội tháo dỡ', 'Khảo sát tận nơi'], intro: ['Máy móc cũ là nhóm hàng cần xem xét kỹ về kích thước, khối lượng, khả năng tháo dỡ và giá trị vật liệu có thể thu hồi.', 'Với các lô hàng công nghiệp, chúng tôi hỗ trợ khảo sát thực tế để lên phương án vận chuyển, cắt dỡ và thu gom an toàn.'], overview: [['Mặt hàng chính', 'Máy công nghiệp, mô tơ điện, máy phát, máy nén khí, dây chuyền cũ, thiết bị cơ khí.'], ['Danh mục thực tế', 'Thiết bị hỏng, cụm máy tháo bỏ, phụ kiện máy, bộ phận có lõi đồng hoặc khung kim loại.']], checklistTitle: 'Những loại máy móc thường được thu mua', checklist: ['Máy công nghiệp thanh lý, thiết bị cơ khí cũ và bộ phận máy.', 'Mô tơ đồng, máy phát điện, máy nén khí, máy bơm.', 'Dây chuyền cũ, máy may công nghiệp, thiết bị sản xuất đã qua sử dụng.', 'Cụm hàng cần xe nâng, cẩu hoặc đội tháo dỡ chuyên dụng.'], stats: [['Khảo sát trước khi thu gom', 'Đảm bảo xác định đúng khối lượng, đường vận chuyển và nhân lực cần thiết.'], ['Tận dụng giá trị vật liệu', 'Một số máy có lõi đồng, gang, sắt hoặc inox làm tăng giá trị thu mua.'], ['Phù hợp thanh lý xưởng', 'Có thể kết hợp cùng hàng tồn, giá kệ và vật tư công nghiệp khác.'], ['Xử lý gọn tại hiện trường', 'Hỗ trợ tháo dỡ, chia tải và vận chuyển theo từng cụm máy.']], tipsTitle: 'Thông tin nên chuẩn bị', tips: [['Gửi ảnh toàn máy và tem thông số', 'Giúp nhận diện nhanh chủng loại và quy mô thiết bị.'], ['Báo rõ vị trí đặt máy', 'Nếu máy ở tầng cao hoặc trong xưởng chật cần chuẩn bị phương án phù hợp.'], ['Ước tính số lượng hoặc tải trọng', 'Đặc biệt hữu ích với lô nhiều mô tơ hoặc nhiều cụm máy giống nhau.']], tags: ['máy móc cũ', 'mô tơ đồng', 'thiết bị hỏng', 'thanh lý công nghiệp'], sidebarTitle: 'Thông tin mặt hàng', sidebarInfo: [['Nhóm hàng', 'Máy móc cũ'], ['Danh mục chính', 'Máy công nghiệp - mô tơ - thiết bị hỏng'], ['Hình thức thu mua', 'Khảo sát tận nơi'], ['Khu vực phục vụ', 'TP.HCM, Bình Dương, Đồng Nai'], ['Hỗ trợ', 'Tháo dỡ, vận chuyển, bốc xếp']], related: [['projects.html', 'Đồng đỏ, cáp điện', 'Liên quan lõi đồng'], ['projects.html', 'Kho xưởng thanh lý', 'Tổng hợp'], ['projects.html', 'Sắt thép phế liệu', 'Khung máy'], ['services.html', 'Thu gom kho xưởng', 'Trọn gói']], ctaTitle: 'Có máy móc cũ hoặc thiết bị công nghiệp cần thanh lý?', ctaText: 'Gửi ảnh và vị trí thực tế để được lên phương án khảo sát, tháo dỡ và báo giá phù hợp.'
+        },
+        'giay-carton': {
+          pageTitle: 'Giấy carton, giấy vụn - Phế Liệu Thành Phát', heroTitle: 'Chi tiết giấy carton, giấy vụn, hồ sơ thanh lý', heroText: 'Nhóm giấy thu mua thường xuyên từ kho, siêu thị, văn phòng, nhà in và điểm thanh lý hồ sơ.', articleTitle: 'Giấy carton, giấy vụn, hồ sơ thanh lý - nhóm hàng dễ gom theo lô', meta: ['Thu gom nhanh', 'Kho, siêu thị, nhà in', 'Phù hợp số lượng lớn'], intro: ['Giấy carton và giấy vụn là nhóm hàng phổ biến trong vận hành kho bãi, siêu thị, văn phòng và nhà in. Việc gom đúng loại giấy giúp báo giá nhanh và xử lý gọn.', 'Đây là nhóm hàng phù hợp với các lô phát sinh định kỳ hoặc cần giải phóng kho trong thời gian ngắn.'], overview: [['Mặt hàng chính', 'Carton, giấy in, giấy vụn, hồ sơ tồn kho, tài liệu thanh lý.'], ['Danh mục thực tế', 'Giấy đóng gói, bìa carton, giấy văn phòng, tài liệu cũ và giấy phát sinh theo đợt.']], checklistTitle: 'Những loại giấy thường được thu mua', checklist: ['Carton số lượng lớn từ kho, siêu thị và điểm phân phối.', 'Giấy in, giấy văn phòng, hồ sơ cũ, tài liệu thanh lý.', 'Giấy vụn từ nhà in, kho thương mại hoặc hoạt động đóng gói.', 'Các lô giấy cần thu gom nhanh để giải phóng diện tích lưu trữ.'], stats: [['Dễ thu gom theo đợt', 'Phù hợp nguồn hàng phát sinh định kỳ hàng tuần hoặc hàng tháng.'], ['Báo giá nhanh', 'Chỉ cần ước lượng khối lượng, độ khô ráo và loại giấy chính.'], ['Hỗ trợ số lượng lớn', 'Thu gom cho kho, siêu thị, nhà in và doanh nghiệp.'], ['Xử lý gọn mặt bằng', 'Giảm tồn kho nhanh với các lô giấy cồng kềnh, chiếm diện tích.']], tipsTitle: 'Lưu ý khi gom giấy', tips: [['Giữ giấy khô ráo', 'Giấy ẩm hoặc lẫn rác dễ ảnh hưởng đến đơn giá.'], ['Tách carton và giấy mềm', 'Nên gom riêng để tiện báo giá và cân hàng.'], ['Ước tính số bao hoặc số kg', 'Thông tin cơ bản giúp xử lý yêu cầu nhanh hơn.']], tags: ['giấy carton', 'giấy vụn', 'hồ sơ thanh lý', 'thu gom kho'], sidebarTitle: 'Thông tin mặt hàng', sidebarInfo: [['Nhóm hàng', 'Giấy & nhựa'], ['Danh mục chính', 'Carton - giấy vụn - hồ sơ'], ['Hình thức thu mua', 'Theo lô hoặc định kỳ'], ['Khu vực phục vụ', 'TP.HCM, Bình Dương, Đồng Nai'], ['Hỗ trợ', 'Thu gom nhanh tại kho bãi']], related: [['projects.html', 'Nhựa công nghiệp', 'Cùng nhóm'], ['projects.html', 'Kho xưởng thanh lý', 'Giải phóng mặt bằng'], ['services.html', 'Thu gom tận nơi', 'Nhanh gọn'], ['contact.html', 'Báo giá nhanh', 'Tiện lợi']], ctaTitle: 'Có giấy carton hoặc hồ sơ cần thanh lý?', ctaText: 'Gửi thông tin số lượng hoặc hình ảnh thực tế để được báo giá nhanh và sắp xếp xe thu gom.'
+        },
+        'nhua-pallet': {
+          pageTitle: 'Nhựa công nghiệp, pallet - Phế Liệu Thành Phát', heroTitle: 'Chi tiết nhựa công nghiệp, pallet, bao bì', heroText: 'Thu mua pallet nhựa, nhựa cứng, can nhựa, thùng nhựa và nhiều nhóm vật liệu nhựa tái chế phát sinh trong kho xưởng.', articleTitle: 'Nhựa công nghiệp, pallet, bao bì - nhóm hàng phù hợp lô lớn', meta: ['Xe tải linh hoạt', 'Lô hàng số lượng lớn', 'Kho xưởng thường xuyên'], intro: ['Nhựa công nghiệp là nhóm hàng thường xuất hiện trong vận hành kho, logistics, sản xuất và đóng gói. Các lô nhựa đúng chủng loại sẽ thuận tiện hơn cho việc báo giá và thu gom.', 'Pallet nhựa, thùng nhựa, can nhựa và bao bì nhựa thường phù hợp để gom theo lô lớn, tiết kiệm thời gian xử lý.'], overview: [['Mặt hàng chính', 'Pallet nhựa, nhựa cứng, can nhựa, thùng nhựa và vật liệu nhựa sản xuất.'], ['Danh mục thực tế', 'Bao bì, nhựa tái chế, nhựa kho xưởng và các cụm hàng nhựa phát sinh trong vận hành.']], checklistTitle: 'Những loại nhựa thường được thu mua', checklist: ['Pallet nhựa, nhựa cứng, sóng nhựa và thùng nhựa.', 'Can nhựa, bao bì nhựa, vật liệu nhựa sản xuất và nhựa tồn kho.', 'Nhóm nhựa phát sinh từ logistics, kho xưởng và đóng gói.', 'Lô hàng cần xe tải linh hoạt hoặc thu gom theo nhiều đợt.'], stats: [['Phù hợp hàng lô lớn', 'Đặc biệt hiệu quả với pallet nhựa và nhựa sản xuất số lượng nhiều.'], ['Xe thu gom linh hoạt', 'Có thể bố trí xe phù hợp với điều kiện kho và số lượng hàng.'], ['Dễ kết hợp cùng hàng khác', 'Thường đi kèm carton, giấy hoặc hàng thanh lý tổng hợp.'], ['Cần phân loại đúng nhóm', 'Tách riêng từng loại nhựa giúp quá trình báo giá chính xác hơn.']], tipsTitle: 'Cách chuẩn bị trước khi báo giá', tips: [['Tách nhựa cứng và bao bì', 'Giúp đối chiếu giá theo từng nhóm rõ ràng hơn.'], ['Báo số lượng pallet hoặc bao', 'Thông tin sơ bộ giúp ước lượng nhanh hơn.'], ['Chụp ảnh khu vực tập kết', 'Hữu ích để sắp xếp xe và phương án bốc xếp phù hợp.']], tags: ['nhựa công nghiệp', 'pallet nhựa', 'bao bì nhựa', 'nhựa tái chế'], sidebarTitle: 'Thông tin mặt hàng', sidebarInfo: [['Nhóm hàng', 'Giấy & nhựa'], ['Danh mục chính', 'Nhựa công nghiệp - pallet - bao bì'], ['Hình thức thu mua', 'Theo lô lớn hoặc định kỳ'], ['Khu vực phục vụ', 'TP.HCM, Bình Dương, Đồng Nai'], ['Hỗ trợ', 'Xe tải và thu gom kho xưởng']], related: [['projects.html', 'Giấy carton, giấy vụn', 'Cùng nhóm'], ['projects.html', 'Kho xưởng thanh lý', 'Tổng hợp'], ['services.html', 'Thu gom kho xưởng', 'Trọn gói'], ['contact.html', 'Gửi thông tin hàng', 'Nhanh']], ctaTitle: 'Có pallet nhựa hoặc nhựa công nghiệp cần bán?', ctaText: 'Gửi hình ảnh và số lượng để được tư vấn phương án thu gom phù hợp với lô hàng của bạn.'
+        },
+        'kho-xuong': {
+          pageTitle: 'Hàng thanh lý kho xưởng - Phế Liệu Thành Phát', heroTitle: 'Chi tiết hàng thanh lý kho xưởng', heroText: 'Nhóm hàng tổng hợp gồm giá kệ, vật tư cũ, khung sắt, thiết bị và hàng tồn cần giải phóng mặt bằng nhanh.', articleTitle: 'Hàng thanh lý kho xưởng - nhóm hàng tổng hợp cần xử lý trọn gói', meta: ['Phân loại tận nơi', 'Xử lý gấp', 'Phù hợp trọn gói'], intro: ['Kho xưởng thanh lý thường phát sinh nhiều nhóm hàng cùng lúc như sắt thép, vật tư điện, giá kệ, thiết bị cũ và vật liệu tồn kho. Vì vậy cần một phương án phân loại và thu gom linh hoạt.', 'Chúng tôi hỗ trợ khảo sát, chia nhóm hàng, ước lượng khối lượng và xử lý theo tiến độ phù hợp để giải phóng mặt bằng nhanh hơn.'], overview: [['Mặt hàng chính', 'Giá kệ, khung sắt, vật tư điện, thiết bị cũ và hàng tồn kho.'], ['Danh mục thực tế', 'Ống kim loại, phụ kiện, cụm hàng hỗn hợp, vật tư phát sinh cần xử lý theo lô hoặc trọn gói.']], checklistTitle: 'Các loại hàng thường gặp khi thanh lý kho xưởng', checklist: ['Giá kệ kho, khung sắt, vật tư điện, thiết bị cũ.', 'Hàng tồn kho lâu ngày, vật tư dư công trình hoặc sản xuất.', 'Ống kim loại, phụ kiện kỹ thuật và cụm hàng hỗn hợp.', 'Lô hàng cần phân loại tận nơi và xử lý nhanh theo tiến độ.'], stats: [['Xử lý nhiều nhóm hàng cùng lúc', 'Phù hợp kho xưởng có cả kim loại, điện, máy móc và vật tư tồn.'], ['Tiết kiệm thời gian thanh lý', 'Một phương án tổng hợp giúp giảm thao tác làm việc với nhiều đơn vị khác nhau.'], ['Khảo sát trước khi triển khai', 'Đảm bảo lên đúng phương án xe, nhân lực và tiến độ xử lý.'], ['Linh hoạt theo mục tiêu mặt bằng', 'Có thể ưu tiên dọn gấp khu vực cần bàn giao hoặc thi công.']], tipsTitle: 'Những thông tin nên chuẩn bị', tips: [['Gửi ảnh tổng thể kho xưởng', 'Ảnh toàn cảnh giúp đánh giá mức độ hỗn hợp của lô hàng.'], ['Báo yêu cầu tiến độ', 'Nếu cần xử lý gấp hoặc theo từng đợt, nên nói rõ từ đầu.'], ['Ghi chú hàng cần giữ lại', 'Tránh nhầm lẫn với các vật tư hoặc thiết bị chưa thanh lý.']], tags: ['thanh lý kho xưởng', 'giá kệ cũ', 'vật tư tồn kho', 'giải phóng mặt bằng'], sidebarTitle: 'Thông tin mặt hàng', sidebarInfo: [['Nhóm hàng', 'Thanh lý kho xưởng'], ['Danh mục chính', 'Giá kệ - vật tư - thiết bị cũ'], ['Hình thức thu mua', 'Khảo sát và xử lý trọn gói'], ['Khu vực phục vụ', 'TP.HCM, Bình Dương, Đồng Nai'], ['Hỗ trợ', 'Phân loại, bốc xếp, vận chuyển']], related: [['projects.html', 'Sắt thép phế liệu', 'Kim loại đen'], ['projects.html', 'Máy móc cũ', 'Thiết bị'], ['projects.html', 'Nhựa và carton', 'Kho bãi'], ['services.html', 'Thu gom kho xưởng', 'Chuyên sâu']], ctaTitle: 'Cần thanh lý kho xưởng hoặc giải phóng mặt bằng?', ctaText: 'Gửi hiện trạng thực tế để chúng tôi tư vấn phương án phân loại, thu gom và xử lý phù hợp.'
+        },
+        'bo-mach': {
+          pageTitle: 'Bo mạch, linh kiện điện tử - Phế Liệu Thành Phát', heroTitle: 'Chi tiết bo mạch, linh kiện điện tử, dây điện', heroText: 'Nhóm hàng điện tử có khả năng thu hồi kim loại giá trị như bo mạch, board điện, tủ điện, dây điện và linh kiện cũ.', articleTitle: 'Bo mạch, linh kiện điện tử, dây điện - nhóm hàng cần phân loại kỹ', meta: ['Nhiều kim loại màu', 'Cần phân loại kỹ', 'Báo giá theo tình trạng thực tế'], intro: ['Bo mạch và linh kiện điện tử là nhóm hàng đa dạng về chủng loại, tình trạng và tỷ lệ kim loại thu hồi nên cần đánh giá kỹ trước khi chốt giá.', 'Ngoài bo mạch còn có tủ điện, dây điện, thiết bị điện tử hỏng và các bộ phận chứa đồng hoặc kim loại màu có giá trị.'], overview: [['Mặt hàng chính', 'Bo mạch, board điện tử, dây điện, linh kiện điện tử và thiết bị điện hỏng.'], ['Danh mục thực tế', 'Tủ điện, bộ nguồn, board máy công nghiệp, thiết bị điện dân dụng hoặc công nghiệp đã qua sử dụng.']], checklistTitle: 'Các loại điện tử thường được thu mua', checklist: ['Bo mạch điện tử, board điều khiển, linh kiện cũ.', 'Dây điện, tủ điện, thiết bị điện tử hỏng và bộ phận điện công nghiệp.', 'Các cụm hàng có nhiều kim loại màu cần tách riêng để định giá tốt hơn.', 'Lô hàng hỗn hợp cần phân loại kỹ theo tình trạng và chủng loại.'], stats: [['Giá trị phụ thuộc phân loại', 'Việc tách riêng bo mạch, dây điện và linh kiện giúp báo giá chính xác hơn.'], ['Thu hồi được nhiều kim loại', 'Một số nhóm chứa đồng, nhôm và kim loại màu có giá trị tái chế.'], ['Phù hợp kho kỹ thuật', 'Thường phát sinh từ nhà xưởng, đơn vị bảo trì hoặc thanh lý thiết bị.'], ['Cần ảnh thực tế rõ ràng', 'Hình ảnh chi tiết giúp nhận diện nhanh chủng loại và tình trạng hàng.']], tipsTitle: 'Lưu ý khi gửi thông tin hàng', tips: [['Chụp ảnh cận cảnh từng nhóm', 'Giúp phân biệt bo mạch, dây điện, linh kiện và tủ điện.'], ['Tách dây điện và bo mạch', 'Hai nhóm này thường có cách định giá khác nhau.'], ['Báo rõ nguồn hàng', 'Thông tin từ kho kỹ thuật, nhà máy hay dân dụng sẽ hỗ trợ đánh giá nhanh hơn.']], tags: ['bo mạch điện tử', 'linh kiện điện tử', 'dây điện', 'tủ điện cũ'], sidebarTitle: 'Thông tin mặt hàng', sidebarInfo: [['Nhóm hàng', 'Điện tử'], ['Danh mục chính', 'Bo mạch - dây điện - linh kiện'], ['Hình thức thu mua', 'Theo lô hoặc khảo sát'], ['Khu vực phục vụ', 'TP.HCM, Bình Dương, Đồng Nai'], ['Hỗ trợ', 'Phân loại và báo giá nhanh']], related: [['projects.html', 'Đồng đỏ, cáp điện', 'Liên quan kim loại màu'], ['projects.html', 'Máy móc cũ', 'Thiết bị công nghiệp'], ['projects.html', 'Kho xưởng thanh lý', 'Tổng hợp'], ['services.html', 'Khảo sát tận nơi', 'Nhanh']], ctaTitle: 'Có bo mạch hoặc linh kiện điện tử cần thanh lý?', ctaText: 'Gửi ảnh chi tiết từng cụm hàng để được hỗ trợ phân loại và báo giá nhanh hơn.'
+        }
+      };
+
+      const config = detailConfigs[item];
+      if (!config) return;
+
+      document.title = config.pageTitle;
+      const desc = document.querySelector('meta[name="description"]');
+      if (desc) desc.setAttribute('content', config.heroText);
+
+      const breadcrumbTitle = document.querySelector('.breadcrumbs h2');
+      const breadcrumbText = document.querySelector('.breadcrumbs p');
+      const breadcrumbCurrent = document.querySelector('.breadcrumbs ol li:last-child');
+      if (breadcrumbTitle) breadcrumbTitle.textContent = config.heroTitle;
+      if (breadcrumbText) breadcrumbText.textContent = config.heroText;
+      if (breadcrumbCurrent) breadcrumbCurrent.textContent = config.heroTitle;
+
+      const detailBody = document.querySelector('.detail-body');
+      if (detailBody) {
+        detailBody.innerHTML = `
+          <div class="article-hero">
+            <span class="hero-kicker"><i class="bi bi-stars"></i> Trang chi tiết nổi bật</span>
+            <h2>${config.articleTitle}</h2>
+            <p class="article-lead">${config.intro[0]}</p>
+            <div class="meta-list">
+              ${config.meta.map((text, index) => {
+                const icons = ['bi bi-cash-coin', 'bi bi-list-check', 'bi bi-truck-front-fill'];
+                return `<span><i class="${icons[index] || 'bi bi-check-circle-fill'}"></i> ${text}</span>`;
+              }).join('')}
+            </div>
+          </div>
+          <div class="overview-grid">
+            <div class="overview-card">
+              <span><i class="bi bi-star-fill"></i> ${config.overview[0][0]}</span>
+              <h4>Nhóm chính</h4>
+              <p>${config.overview[0][1]}</p>
+            </div>
+            <div class="overview-card">
+              <span><i class="bi bi-diagram-3-fill"></i> ${config.overview[1][0]}</span>
+              <h4>Hàng thực tế</h4>
+              <p>${config.overview[1][1]}</p>
+            </div>
+          </div>
+          <h3>${config.checklistTitle}</h3>
+          <ul class="check-list">
+            ${config.checklist.slice(0, 3).map((text) => `<li><i class="bi bi-check-circle-fill"></i><span>${text}</span></li>`).join('')}
+          </ul>
+          <div class="stats-grid">
+            ${config.stats.slice(0, 3).map(([title, text]) => `<div class="stat-box"><strong>${title}</strong><p>${text}</p></div>`).join('')}
+          </div>
+          <h3>${config.tipsTitle}</h3>
+          <ul class="check-list">
+            ${config.tips.slice(0, 2).map(([title, text]) => `<li><i class="bi bi-check-circle-fill"></i><span><strong>${title}:</strong> ${text}</span></li>`).join('')}
+          </ul>
+          <div class="tag-list">
+            ${config.tags.slice(0, 3).map((tag) => `<span class="tag-item"><i class="bi bi-tag-fill"></i> ${tag}</span>`).join('')}
+          </div>
+        `;
+      }
+
+      const sideCards = document.querySelectorAll('.col-lg-4 .side-card');
+      if (sideCards[0]) {
+        sideCards[0].classList.add('portfolio-info-card');
+        sideCards[0].innerHTML = `
+          <h4>${config.sidebarTitle}</h4>
+          <ul>
+            ${config.sidebarInfo.map(([label, value]) => `<li><strong>${label}</strong><span>${value}</span></li>`).join('')}
+          </ul>
+          <a href="contact.html" class="btn-main"><i class="bi bi-telephone-fill"></i> Liên hệ báo giá</a>
+        `;
+      }
+      if (sideCards[1]) {
+        sideCards[1].innerHTML = `
+          <h4>Nhóm hàng liên quan</h4>
+          <ul class="side-list">
+            ${config.related.map(([href, text, badge]) => `<li><a href="${href}">${text}</a><span>${badge}</span></li>`).join('')}
+          </ul>
+        `;
+      }
+      if (sideCards[2]) {
+        sideCards[2].innerHTML = `
+          <h4>Từ khóa nổi bật</h4>
+          <div class="tag-cloud">
+            ${config.tags.map((tag) => `<a href="projects.html" class="tag">${tag}</a>`).join('')}
+          </div>
+        `;
+      }
+
+
+      const ctaTitle = document.querySelector('.cta-box h3');
+      const ctaText = document.querySelector('.cta-box p');
+      if (ctaTitle) ctaTitle.textContent = config.ctaTitle;
+      if (ctaText) ctaText.textContent = config.ctaText;
+
+      revealBlocks();
+      if (window.AOS && typeof window.AOS.refreshHard === 'function') {
+        window.AOS.refreshHard();
+      } else if (window.AOS && typeof window.AOS.refresh === 'function') {
+        window.AOS.refresh();
+      }
+    })();
+  </script>
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
