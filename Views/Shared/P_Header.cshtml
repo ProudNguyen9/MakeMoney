@@ -1,0 +1,66 @@
+<header id="header" class="header">
+    <div class="container-fluid home-wide-shell">
+        <div class="header-top-content">
+            <div class="header-top-left">
+                <div class="header-top-item">
+                    <i class="bi bi-telephone-fill"></i>
+                    <a href="tel:0909123456">Hotline: 0909 123 456</a>
+                </div>
+                <div class="header-top-item">
+                    <i class="bi bi-envelope-fill"></i>
+                    <a href="mailto:info@phelieuhoangdoanh.com">info@phelieuhoangdoanh.com</a>
+                </div>
+                <div class="header-top-item">
+                    <i class="bi bi-pin-map-fill"></i>
+                    <span>Phục vụ TP.HCM, Bình Dương, Đồng Nai</span>
+                </div>
+                <div class="header-top-item">
+                    <i class="bi bi-flower1"></i>
+                    <span class="tag-location">
+                        Giới thiệu ngay – Hoa hồng cao 🔥
+                    </span>
+                </div>
+            </div>
+            <div class="header-social">
+                <a href="#" title="Facebook" target="_blank"><i class="bi bi-facebook"></i></a>
+                <a href="#" title="Zalo" target="_blank"><i class="bi bi-chat-dots"></i></a>
+                <a href="#" title="YouTube" target="_blank"><i class="bi bi-youtube"></i></a>
+                <a href="#" title="Instagram" target="_blank"><i class="bi bi-instagram"></i></a>
+            </div>
+        </div>
+
+        <div class="header-main-bar">
+            <a asp-controller="Home" asp-action="Index" class="logo d-flex align-items-center" aria-label="Trang chủ">
+                <img src="~/assets/img/logo2.png" alt="Logo Phế Liệu Thành Trung">
+            </a>
+
+            <div class="header-main-actions">
+                <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+                <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+                <nav id="navbar" class="navbar me-2">
+                    <ul>
+                        <li><a asp-controller="Home" asp-action="Index" class="active">Trang chủ</a></li>
+                        <li><a href="~/about.html">Giới thiệu</a></li>
+                        <li class="dropdown">
+                            <a href="~/services.html">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                            <ul>
+                                <li><a href="~/services.html">Khảo sát tận nơi</a></li>
+                                <li><a href="~/services.html">Thu mua số lượng lớn</a></li>
+                                <li><a href="~/services.html">Bốc xếp & vận chuyển</a></li>
+                                <li><a href="~/services.html">Dọn kho thanh lý</a></li>
+                                <li><a href="~/services.html">Thu gom định kỳ</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="~/projects.html">Mặt hàng</a></li>
+                        <li><a href="~/blog.html">Tin tức</a></li>
+                        <li><a href="~/contact.html">Liên hệ</a></li>
+                    </ul>
+                </nav>
+                <a href="#quote-form" class="header-cta d-none d-lg-inline-flex">
+                    <i class="bi bi-lightning-charge-fill"></i>
+                    Báo giá ngay
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
