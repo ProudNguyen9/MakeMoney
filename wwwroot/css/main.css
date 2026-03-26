@@ -7497,9 +7497,9 @@ section {
       border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
-    .scroll-top {
+    /* .scroll-top {
       background: var(--scrap-green);
-    }
+    } */
 
     .scroll-top:hover {
       background: var(--scrap-orange);
