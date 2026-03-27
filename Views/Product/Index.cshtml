@@ -1,0 +1,418 @@
+@model WebThuMuaPheLieu.Models.ProductIndexViewModel
+
+@{
+    Layout = "_HomeLayout";
+    ViewData["Title"] = "Mặt hàng";
+}
+
+<section id="products" class="services sections-bg product-materials-section home-card-section">
+    <div class="container-fluid home-section-shell" data-aos="fade-up">
+
+        <div class="section-header">
+            <h2>Những nhóm hàng thu mua thường xuyên</h2>
+            <p>
+                Phế Liệu Thành Phát thu mua đa dạng mặt hàng từ kim loại đen, kim loại màu đến máy móc cũ,
+                giấy, nhựa và hàng thanh lý kho xưởng.
+            </p>
+        </div>
+
+        <div id="product-list" class="home-cards-grid">
+            @foreach (var product in Model.Products)
+            {
+                var carouselId = $"product-carousel-{product.Id}";
+
+                <div data-aos="fade-up" data-aos-delay="100">
+                    <div class="card-item h-100 materials-card-v2 product-card-v2">
+                        <div id="@carouselId" class="materials-card-media product-carousel js-product-carousel">
+                            <div class="product-img">
+                                @for (var i = 0; i < product.Images.Count; i++)
+                                {
+                                    <div class="product-slide @(i == 0 ? "active" : string.Empty)">
+                                        <img src="@product.Images[i]" alt="@product.Name" class="img-fluid w-100">
+                                    </div>
+                                }
+                            </div>
+                            <span class="materials-badge"><i class="bi bi-box-seam"></i> @(product.CategoryName ?? "Mặt hàng")</span>
+                        </div>
+                        <div class="materials-card-body product-card-body">
+                            <h4 class="card-title">@product.Name</h4>
+                            <p class="mb-3">@(product.ShortDescription ?? product.Description ?? "Đang cập nhật mô tả cho mặt hàng này.")</p>
+                            <ul class="product-meta-list mb-0">
+                                <li><strong>Giá:</strong> @(product.PriceLabel ?? "Liên hệ")</li>
+                                <li><strong>Đơn vị:</strong> @(product.Unit ?? "Đang cập nhật")</li>
+                            </ul>
+                            <a href="~/blog.html" class="readmore">Xem bài viết <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="product-pagination mt-5">
+                <ul id="product-pagination" class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : string.Empty)">
+                        <a class="page-link js-page-link" href='@Url.Action("Index", "Product", new { page = Model.CurrentPage - 1 })' data-page="@(Model.CurrentPage - 1)">Trước</a>
+                    </li>
+
+                    @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                    {
+                        <li class="page-item @(pageNumber == Model.CurrentPage ? "active" : string.Empty)">
+                            <a class="page-link js-page-link" href='@Url.Action("Index", "Product", new { page = pageNumber })' data-page="@pageNumber">@pageNumber</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : string.Empty)">
+                        <a class="page-link js-page-link" href='@Url.Action("Index", "Product", new { page = Model.CurrentPage + 1 })' data-page="@(Model.CurrentPage + 1)">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+
+    </div>
+</section>
+
+<script>
+    (() => {
+        const productList = document.getElementById('product-list');
+        const pagination = document.getElementById('product-pagination');
+
+        function renderProducts(products) {
+            if (!productList) return;
+
+            productList.innerHTML = products.map((product, index) => {
+                const carouselId = `product-carousel-${product.id}`;
+                const slides = product.images.map((image, imageIndex) => `
+                    <div class="product-slide ${imageIndex === 0 ? 'active' : ''}">
+                        <img src="${image}" alt="${product.name}">
+                    </div>`).join('');
+
+                return `
+                    <div data-aos="fade-up" data-aos-delay="${100 + (index * 50)}">
+                        <div class="card-item h-100 materials-card-v2 product-card-v2">
+                            <div id="${carouselId}" class="materials-card-media product-carousel js-product-carousel">
+                                <div class="product-img">
+                                    ${slides}
+                                </div>
+                                <span class="materials-badge"><i class="bi bi-box-seam"></i> ${product.categoryName ?? 'Mặt hàng'}</span>
+                            </div>
+                            <div class="materials-card-body product-card-body">
+                                <h4 class="card-title">${product.name}</h4>
+                                <p class="mb-3">${product.shortDescription ?? product.description ?? 'Đang cập nhật mô tả cho mặt hàng này.'}</p>
+                                <ul class="product-meta-list mb-0">
+                                    <li><strong>Giá:</strong> ${product.priceLabel ?? 'Liên hệ'}</li>
+                                    <li><strong>Đơn vị:</strong> ${product.unit ?? 'Đang cập nhật'}</li>
+                                </ul>
+                                <a href="/blog.html" class="readmore">Xem bài viết <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            bindProductCarouselHover();
+        }
+
+        function renderPagination(currentPage, totalPages) {
+            if (!pagination) return;
+
+            let html = `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link js-page-link" href="/Product?page=${currentPage - 1}" data-page="${currentPage - 1}">Trước</a>
+                </li>`;
+
+            for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+                html += `
+                    <li class="page-item ${pageNumber === currentPage ? 'active' : ''}">
+                        <a class="page-link js-page-link" href="/Product?page=${pageNumber}" data-page="${pageNumber}">${pageNumber}</a>
+                    </li>`;
+            }
+
+            html += `
+                <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                    <a class="page-link js-page-link" href="/Product?page=${currentPage + 1}" data-page="${currentPage + 1}">Sau</a>
+                </li>`;
+
+            pagination.innerHTML = html;
+            bindPaginationAjax();
+        }
+
+        async function loadPage(page) {
+            if (!pagination || page < 1) return;
+
+            const response = await fetch(`/Product/GetPagedProducts?page=${page}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const data = await response.json();
+            renderProducts(data.products);
+            renderPagination(data.currentPage, data.totalPages);
+            window.history.pushState({}, '', `/Product?page=${data.currentPage}`);
+        }
+
+        function bindPaginationAjax() {
+            document.querySelectorAll('.js-page-link').forEach(link => {
+                link.addEventListener('click', event => {
+                    const page = Number(link.dataset.page);
+                    const pageItem = link.closest('.page-item');
+
+                    if (pageItem?.classList.contains('disabled') || pageItem?.classList.contains('active')) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    event.preventDefault();
+                    loadPage(page);
+                });
+            });
+        }
+
+        function bindProductCarouselHover() {
+            document.querySelectorAll('.js-product-carousel').forEach(element => {
+                let hoverInterval = null;
+                const hoverTarget = element.querySelector('.product-img');
+
+                const getSlides = () => Array.from(element.querySelectorAll('.product-slide'));
+
+                const showSlide = (nextIndex) => {
+                    const slides = getSlides();
+                    slides.forEach((slide, index) => {
+                        slide.classList.toggle('active', index === nextIndex);
+                    });
+                };
+
+                const getCurrentIndex = () => {
+                    const slides = getSlides();
+                    const currentIndex = slides.findIndex(slide => slide.classList.contains('active'));
+                    return currentIndex >= 0 ? currentIndex : 0;
+                };
+
+                const moveNext = () => {
+                    const slides = getSlides();
+                    if (slides.length <= 1) return;
+                    showSlide((getCurrentIndex() + 1) % slides.length);
+                };
+
+                const stopHover = () => {
+                    if (hoverInterval) {
+                        window.clearInterval(hoverInterval);
+                        hoverInterval = null;
+                    }
+                    element.classList.remove('is-hovering');
+                };
+
+                hoverTarget?.addEventListener('mouseenter', () => {
+                    if (getSlides().length <= 1 || hoverInterval) return;
+                    element.classList.add('is-hovering');
+                    moveNext();
+                    hoverInterval = window.setInterval(moveNext, 1200);
+                });
+
+                hoverTarget?.addEventListener('mouseleave', stopHover);
+            });
+        }
+
+        bindPaginationAjax();
+        bindProductCarouselHover();
+
+        window.addEventListener('popstate', () => {
+            const params = new URLSearchParams(window.location.search);
+            const page = Number(params.get('page') ?? '1');
+            loadPage(page);
+        });
+    })();
+</script>
+<section class="services product-advantages-section home-card-section">
+    <div class="container-fluid home-section-shell" data-aos="fade-up">
+        <div class="section-header product-advantages-header">
+            <span class="product-advantages-eyebrow">Thu mua chuyên nghiệp - xử lý theo nhóm hàng</span>
+            <h2>Lợi thế khi thu mua theo từng nhóm hàng</h2>
+            <p>
+                Khi phế liệu được phân tách ngay từ đầu, toàn bộ quy trình từ khảo sát, báo giá, bốc xếp đến thanh toán
+                đều trở nên nhanh hơn, rõ ràng hơn và tối ưu giá trị hơn cho khách hàng cá nhân lẫn doanh nghiệp.
+            </p>
+        </div>
+
+        <div class="product-advantages-highlight" data-aos="fade-up" data-aos-delay="100">
+            <div class="product-advantages-highlight__badge">
+                <i class="bi bi-stars"></i>
+                <span>3 giá trị cốt lõi khi phân loại đúng ngay từ đầu</span>
+            </div>
+            <div class="row gy-4 align-items-center">
+                <div class="col-lg-7">
+                    <div class="product-advantages-highlight__content">
+                        <h3>Tối ưu giá thu mua, tiết kiệm thời gian và hạn chế sai lệch khi cân hàng</h3>
+                        <p>
+                            Với mỗi nhóm như đồng, sắt, nhôm, inox, nhựa, cáp điện, mô tơ hay hàng công trình,
+                            chúng tôi áp dụng cách kiểm tra và định giá phù hợp để đảm bảo khách hàng nhận được mức
+                            thu mua sát thị trường thay vì bị gom chung một đơn giá.
+                        </p>
+                        <div class="product-advantages-highlight__stats">
+                            <div class="advantage-stat">
+                                <strong>Báo giá rõ loại</strong>
+                                <span>Tách riêng từng nhóm vật liệu có giá trị khác nhau</span>
+                            </div>
+                            <div class="advantage-stat">
+                                <strong>Thu gom đúng cách</strong>
+                                <span>Chuẩn bị nhân sự, xe tải và dụng cụ phù hợp từng lô hàng</span>
+                            </div>
+                            <div class="advantage-stat">
+                                <strong>Đối chiếu dễ dàng</strong>
+                                <span>Dễ kiểm tra khối lượng, hạn chế chênh lệch khi thanh toán</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="product-advantages-highlight__panel">
+                        <div class="highlight-panel-card">
+                            <div class="mini-icon"><i class="bi bi-file-earmark-check"></i></div>
+                            <h4>Quy trình gọn và minh bạch</h4>
+                            <ul>
+                                <li><i class="bi bi-check-circle-fill"></i> Khảo sát nhanh theo nhóm vật liệu</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Ước tính giá trước khi thu gom</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Cân tách loại rõ ràng tại chỗ</li>
+                                <li><i class="bi bi-check-circle-fill"></i> Thanh toán thuận tiện, dễ đối chiếu</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row gy-4 product-advantages-grid">
+            <div class="col-xl-3 col-md-6">
+                <div class="service-item product-advantage-card position-relative h-100" data-aos="zoom-in" data-aos-delay="120">
+                    <div class="icon">
+                        <i class="bi bi-tags-fill"></i>
+                    </div>
+                    <span class="product-advantage-card__number">01</span>
+                    <h3>Định giá sát thực tế</h3>
+                    <p>
+                        Mỗi nhóm hàng có mức giá riêng. Việc tách đúng chủng loại giúp báo giá chuẩn hơn,
+                        đặc biệt với đồng đỏ, cáp điện, inox, nhôm đúc và các mặt hàng có giá trị cao.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="service-item product-advantage-card position-relative h-100" data-aos="zoom-in" data-aos-delay="180">
+                    <div class="icon">
+                        <i class="bi bi-speedometer2"></i>
+                    </div>
+                    <span class="product-advantage-card__number">02</span>
+                    <h3>Thu gom nhanh hơn</h3>
+                    <p>
+                        Khi biết trước loại hàng, đội thu mua có thể chuẩn bị xe, nhân lực, thiết bị cắt tháo
+                        và phương án bốc xếp phù hợp để rút ngắn đáng kể thời gian làm việc tại chỗ.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="service-item product-advantage-card position-relative h-100" data-aos="zoom-in" data-aos-delay="240">
+                    <div class="icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <span class="product-advantage-card__number">03</span>
+                    <h3>Minh bạch khi cân hàng</h3>
+                    <p>
+                        Từng loại vật liệu được cân và ghi nhận riêng, giúp khách hàng dễ kiểm tra số lượng,
+                        đối chiếu đơn giá và an tâm hơn khi xử lý các lô hàng lớn hoặc hàng thanh lý kho xưởng.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="service-item product-advantage-card position-relative h-100" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="icon">
+                        <i class="bi bi-recycle"></i>
+                    </div>
+                    <span class="product-advantage-card__number">04</span>
+                    <h3>Tối ưu khâu phân luồng</h3>
+                    <p>
+                        Hàng được gom theo nhóm ngay từ đầu sẽ dễ vận chuyển, dễ lưu kho tạm và thuận lợi hơn
+                        cho khâu tái chế, từ đó giảm thất thoát và tăng hiệu quả xử lý toàn bộ lô phế liệu.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="service-item product-advantage-card position-relative h-100" data-aos="fade-up" data-aos-delay="140">
+                    <div class="icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <h3>Phù hợp cả đơn nhỏ lẫn hàng số lượng lớn</h3>
+                    <p>
+                        Từ hộ gia đình, cửa hàng đến nhà xưởng, công trình hoặc kho thanh lý, chúng tôi đều có thể
+                        sắp xếp phương án thu mua tương ứng với khối lượng và đặc thù từng nhóm hàng.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="service-item product-advantage-card position-relative h-100" data-aos="fade-up" data-aos-delay="220">
+                    <div class="icon">
+                        <i class="bi bi-cash-coin"></i>
+                    </div>
+                    <h3>Dễ chốt giá và thanh toán nhanh</h3>
+                    <p>
+                        Khi đã phân loại rõ, bảng giá trở nên cụ thể hơn, khách hàng dễ quyết định hơn và quá trình
+                        thanh toán cũng diễn ra nhanh, hạn chế tranh cãi do hiểu nhầm đơn giá giữa các loại vật liệu.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-12">
+                <div class="service-item product-advantage-card position-relative h-100 " data-aos="fade-up" data-aos-delay="300">
+                    <div class="icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h3>Khách hàng chủ động hơn trong khâu chuẩn bị</h3>
+                    <p>
+                        Chỉ cần chụp ảnh hoặc mô tả sơ bộ từng nhóm phế liệu, khách hàng đã có thể nhận tư vấn trước
+                        về cách tập kết, cách tháo dỡ và thời điểm thu gom phù hợp để tiết kiệm công sức nhất.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="call-to-action modern-cta home-card-section">
+    <div class="container-fluid home-section-shell" data-aos="zoom-out">
+        <div class="row align-items-center gy-4">
+
+            <!-- TEXT -->
+            <div class="col-lg-8">
+                <h3>Bạn có nhiều loại phế liệu cần thu mua cùng lúc?</h3>
+                <p>
+                    Gửi hình ảnh tổng thể, chúng tôi sẽ hỗ trợ phân nhóm hàng,
+                    tư vấn cách gom gọn để cân nhanh và báo giá thuận lợi nhất ngay tại chỗ.
+                </p>
+
+                <div class="cta-actions">
+                    <a class="cta-btn" asp-controller="Home" asp-action="Contact">
+                        <i class="bi bi-telephone-fill"></i> Liên hệ báo giá
+                    </a>
+
+                    <a class="cta-btn-outline" href="#">
+                        <i class="bi bi-chat-dots-fill"></i> Nhắn Zalo
+                    </a>
+                </div>
+            </div>
+
+            <!-- IMAGE -->
+            <div class="col-lg-4 text-center">
+                <img src="~/assets/img/services.jpg" alt="Liên hệ thu mua" class="cta-img">
+            </div>
+
+        </div>
+    </div>
+</section>
