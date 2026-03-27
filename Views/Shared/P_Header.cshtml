@@ -32,35 +32,37 @@
         <div class="header-main-bar">
             <a asp-controller="Home" asp-action="Index" class="logo d-flex align-items-center" aria-label="Trang chủ">
                 <img src="~/assets/img/logo2.png" alt="Logo Phế Liệu Thành Trung">
-            </a>
-
-            <div class="header-main-actions">
-                <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
-                <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
-                <nav id="navbar" class="navbar me-2">
-                    <ul>
-                        <li><a asp-controller="Home" asp-action="Index" class="active">Trang chủ</a></li>
-                        <li><a href="~/about.html">Giới thiệu</a></li>
-                        <li class="dropdown">
-                            <a href="~/services.html">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
-                            <ul>
-                                <li><a href="~/services.html">Khảo sát tận nơi</a></li>
-                                <li><a href="~/services.html">Thu mua số lượng lớn</a></li>
-                                <li><a href="~/services.html">Bốc xếp & vận chuyển</a></li>
-                                <li><a href="~/services.html">Dọn kho thanh lý</a></li>
-                                <li><a href="~/services.html">Thu gom định kỳ</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="~/projects.html">Mặt hàng</a></li>
-                        <li><a href="~/blog.html">Tin tức</a></li>
-                        <li><a href="~/contact.html">Liên hệ</a></li>
-                    </ul>
-                </nav>
-                <a href="#quote-form" class="header-cta d-none d-lg-inline-flex">
-                    <i class="bi bi-lightning-charge-fill"></i>
-                    Báo giá ngay
                 </a>
+
+                <div class="header-main-actions">
+                    <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+                    <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+                    <nav id="navbar" class="navbar me-2">
+                        <ul>
+                            <li><a asp-controller="Home" asp-action="Index"
+                                   class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : null)">Trang
+                                chủ</a></li>
+                                <li><a href="~/about.html">Giới thiệu</a></li>
+                                <li class="dropdown">
+                                    <a href="~/services.html">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                                    <ul>
+                                        <li><a href="~/services.html">Khảo sát tận nơi</a></li>
+                                        <li><a href="~/services.html">Thu mua số lượng lớn</a></li>
+                                        <li><a href="~/services.html">Bốc xếp & vận chuyển</a></li>
+                                        <li><a href="~/services.html">Dọn kho thanh lý</a></li>
+                                        <li><a href="~/services.html">Thu gom định kỳ</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="~/projects.html">Mặt hàng</a></li>
+                                <li><a href="~/blog.html">Tin tức</a></li>
+                                <li><a href="~/contact.html">Liên hệ</a></li>
+                            </ul>
+                        </nav>
+                        <a href="#quote-form" class="header-cta d-none d-lg-inline-flex">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                            Báo giá ngay
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</header>
+        </header>
