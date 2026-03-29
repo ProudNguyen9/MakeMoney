@@ -1,0 +1,90 @@
+@model IEnumerable<WebThuMuaPheLieu.Models.BlogPost>
+@{
+    var recentBlogPosts = Model?.ToList() ?? new List<WebThuMuaPheLieu.Models.BlogPost>();
+}
+
+@functions {
+    string NormalizeBlogImagePath(string? coverImage)
+    {
+        if (string.IsNullOrWhiteSpace(coverImage))
+        {
+            return "/assets/img/blog/blog-1.jpg";
+        }
+
+        var normalized = coverImage.Replace("\\", "/").Trim();
+
+        if (normalized.StartsWith("/"))
+        {
+            return normalized;
+        }
+
+        var fileName = normalized.Contains('/')
+            ? normalized.Split('/').Last()
+            : normalized;
+
+        return $"/assets/img/blog/{fileName}";
+    }
+
+    string BuildBlogSummary(WebThuMuaPheLieu.Models.BlogPost post)
+    {
+        var summary = !string.IsNullOrWhiteSpace(post.Excerpt)
+            ? post.Excerpt
+            : post.Content;
+
+        if (string.IsNullOrWhiteSpace(summary))
+        {
+            return "Nội dung bài viết đang được cập nhật.";
+        }
+
+        summary = summary.Trim();
+        return summary.Length > 160 ? $"{summary[..157]}..." : summary;
+    }
+}
+
+<section id="recent-news" class="services py-5 home-card-section">
+    <div class="container-fluid home-section-shell" data-aos="fade-up">
+        <div class="section-header">
+            <h2>Tin tức gần đây</h2>
+            <p>Nội dung tin tức được xây dựng rõ ràng để khách hàng dễ theo dõi và nắm bắt nhanh hơn trong quá trình tìm hiểu thị trường: chúng tôi thường xuyên cập nhật giá phế liệu, kinh nghiệm phân loại, mẹo chuẩn bị trước khi thanh lý và các lưu ý thực tế, giúp khách cá nhân, cửa hàng, kho xưởng và doanh nghiệp chủ động hơn trước khi bán hàng.</p>
+        </div>
+
+        @if (recentBlogPosts.Any())
+        {
+            <div class="home-cards-grid">
+                @for (var index = 0; index < recentBlogPosts.Count; index++)
+                {
+                    var post = recentBlogPosts[index];
+                    var publishDate = post.PublishedAt ?? post.CreatedAt;
+                    var animationDelay = 100 + (index % 4) * 100;
+
+                    <div data-aos="fade-up" data-aos-delay="@animationDelay">
+                        <article class="news-card-v2">
+                            <div class="news-card-media">
+                                <img src="@NormalizeBlogImagePath(post.CoverImage)"
+                                     alt="@(post.Title ?? "Tin tức phế liệu")"
+                                     class="img-fluid w-100"
+                                     loading="lazy">
+                                <span class="news-badge"><i class="bi bi-newspaper"></i> Tin tức</span>
+                            </div>
+                            <div class="news-card-body">
+                                <div class="news-card-meta">
+                                    <span><i class="bi bi-calendar3"></i> @(publishDate?.ToString("dd/MM/yyyy") ?? "Đang cập nhật")</span>
+                                    <span><i class="bi bi-journal-text"></i> Bài viết mới</span>
+                                </div>
+                                <h3 class="news-card-title">@(post.Title ?? "Tin tức đang cập nhật")</h3>
+                                <p>@BuildBlogSummary(post)</p>
+                                <a href="~/blog.html" class="readmore">Xem bài viết <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </article>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="col-12 text-center py-4">
+                <p class="text-muted mb-0">Đang cập nhật tin tức mới nhất...</p>
+            </div>
+        }
+    </div>
+</section>

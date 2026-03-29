@@ -4764,7 +4764,7 @@ body {
 .materials-card-body .card-title {
   display: flex;
   align-items: flex-start;
-  min-height: 54px;
+  min-height: 12px;
   font-size: 21px;
   line-height: 1.35;
   margin: 0;
