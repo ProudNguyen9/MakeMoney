@@ -202,17 +202,29 @@
     .detail-hero-main {
       position: relative;
       width: 100%;
-      height: 620px;
+      min-height: 553px;
+      height: 553px;
       overflow: hidden;
       border-radius: 1.75rem;
       border: 1px solid rgb(253, 230, 138);
       box-shadow: 0 18px 40px rgba(17, 24, 39, 0.12);
+      background: #f8fafc;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
     }
 
     .detail-hero-main img {
       width: 100%;
       height: 100%;
+      min-height: 100%;
+      max-height: none;
       object-fit: cover;
+      object-position: center;
+      display: block;
+      image-rendering: auto;
+      transform: translateZ(0);
+      backface-visibility: hidden;
     }
 
     .detail-hero-overlay {
@@ -358,10 +370,11 @@
     }
 
     .detail-heading-block h1 {
-      font-size: 2.65rem;
+      font-family: "Bungee", sans-serif;
+      font-size: 1.6rem;
       line-height: 1.1;
-      font-weight: 900;
-      letter-spacing: -0.03em;
+      font-weight: 400;
+      letter-spacing: 0.03em;
       margin-bottom: 8px;
       color: var(--primary);
     }
@@ -378,11 +391,11 @@
       position: relative;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 14px;
       width: 100%;
       min-width: 0;
-      padding: 22px 24px 18px;
-      border-radius: 2rem;
+      padding: 18px 20px 16px;
+      border-radius: 1.5rem;
       border: 1px solid rgba(249, 189, 34, 0.45);
       background:
         radial-gradient(circle at top right, rgba(249, 189, 34, 0.12), transparent 22%),
@@ -410,15 +423,15 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      gap: 16px 24px;
+      gap: 12px 18px;
     }
 
     .detail-price-label {
       margin: 0;
-      font-size: 0.95rem;
+      font-size: 0.8rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.22em;
+      letter-spacing: 0.18em;
       color: #334155;
     }
 
@@ -426,12 +439,12 @@
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
-      gap: 12px 16px;
-      margin-top: 10px;
+      gap: 8px 12px;
+      margin-top: 6px;
     }
 
     .detail-price-value {
-      font-size: clamp(2.25rem, 3vw, 3.3rem);
+      font-size: clamp(1.75rem, 2.4vw, 2.7rem);
       line-height: 1;
       font-weight: 900;
       letter-spacing: -0.04em;
@@ -439,23 +452,23 @@
     }
 
     .detail-price-note {
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-weight: 500;
       color: #475569;
       white-space: normal;
-      max-width: 520px;
+      max-width: 460px;
     }
 
     .detail-trend-pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       width: fit-content;
-      padding: 12px 18px;
+      padding: 10px 14px;
       border-radius: 999px;
       background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
       color: #059669;
-      font-size: 1rem;
+      font-size: 0.92rem;
       font-weight: 700;
       white-space: nowrap;
     }
@@ -645,11 +658,40 @@
 
     .detail-section-head h2 {
       margin-top: 16px;
-      font-size: 2.05rem;
+      font-family: "Bungee", sans-serif;
+      font-size: 1.6rem;
       line-height: 1.15;
-      font-weight: 900;
-      letter-spacing: -0.03em;
+      font-weight: 400;
+      letter-spacing: 0.03em;
       color: var(--primary);
+    }
+
+    .detail-main #recent-news .section-header h2,
+    .detail-main #services .section-header h2 {
+      font-size: 1.6rem !important;
+      line-height: 1.15;
+    }
+
+    .detail-main #recent-news .section-header p,
+    .detail-main #services .section-header p {
+      font-weight: initial;
+    }
+
+    .detail-main #services .section-header {
+      text-align: center;
+    }
+
+    .detail-main #services .section-header p {
+      margin: 0 auto;
+      width: 100%;
+      max-width: 760px;
+      font-family: "Be Vietnam Pro", sans-serif;
+      font-size: 21px;
+      font-weight: initial;
+      line-height: 1.9rem;
+      color: var(--on-surface-variant);
+      letter-spacing: 0;
+      text-align: center;
     }
 
     .detail-section-head p {
@@ -699,71 +741,68 @@
       backdrop-filter: blur(8px);
     }
 
-    .detail-materials-track {
-      display: flex;
-      gap: 20px;
-      overflow-x: auto;
-      padding: 4px 4px 8px;
-      scroll-behavior: smooth;
-      scrollbar-width: none;
-      scroll-snap-type: x mandatory;
-    }
-
-    .detail-materials-track::-webkit-scrollbar {
-      display: none;
-    }
-
-    .detail-material-card {
-      flex: 0 0 320px;
-      scroll-snap-align: start;
-      border-radius: 1.5rem;
+    .detail-related-carousel-wrap {
       overflow: hidden;
-      background: #fff;
-      border: 1px solid rgba(6, 78, 59, 0.08);
-      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05);
     }
 
-    .detail-material-card img {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
+    .detail-related-products-swiper {
+      overflow: hidden;
+      padding: 4px 2px 34px;
     }
 
-    .detail-material-body {
-      padding: 20px;
+    .detail-related-products-swiper .swiper-wrapper {
+      align-items: stretch;
     }
 
-    .detail-material-body h3 {
-      font-size: 1.05rem;
-      font-weight: 900;
-      color: var(--primary);
-      letter-spacing: -0.02em;
-    }
-
-    .detail-material-body p {
-      margin-top: 10px;
-      font-size: 14px;
-      line-height: 1.75rem;
-      color: var(--on-surface-variant);
-    }
-
-    .detail-material-tags {
+    .detail-related-products-swiper .swiper-slide {
+      height: auto;
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 16px;
     }
 
-    .detail-material-tags span {
+    .detail-related-products-swiper .detail-related-card {
+      width: 100%;
+      height: 100%;
+    }
+
+    .detail-related-products-swiper .materials-card-media {
+      aspect-ratio: 16 / 10;
+      height: auto;
+      min-height: 220px;
+    }
+
+    .detail-related-products-swiper .materials-products-pagination {
+      bottom: 0 !important;
+    }
+
+    .detail-related-products-swiper .materials-products-pagination .swiper-pagination-bullet {
+      width: 10px;
+      height: 10px;
+      background: rgba(15, 23, 42, 0.22);
+      opacity: 1;
+    }
+
+    .detail-related-products-swiper .materials-products-pagination .swiper-pagination-bullet-active {
+      background: #198754;
+    }
+
+    .detail-related-products-swiper .materials-card-body .readmore {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: #ecfdf5;
-      color: #047857;
-      font-size: 12px;
-      font-weight: 700;
+      gap: 8px;
+      color: rgba(15, 23, 42, 0.62);
+      opacity: 0.72;
+      transition: color 0.3s ease, opacity 0.3s ease, gap 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .detail-related-products-swiper .materials-card-body .readmore i {
+      font-size: 15px;
+    }
+
+    .detail-related-products-swiper .materials-card-v2:hover .readmore {
+      color: #198754;
+      opacity: 1;
+      gap: 12px;
+      text-shadow: 0 0 18px rgba(25, 135, 84, 0.22);
     }
 
     .detail-two-col {
@@ -804,10 +843,11 @@
     .detail-referral-card h2 {
       margin-top: 20px;
       max-width: 640px;
-      font-size: 2.05rem;
+      font-family: "Bungee", sans-serif;
+      font-size: 1.6rem;
       line-height: 1.15;
-      font-weight: 900;
-      letter-spacing: -0.03em;
+      font-weight: 400;
+      letter-spacing: 0.03em;
       color: var(--primary);
     }
 
@@ -820,10 +860,11 @@
       margin-left: auto;
       margin-right: auto;
       /* max-width: 640px; */
-      font-size: 2.05rem;
+      font-family: "Bungee", sans-serif;
+      font-size: 1.6rem;
       line-height: 1.15;
-      font-weight: 900;
-      letter-spacing: -0.03em;
+      font-weight: 400;
+      letter-spacing: 0.03em;
       color: var(--primary);
       text-align: center;
     }
@@ -1062,11 +1103,12 @@
     .detail-final-cta-copy h2 {
       margin-top: 20px;
       max-width: 720px;
-      font-size: 2.2rem;
+      font-family: "Bungee", sans-serif;
+      font-size: 1.6rem;
       line-height: 1.15;
-      font-weight: 900;
+      font-weight: 400;
       color: #fff;
-      letter-spacing: -0.03em;
+      letter-spacing: 0.03em;
     }
 
     .detail-final-cta-copy h2 span {
@@ -1543,10 +1585,11 @@
 
     .detail-process-head h2 {
       margin-top: 16px;
-      font-size: 2.25rem;
-      font-weight: 900;
+      font-family: "Bungee", sans-serif;
+      font-size: 1.6rem;
+      font-weight: 400;
       color: #145c3a;
-      letter-spacing: -0.03em;
+      letter-spacing: 0.03em;
     }
 
     .detail-process-head p {
@@ -1739,10 +1782,11 @@
 
     .detail-trust-highlight h2 {
       margin-top: 20px;
-      font-size: 2.5rem;
+      font-family: "Bungee", sans-serif;
+      font-size: 1.6rem;
       line-height: 1.12;
-      font-weight: 900;
-      letter-spacing: -0.03em;
+      font-weight: 400;
+      letter-spacing: 0.03em;
     }
 
     .detail-trust-highlight p {
@@ -2153,19 +2197,20 @@
         padding-right: 20px;
       }
 
+      .detail-heading-block h1 {
+        font-size: 2rem;
+      }
+
       .detail-section-head h2,
       .detail-process-head h2,
       .detail-final-cta-copy h2,
       .detail-trust-highlight h2,
-      .detail-heading-block h1 {
-        font-size: 1.9rem;
+      .detail-referral-card h2,
+      .detail-referral-title {
+        font-size: 1.6rem;
       }
 
-      .detail-referral-card h2 {
-        font-size: 1.8rem;
-      }
-
-      .detail-material-card {
-        flex-basis: 280px;
+      .detail-related-products-swiper {
+        padding-bottom: 30px;
       }
     }

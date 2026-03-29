@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebThuMuaPheLieu.Models.Product>
+﻿@model WebThuMuaPheLieu.ViewModels.HomeIndexViewModel
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Trang chủ";
@@ -52,7 +52,7 @@
                                 <div class="container-fluid home-section-shell" data-aos="fade-up">
                                     <div class="section-header mb-0">
                                         <h2>Thu mua tất cả các loại phế liệu</h2>
-                                        <p>Danh mục thu mua được trình bày rõ ràng để khách hàng dễ hình dung ngay từ đầu: chúng tôi tiếp nhận
+                                        <p class="text-dart">Danh mục thu mua được trình bày rõ ràng để khách hàng dễ hình dung ngay từ đầu: chúng tôi tiếp nhận
                                             nhiều loại phế liệu từ dân dụng, văn phòng, cửa hàng nhỏ lẻ cho đến hàng công nghiệp số lượng lớn
                                             tại kho xưởng, công trình và doanh nghiệp, đồng thời hỗ trợ khảo sát tận nơi, tư vấn phân loại,
                                             báo giá minh bạch và thu gom nhanh gọn trong suốt quá trình thanh lý.</p>
@@ -121,11 +121,7 @@
                                         </style>
 
                                         @{
-                                            var productList = Model?.ToList() ?? new List<WebThuMuaPheLieu.Models.Product>();
-                                            var recentBlogPosts = (ViewBag.RecentBlogPosts as IEnumerable<WebThuMuaPheLieu.Models.BlogPost>)?.ToList()
-                                                ?? new List<WebThuMuaPheLieu.Models.BlogPost>();
-                                            var serviceBlogPosts = (ViewBag.ServiceBlogPosts as IEnumerable<WebThuMuaPheLieu.Models.BlogPost>)?.ToList()
-                                                ?? new List<WebThuMuaPheLieu.Models.BlogPost>();
+                                            var productList = Model?.Products?.ToList() ?? new List<WebThuMuaPheLieu.Models.Product>();
                                         }
 
                                         @if (productList.Any())
@@ -137,7 +133,8 @@
                                                         var imageSequence = BuildImageSequence(product);
 
                                                         <div class="swiper-slide">
-                                                            <div class="card-item h-100 materials-card-v2">
+                                                            <a asp-controller="Home" asp-action="Detail" asp-route-slug="@product.Slug" asp-route-id="@product.Id"
+                                                               class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
                                                                 <div class="materials-card-media">
                                                                     <img src="@imageSequence[0]"
                                                                          data-image-sequence="@string.Join("|", imageSequence)"
@@ -153,9 +150,9 @@
                                                                 <div class="materials-card-body">
                                                                     <h4 class="card-title">@product.Name</h4>
                                                                     <p>@(product.ShortDescription ?? product.Description ?? "Đang cập nhật thông tin sản phẩm.")</p>
-                                                                    <a href="~/detail.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
+                                                                    <span class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></span>
                                                                 </div>
-                                                            </div>
+                                                            </a>
                                                         </div>
                                                     }
                                                 </div>
@@ -405,7 +402,7 @@
                                                                                                                     </div>
                                                                                                                 </section>
 
-                                                                                                                <partial name="Components/_RecentNewsSection" model="recentBlogPosts" />
+                                                                                                                @await Component.InvokeAsync("RecentNewsSectionComponent")
 
                                                                                                                                                         <section id="coverage-areas" class="services py-5 home-card-section coverage-section">
                                                                                                                                                             <div class="container-fluid home-section-shell" data-aos="fade-up">
@@ -502,5 +499,5 @@
                                                                                                                                                                                                                                         </div>
                                                                                                                                                                                                                                     </section>
 
-                                                                                                                                                                                                                                    <partial name="Components/_ScrapPurchaseServicesSection" model="serviceBlogPosts" />
+                                                                                                                                                                                                                                    @await Component.InvokeAsync("ScrapPurchaseServicesSectionComponent")
                                                                                                                                                                                                                                                                                     </main>
