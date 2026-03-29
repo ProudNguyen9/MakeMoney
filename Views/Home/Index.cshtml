@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<WebThuMuaPheLieu.Models.Product>
+@{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Trang chủ";
 }
@@ -17,7 +18,6 @@
                                 thu mua</a>
                             </div>
                         </div>
-
                         <div class="col-lg-7" data-aos="fade-left" data-aos-delay="180">
                             <div class="hero-visual-wrap">
                                 <div class="hero-illustration">
@@ -58,91 +58,289 @@
                                             báo giá minh bạch và thu gom nhanh gọn trong suốt quá trình thanh lý.</p>
                                         </div>
 
-                                        <div class="home-cards-grid" data-aos="fade-up" data-aos-delay="100">
-                                            <div>
-                                                <div class="card-item h-100 materials-card-v2">
-                                                    <div class="materials-card-media">
-                                                        <img src="~/assets/img/satthep.png" alt="Sắt thép" class="img-fluid w-100">
-                                                            <span class="materials-badge"><i class="bi bi-building"></i> Công trình</span>
-                                                        </div>
-                                                        <div class="materials-card-body">
-                                                            <h4 class="card-title">Sắt thép công trình</h4>
-                                                            <p class="mb-0">Nhận thu mua sắt thép công trình, khung kèo, xà gồ, tôn cũ và các kết cấu
-                                                                tháo dỡ với số lượng từ nhỏ đến lớn.</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                        <style>
+                                            #materials .materials-grid-swiper {
+                                                overflow: hidden;
+                                                padding: 4px 2px 34px;
+                                            }
 
-                                                    <div>
-                                                        <div class="card-item h-100 materials-card-v2">
-                                                            <div class="materials-card-media">
-                                                                <img src="~/assets/img/dongnhom.jpg" alt="Kim loại" class="img-fluid w-100">
-                                                                    <span class="materials-badge"><i class="bi bi-gem"></i> Kim loại màu</span>
+                                            #materials .materials-grid-swiper .swiper-wrapper {
+                                                align-items: stretch;
+                                            }
+
+                                            #materials .materials-grid-swiper .swiper-slide {
+                                                height: auto;
+                                                display: flex;
+                                            }
+
+                                            #materials .materials-grid-swiper .materials-card-v2 {
+                                                width: 100%;
+                                                height: 100%;
+                                            }
+
+                                            #materials .materials-grid-swiper .materials-card-media {
+                                                aspect-ratio: 16 / 10;
+                                                height: auto;
+                                                min-height: 220px;
+                                            }
+
+                                            #materials .materials-products-pagination {
+                                                bottom: 0 !important;
+                                            }
+
+                                            #materials .materials-products-pagination .swiper-pagination-bullet {
+                                                width: 10px;
+                                                height: 10px;
+                                                background: rgba(15, 23, 42, 0.22);
+                                                opacity: 1;
+                                            }
+
+                                            #materials .materials-products-pagination .swiper-pagination-bullet-active {
+                                                background: #198754;
+                                            }
+
+                                            #materials .materials-card-body .readmore {
+                                                display: inline-flex;
+                                                align-items: center;
+                                                gap: 8px;
+                                                color: rgba(15, 23, 42, 0.62);
+                                                opacity: 0.72;
+                                                transition: color 0.3s ease, opacity 0.3s ease, gap 0.3s ease, text-shadow 0.3s ease;
+                                            }
+
+                                            #materials .materials-card-body .readmore i {
+                                                font-size: 15px;
+                                            }
+
+                                            #materials .materials-card-v2:hover .readmore {
+                                                color: #198754;
+                                                opacity: 1;
+                                                gap: 12px;
+                                                text-shadow: 0 0 18px rgba(25, 135, 84, 0.22);
+                                            }
+                                        </style>
+
+                                        @{
+                                            var productList = Model?.ToList() ?? new List<WebThuMuaPheLieu.Models.Product>();
+                                            var recentBlogPosts = (ViewBag.RecentBlogPosts as IEnumerable<WebThuMuaPheLieu.Models.BlogPost>)?.ToList()
+                                                ?? new List<WebThuMuaPheLieu.Models.BlogPost>();
+                                            var serviceBlogPosts = (ViewBag.ServiceBlogPosts as IEnumerable<WebThuMuaPheLieu.Models.BlogPost>)?.ToList()
+                                                ?? new List<WebThuMuaPheLieu.Models.BlogPost>();
+                                        }
+
+                                        @if (productList.Any())
+                                        {
+                                            <div class="materials-grid-swiper swiper" data-aos="fade-up" data-aos-delay="100">
+                                                <div class="swiper-wrapper">
+                                                    @foreach (var product in productList)
+                                                    {
+                                                        var imageSequence = BuildImageSequence(product);
+
+                                                        <div class="swiper-slide">
+                                                            <div class="card-item h-100 materials-card-v2">
+                                                                <div class="materials-card-media">
+                                                                    <img src="@imageSequence[0]"
+                                                                         data-image-sequence="@string.Join("|", imageSequence)"
+                                                                         data-default-image="@imageSequence[0]"
+                                                                         alt="@product.Name"
+                                                                         class="img-fluid w-100 materials-hover-image"
+                                                                         loading="lazy">
+                                                                    <span class="materials-badge">
+                                                                        <i class="bi bi-@(GetCategoryIcon(product.Category?.Name))"></i>
+                                                                        @(product.Category?.Name ?? "Phế liệu")
+                                                                    </span>
                                                                 </div>
                                                                 <div class="materials-card-body">
-                                                                    <h4 class="card-title">Đồng, nhôm, inox</h4>
-                                                                    <p class="mb-0">Thu mua đồng cáp, nhôm thanh, inox 304 và nhiều kim loại màu khác, phân loại
-                                                                        rõ và báo giá theo đúng chất lượng.</p>
-                                                                    </div>
+                                                                    <h4 class="card-title">@product.Name</h4>
+                                                                    <p>@(product.ShortDescription ?? product.Description ?? "Đang cập nhật thông tin sản phẩm.")</p>
+                                                                    <a href="~/detail.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
                                                                 </div>
                                                             </div>
+                                                        </div>
+                                                    }
+                                                </div>
 
-                                                            <div>
-                                                                <div class="card-item h-100 materials-card-v2">
-                                                                    <div class="materials-card-media">
-                                                                        <img src="~/assets/img/giaycatton.jpg" alt="Giấy nhựa" class="img-fluid w-100">
-                                                                            <span class="materials-badge"><i class="bi bi-box-seam"></i> Kho hàng</span>
-                                                                        </div>
-                                                                        <div class="materials-card-body">
-                                                                            <h4 class="card-title">Giấy, carton, nhựa</h4>
-                                                                            <p class="mb-0">Nhận giấy vụn, carton, nhựa PP, PE, PET cùng bao bì tồn kho, phù hợp cho cửa
-                                                                                hàng, kho bãi và xưởng sản xuất.</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                <div class="materials-products-pagination swiper-pagination"></div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="col-12 text-center py-5">
+                                                <p class="text-muted">Đang cập nhật danh sách sản phẩm...</p>
+                                            </div>
+                                        }
 
-                                                                    <div>
-                                                                        <div class="card-item h-100 materials-card-v2">
-                                                                            <div class="materials-card-media">
-                                                                                <img src="~/assets/img/maymoc.jpg" alt="Máy móc" class="img-fluid w-100">
-                                                                                    <span class="materials-badge"><i class="bi bi-cpu"></i> Thiết bị cũ</span>
-                                                                                </div>
-                                                                                <div class="materials-card-body">
-                                                                                    <h4 class="card-title">Máy móc, dây cáp</h4>
-                                                                                    <p class="mb-0">Thu mua máy lạnh cũ, mô tơ, tủ điện, bo mạch và dây cáp điện thanh lý, hỗ
-                                                                                        trợ tháo dỡ khi khách hàng cần.</p>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function () {
+                                                const materialsSwiperElement = document.querySelector('.materials-grid-swiper');
 
-                                                                            <div>
-                                                                                <div class="card-item h-100 materials-card-v2">
-                                                                                    <div class="materials-card-media">
-                                                                                        <img src="~/assets/img/satthep.png" alt="Phế liệu nhà xưởng" class="img-fluid w-100">
-                                                                                            <span class="materials-badge"><i class="bi bi-gear-wide-connected"></i> Nhà xưởng</span>
-                                                                                        </div>
-                                                                                        <div class="materials-card-body">
-                                                                                            <h4 class="card-title">Phế liệu nhà xưởng</h4>
-                                                                                            <p class="mb-0">Hỗ trợ thu gom vật tư cơ khí, dầm thép, khung sắt và phế liệu phát sinh
-                                                                                                trong quá trình dọn kho hoặc tháo dỡ nhà xưởng.</p>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
+                                                if (materialsSwiperElement && typeof Swiper !== 'undefined') {
+                                                    const totalSlides = materialsSwiperElement.querySelectorAll('.swiper-slide').length;
+                                                    const shouldLoop = totalSlides > 8;
 
-                                                                                    <div>
-                                                                                        <div class="card-item h-100 materials-card-v2">
-                                                                                            <div class="materials-card-media">
-                                                                                                <img src="~/assets/img/services.jpg" alt="Phế liệu dân dụng" class="img-fluid w-100">
-                                                                                                    <span class="materials-badge"><i class="bi bi-house-door-fill"></i> Dân dụng</span>
-                                                                                                </div>
-                                                                                                <div class="materials-card-body">
-                                                                                                    <h4 class="card-title">Phế liệu dân dụng</h4>
-                                                                                                    <p class="mb-0">Nhận thu mua đồ cũ gia đình, cửa sắt, inox, nhôm kính và nhiều vật tư thanh
-                                                                                                        lý tại nhà với quy trình nhanh gọn, dễ làm việc.</p>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
+                                                    new Swiper(materialsSwiperElement, {
+                                                        speed: 800,
+                                                        loop: false,
+                                                        rewind: true,
+                                                        slidesPerView: 1,
+                                                        slidesPerGroup: 1,
+                                                        spaceBetween: 16,
+                                                        grabCursor: true,
+                                                        allowTouchMove: true,
+                                                        simulateTouch: true,
+                                                        touchStartPreventDefault: false,
+                                                        watchOverflow: true,
+                                                        grid: {
+                                                            rows: 2,
+                                                            fill: 'row'
+                                                        },
+                                                        autoplay: {
+                                                            delay: 5000,
+                                                            disableOnInteraction: false,
+                                                            pauseOnMouseEnter: false,
+                                                            stopOnLastSlide: false
+                                                        },
+                                                        pagination: {
+                                                            el: '.materials-products-pagination',
+                                                            clickable: true
+                                                        },
+                                                        breakpoints: {
+                                                            576: {
+                                                                slidesPerView: 2,
+                                                                spaceBetween: 18,
+                                                                grid: {
+                                                                    rows: 2,
+                                                                    fill: 'row'
+                                                                }
+                                                            },
+                                                            992: {
+                                                                slidesPerView: 3,
+                                                                spaceBetween: 20,
+                                                                grid: {
+                                                                    rows: 2,
+                                                                    fill: 'row'
+                                                                }
+                                                            },
+                                                            1200: {
+                                                                slidesPerView: 4,
+                                                                spaceBetween: 20,
+                                                             
+                                                                grid: {
+                                                                    rows: 2,
+                                                                    fill: 'row'
+                                                                }
+                                                            }
+                                                        }
+                                                    });
+                                                }
+
+                                                document.querySelectorAll('.materials-hover-image').forEach(function (imageElement) {
+                                                    const sequence = (imageElement.dataset.imageSequence || '')
+                                                        .split('|')
+                                                        .filter(Boolean);
+
+                                                    if (sequence.length <= 1) {
+                                                        return;
+                                                    }
+
+                                                    const defaultImage = imageElement.dataset.defaultImage || sequence[0];
+                                                    let intervalId = null;
+                                                    let currentIndex = 0;
+
+                                                    const startHoverRotation = function () {
+                                                        if (intervalId) {
+                                                            return;
+                                                        }
+
+                                                        currentIndex = sequence.length > 1 ? 1 : 0;
+                                                        imageElement.src = sequence[currentIndex];
+
+                                                        intervalId = setInterval(function () {
+                                                            currentIndex = (currentIndex + 1) % sequence.length;
+                                                            imageElement.src = sequence[currentIndex];
+                                                        }, 900);
+                                                    };
+
+                                                    const stopHoverRotation = function () {
+                                                        if (intervalId) {
+                                                            clearInterval(intervalId);
+                                                            intervalId = null;
+                                                        }
+
+                                                        currentIndex = 0;
+                                                        imageElement.src = defaultImage;
+                                                    };
+
+                                                    imageElement.addEventListener('mouseenter', startHoverRotation);
+                                                    imageElement.addEventListener('mouseleave', stopHoverRotation);
+                                                });
+                                            });
+                                        </script>
+
+                                        @functions {
+                                            string GetCategoryIcon(string? categoryName)
+                                            {
+                                                if (string.IsNullOrWhiteSpace(categoryName)) return "box-seam";
+
+                                                return categoryName.ToLower() switch
+                                                {
+                                                    var c when c.Contains("sắt") || c.Contains("thép") || c.Contains("kim loại") => "building",
+                                                    var c when c.Contains("đồng") || c.Contains("nhôm") || c.Contains("inox") => "gem",
+                                                    var c when c.Contains("giấy") || c.Contains("carton") => "box-seam",
+                                                    var c when c.Contains("máy") || c.Contains("điện") || c.Contains("cáp") => "cpu",
+                                                    var c when c.Contains("xưởng") || c.Contains("công nghiệp") => "gear-wide-connected",
+                                                    var c when c.Contains("dân dụng") || c.Contains("gia đình") => "house-door-fill",
+                                                    var c when c.Contains("nhựa") => "recycle",
+                                                    _ => "box-seam"
+                                                };
+                                            }
+
+                                            string NormalizeImagePath(string? imagePath)
+                                            {
+                                                if (string.IsNullOrWhiteSpace(imagePath))
+                                                {
+                                                    return "/assets/images/products/satdac1.jpg";
+                                                }
+
+                                                var normalized = imagePath.Replace("\\", "/").Trim();
+
+                                                if (normalized.StartsWith("~/"))
+                                                {
+                                                    return $"/{normalized[2..]}";
+                                                }
+
+                                                if (!normalized.StartsWith('/'))
+                                                {
+                                                    normalized = $"/{normalized}";
+                                                }
+
+                                                return normalized;
+                                            }
+
+                                            string[] BuildImageSequence(WebThuMuaPheLieu.Models.Product product)
+                                            {
+                                                var imageSequence = (product.ProductImages ?? new List<WebThuMuaPheLieu.Models.ProductImage>())
+                                                    .OrderBy(image => image.OrderIndex ?? int.MaxValue)
+                                                    .Select(image => NormalizeImagePath(image.ImageUrl))
+                                                    .Where(path => !string.IsNullOrWhiteSpace(path))
+                                                    .Distinct()
+                                                    .ToList();
+
+                                                var primaryImage = NormalizeImagePath(product.PrimaryImage);
+
+                                                if (!imageSequence.Any())
+                                                {
+                                                    imageSequence.Add(primaryImage);
+                                                }
+                                                else if (!imageSequence.Any(path => string.Equals(path, primaryImage, StringComparison.OrdinalIgnoreCase)))
+                                                {
+                                                    imageSequence.Insert(0, primaryImage);
+                                                }
+
+                                                return imageSequence.ToArray();
+                                            }
+
+                                        }
 
                                                                                         <div class="referral-highlight" data-aos="fade-up" data-aos-delay="150">
                                                                                             <div class="referral-highlight__content">
@@ -207,84 +405,7 @@
                                                                                                                     </div>
                                                                                                                 </section>
 
-                                                                                                                <section id="recent-news" class="services py-5 home-card-section">
-                                                                                                                    <div class="container-fluid home-section-shell" data-aos="fade-up">
-                                                                                                                        <div class="section-header">
-                                                                                                                            <h2>Tin tức gần đây</h2>
-                                                                                                                            <p>Nội dung tin tức được xây dựng rõ ràng để khách hàng dễ theo dõi và nắm bắt nhanh hơn trong quá trình
-                                                                                                                                tìm hiểu thị trường: chúng tôi thường xuyên cập nhật giá phế liệu, kinh nghiệm phân loại, mẹo chuẩn
-                                                                                                                                bị
-                                                                                                                                trước khi thanh lý và các lưu ý thực tế, giúp khách cá nhân, cửa hàng, kho xưởng và doanh nghiệp chủ
-                                                                                                                                động hơn trước khi bán hàng.</p>
-                                                                                                                            </div>
-
-                                                                                                                            <div class="home-cards-grid">
-                                                                                                                                <div data-aos="fade-up" data-aos-delay="100">
-                                                                                                                                    <article class="news-card-v2">
-                                                                                                                                        <div class="news-card-media">
-                                                                                                                                            <img src="~/assets/img/blog/blog-1.jpg" alt="Cách nhận biết giá phế liệu hôm nay"
-                                                                                                                                                 class="img-fluid w-100">
-                                                                                                                                                <span class="news-badge"><i class="bi bi-graph-up-arrow"></i> Giá thị trường</span>
-                                                                                                                                            </div>
-                                                                                                                                            <div class="news-card-body">
-                                                                                                                                                <div class="news-card-meta">
-                                                                                                                                                    <span><i class="bi bi-calendar3"></i> 19/03/2026</span>
-                                                                                                                                                    <span><i class="bi bi-clock"></i> 4 phút đọc</span>
-                                                                                                                                                </div>
-                                                                                                                                                <h3 class="news-card-title">Cách theo dõi giá phế liệu mỗi ngày để bán đúng thời điểm</h3>
-                                                                                                                                                <p>Hướng dẫn cách xem biến động giá sắt, đồng, nhôm và giấy carton để người bán chọn thời
-                                                                                                                                                    điểm thanh lý phù hợp, tránh bán vội khi giá đang xuống.</p>
-                                                                                                                                                    <a href="~/blog-details.html" class="readmore">Xem bài viết <i
-                                                                                                                                                        class="bi bi-arrow-right"></i></a>
-                                                                                                                                                    </div>
-                                                                                                                                                </article>
-                                                                                                                                            </div>
-
-                                                                                                                                            <div data-aos="fade-up" data-aos-delay="200">
-                                                                                                                                                <article class="news-card-v2">
-                                                                                                                                                    <div class="news-card-media">
-                                                                                                                                                        <img src="~/assets/img/blog/blog-2.jpg" alt="Kinh nghiệm phân loại phế liệu tại nhà"
-                                                                                                                                                             class="img-fluid w-100">
-                                                                                                                                                            <span class="news-badge"><i class="bi bi-sort-down-alt"></i> Kinh nghiệm</span>
-                                                                                                                                                        </div>
-                                                                                                                                                        <div class="news-card-body">
-                                                                                                                                                            <div class="news-card-meta">
-                                                                                                                                                                <span><i class="bi bi-calendar3"></i> 17/03/2026</span>
-                                                                                                                                                                <span><i class="bi bi-clock"></i> 5 phút đọc</span>
-                                                                                                                                                            </div>
-                                                                                                                                                            <h3 class="news-card-title">Mẹo phân loại phế liệu tại nhà giúp bán nhanh và được giá hơn
-                                                                                                                                                            </h3>
-                                                                                                                                                            <p>Chia sẻ cách tách riêng sắt, nhôm, inox, nhựa và giấy trước khi bán để tiết kiệm thời
-                                                                                                                                                                gian cân đo, đồng thời giúp báo giá minh bạch và chính xác hơn.</p>
-                                                                                                                                                                <a href="~/blog-details.html" class="readmore">Xem bài viết <i
-                                                                                                                                                                    class="bi bi-arrow-right"></i></a>
-                                                                                                                                                                </div>
-                                                                                                                                                            </article>
-                                                                                                                                                        </div>
-
-                                                                                                                                                        <div data-aos="fade-up" data-aos-delay="300">
-                                                                                                                                                            <article class="news-card-v2">
-                                                                                                                                                                <div class="news-card-media">
-                                                                                                                                                                    <img src="~/assets/img/blog/blog-3.jpg" alt="Lưu ý khi thanh lý phế liệu số lượng lớn"
-                                                                                                                                                                         class="img-fluid w-100">
-                                                                                                                                                                        <span class="news-badge"><i class="bi bi-truck"></i> Thanh lý lớn</span>
-                                                                                                                                                                    </div>
-                                                                                                                                                                    <div class="news-card-body">
-                                                                                                                                                                        <div class="news-card-meta">
-                                                                                                                                                                            <span><i class="bi bi-calendar3"></i> 15/03/2026</span>
-                                                                                                                                                                            <span><i class="bi bi-clock"></i> 6 phút đọc</span>
-                                                                                                                                                                        </div>
-                                                                                                                                                                        <h3 class="news-card-title">Những điều cần chuẩn bị trước khi thanh lý kho xưởng số lượng
-                                                                                                                                                                            lớn</h3>
-                                                                                                                                                                            <p>Tổng hợp các bước nên chuẩn bị như phân loại hàng, chụp hình hiện trạng, hẹn thời gian
-                                                                                                                                                                                khảo sát và kiểm tra lối xe ra vào để quá trình thu gom diễn ra gọn gàng hơn.</p>
-                                                                                                                                                                                <a href="~/blog.html" class="readmore">Xem bài viết <i class="bi bi-arrow-right"></i></a>
-                                                                                                                                                                            </div>
-                                                                                                                                                                        </article>
-                                                                                                                                                                    </div>
-                                                                                                                                                                </div>
-                                                                                                                                                            </div>
-                                                                                                                                                        </section>
+                                                                                                                <partial name="Components/_RecentNewsSection" model="recentBlogPosts" />
 
                                                                                                                                                         <section id="coverage-areas" class="services py-5 home-card-section coverage-section">
                                                                                                                                                             <div class="container-fluid home-section-shell" data-aos="fade-up">
@@ -381,116 +502,5 @@
                                                                                                                                                                                                                                         </div>
                                                                                                                                                                                                                                     </section>
 
-                                                                                                                                                                                                                                    <section id="services" class="services section-bg py-5 home-card-section">
-                                                                                                                                                                                                                                        <div class="container-fluid home-section-shell" data-aos="fade-up">
-                                                                                                                                                                                                                                            <div class="section-header">
-                                                                                                                                                                                                                                                <h2>Dịch vụ thu mua phế liệu trọn gói</h2>
-                                                                                                                                                                                                                                                <p>Dịch vụ thu mua được trình bày theo hướng trọn gói để khách hàng dễ hình dung ngay từ đầu: chúng tôi
-                                                                                                                                                                                                                                                    hỗ
-                                                                                                                                                                                                                                                    trợ từ khâu tiếp nhận thông tin, khảo sát tận nơi, phân loại hàng hóa, báo giá minh bạch cho đến bốc
-                                                                                                                                                                                                                                                    xếp, vận chuyển và thanh toán, qua đó giúp khách cá nhân lẫn doanh nghiệp tiết kiệm thời gian, giảm
-                                                                                                                                                                                                                                                    công sức xử lý và tối ưu giá trị khi thanh lý phế liệu.</p>
-                                                                                                                                                                                                                                                </div>
-
-                                                                                                                                                                                                                                                <div class="home-cards-grid">
-                                                                                                                                                                                                                                                    <div data-aos="fade-up" data-aos-delay="100">
-                                                                                                                                                                                                                                                        <div class="service-card-v2">
-                                                                                                                                                                                                                                                            <a href="~/details.html" class="service-card-media"
-                                                                                                                                                                                                                                                                   aria-label="Xem chi tiết Thu mua kim loại phế liệu">
-                                                                                                                                                                                                                                                                <img src="~/assets/img/satthep.png" alt="Thu mua kim loại phế liệu" class="img-fluid w-100">
-                                                                                                                                                                                                                                                                    <span class="service-badge"><i class="bi bi-building"></i> Kim loại</span>
-                                                                                                                                                                                                                                                                </a>
-                                                                                                                                                                                                                                                                <div class="service-card-body">
-                                                                                                                                                                                                                                                                    <h3><a href="~/details.html">Thu mua kim loại phế liệu</a></h3>
-                                                                                                                                                                                                                                                                    <p>Nhận thu mua kim loại đen và kim loại màu cho công trình, xưởng cơ khí và nhà máy, cân
-                                                                                                                                                                                                                                                                        đúng chủng loại và báo giá rõ ràng.</p>
-                                                                                                                                                                                                                                                                        <a href="~/details.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
-                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                            </div>
-
-                                                                                                                                                                                                                                                            <div data-aos="fade-up" data-aos-delay="200">
-                                                                                                                                                                                                                                                                <div class="service-card-v2">
-                                                                                                                                                                                                                                                                    <a href="~/details.html" class="service-card-media"
-                                                                                                                                                                                                                                                                           aria-label="Xem chi tiết Thu mua giấy và carton">
-                                                                                                                                                                                                                                                                        <img src="~/assets/img/giaycatton.jpg" alt="Thu mua giấy và carton" class="img-fluid w-100">
-                                                                                                                                                                                                                                                                            <span class="service-badge"><i class="bi bi-box-seam"></i> Kho hàng</span>
-                                                                                                                                                                                                                                                                        </a>
-                                                                                                                                                                                                                                                                        <div class="service-card-body">
-                                                                                                                                                                                                                                                                            <h3><a href="~/details.html">Thu mua giấy và carton</a></h3>
-                                                                                                                                                                                                                                                                            <p>Hỗ trợ thu gom giấy vụn, carton, hồ sơ lưu kho và bao bì tồn dư cho văn phòng, cửa hàng,
-                                                                                                                                                                                                                                                                                kho vận và nhà xưởng.</p>
-                                                                                                                                                                                                                                                                                <a href="~/details.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
-                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                    </div>
-
-                                                                                                                                                                                                                                                                    <div data-aos="fade-up" data-aos-delay="300">
-                                                                                                                                                                                                                                                                        <div class="service-card-v2">
-                                                                                                                                                                                                                                                                            <a href="~/details.html" class="service-card-media"
-                                                                                                                                                                                                                                                                                   aria-label="Xem chi tiết Thu mua nhựa công nghiệp">
-                                                                                                                                                                                                                                                                                <img src="~/assets/img/services.jpg" alt="Thu mua nhựa công nghiệp" class="img-fluid w-100">
-                                                                                                                                                                                                                                                                                    <span class="service-badge"><i class="bi bi-recycle"></i> Tái chế</span>
-                                                                                                                                                                                                                                                                                </a>
-                                                                                                                                                                                                                                                                                <div class="service-card-body">
-                                                                                                                                                                                                                                                                                    <h3><a href="~/details.html">Thu mua nhựa công nghiệp</a></h3>
-                                                                                                                                                                                                                                                                                    <p>Thu mua nhựa sản xuất, nhựa phế phẩm, pallet nhựa và bao bì nhựa tái chế, phù hợp cho đơn
-                                                                                                                                                                                                                                                                                        hàng định kỳ hoặc số lượng lớn.</p>
-                                                                                                                                                                                                                                                                                        <a href="~/details.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
-                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                            </div>
-
-                                                                                                                                                                                                                                                                            <div data-aos="fade-up" data-aos-delay="400">
-                                                                                                                                                                                                                                                                                <div class="service-card-v2">
-                                                                                                                                                                                                                                                                                    <a href="~/details.html" class="service-card-media"
-                                                                                                                                                                                                                                                                                           aria-label="Xem chi tiết Bốc xếp và vận chuyển tận nơi">
-                                                                                                                                                                                                                                                                                        <img src="~/assets/img/maymoc.jpg" alt="Bốc xếp và vận chuyển tận nơi"
-                                                                                                                                                                                                                                                                                             class="img-fluid w-100">
-                                                                                                                                                                                                                                                                                            <span class="service-badge"><i class="bi bi-truck"></i> Vận chuyển</span>
-                                                                                                                                                                                                                                                                                        </a>
-                                                                                                                                                                                                                                                                                        <div class="service-card-body">
-                                                                                                                                                                                                                                                                                            <h3><a href="~/details.html">Bốc xếp và vận chuyển tận nơi</a></h3>
-                                                                                                                                                                                                                                                                                            <p>Có xe tải, xe nâng và đội bốc xếp hỗ trợ thu gom tận nơi, xử lý nhanh hàng nặng, cồng
-                                                                                                                                                                                                                                                                                                kềnh hoặc cần tháo dỡ gọn gàng.</p>
-                                                                                                                                                                                                                                                                                                <a href="~/details.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
-                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                    </div>
-
-                                                                                                                                                                                                                                                                                    <div data-aos="fade-up" data-aos-delay="500">
-                                                                                                                                                                                                                                                                                        <div class="service-card-v2">
-                                                                                                                                                                                                                                                                                            <a href="~/details.html" class="service-card-media"
-                                                                                                                                                                                                                                                                                                   aria-label="Xem chi tiết Dọn kho, thanh lý nhà xưởng">
-                                                                                                                                                                                                                                                                                                <img src="~/assets/img/dongnhom.jpg" alt="Dọn kho, thanh lý nhà xưởng"
-                                                                                                                                                                                                                                                                                                     class="img-fluid w-100">
-                                                                                                                                                                                                                                                                                                    <span class="service-badge"><i class="bi bi-gear-wide-connected"></i> Nhà xưởng</span>
-                                                                                                                                                                                                                                                                                                </a>
-                                                                                                                                                                                                                                                                                                <div class="service-card-body">
-                                                                                                                                                                                                                                                                                                    <h3><a href="~/details.html">Dọn kho, thanh lý nhà xưởng</a></h3>
-                                                                                                                                                                                                                                                                                                    <p>Nhận dọn kho, thanh lý nhà xưởng, thu gom vật tư cũ và thiết bị hư hỏng, giúp doanh
-                                                                                                                                                                                                                                                                                                        nghiệp giải phóng mặt bằng nhanh chóng.</p>
-                                                                                                                                                                                                                                                                                                        <a href="~/details.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
-                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                            </div>
-
-                                                                                                                                                                                                                                                                                            <div data-aos="fade-up" data-aos-delay="600">
-                                                                                                                                                                                                                                                                                                <div class="service-card-v2">
-                                                                                                                                                                                                                                                                                                    <a href="~/details.html" class="service-card-media"
-                                                                                                                                                                                                                                                                                                           aria-label="Xem chi tiết Thanh toán nhanh trong ngày">
-                                                                                                                                                                                                                                                                                                        <img src="~/assets/img/about.jpg" alt="Thanh toán nhanh trong ngày" class="img-fluid w-100">
-                                                                                                                                                                                                                                                                                                            <span class="service-badge"><i class="bi bi-cash-coin"></i> Thanh toán</span>
-                                                                                                                                                                                                                                                                                                        </a>
-                                                                                                                                                                                                                                                                                                        <div class="service-card-body">
-                                                                                                                                                                                                                                                                                                            <h3><a href="~/details.html">Thanh toán nhanh trong ngày</a></h3>
-                                                                                                                                                                                                                                                                                                            <p>Hoàn tất cân đo, đối soát và thanh toán ngay trong ngày, hỗ trợ biên nhận rõ ràng cho
-                                                                                                                                                                                                                                                                                                                khách cá nhân và doanh nghiệp.</p>
-                                                                                                                                                                                                                                                                                                                <a href="~/details.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
-                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                        </section>
+                                                                                                                                                                                                                                    <partial name="Components/_ScrapPurchaseServicesSection" model="serviceBlogPosts" />
                                                                                                                                                                                                                                                                                     </main>
