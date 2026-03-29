@@ -1,3 +1,8 @@
+@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var isHomePage = string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
+}
+
 <header id="header" class="header">
     <div class="container-fluid home-wide-shell">
         <div class="header-top-content">
@@ -33,38 +38,39 @@
             <a asp-controller="Home" asp-action="Index" class="logo d-flex align-items-center" aria-label="Trang chủ">
                 <img src="~/assets/img/logo2.png" alt="Logo Phế Liệu Thành Trung">
 
-            </a>
-
-            <div class="header-main-actions">
-                <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
-                <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
-                <nav id="navbar" class="navbar me-2">
-                    <ul>
-                        <li><a asp-controller="Home" asp-action="Index" class="active">Trang chủ</a></li>
-                        <li><a href="~/about.html">Giới thiệu</a></li>
-                        <li class="dropdown">
-                            <a href="~/services.html">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
-                            <ul>
-                                <li><a href="~/services.html">Thu mua phế liệu công ty</a></li>
-                                <li><a href="~/services.html">Thu mua phế liệu nhà dân</a></li>
-                                <li><a href="~/services.html">Phân loại xử lý phế liệu</a></li>
-                                <li><a href="~/services.html">Thu mua phế liệu nhà xưởng</a></li>
-                                <li><a href="~/services.html">Thu mua phế liệu giá cao, tận nơi</a></li>
-                                <li><a href="~/services.html">Thu mua phế liệu công trình</a></li>
-                                <li><a href="~/services.html">Thu mua thanh lý kho xưởng</a></li>
-                                <li><a href="~/services.html">Thu mua số lượng lớn giá cao</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="~/projects.html">Mặt hàng</a></li>
-                        <li><a href="~/blog.html">Tin tức</a></li>
-                        <li><a href="~/contact.html">Liên hệ</a></li>
-                    </ul>
-                </nav>
-                <a href="#quote-form" class="header-cta d-none d-lg-inline-flex">
-                    <i class="bi bi-lightning-charge-fill"></i>
-                    Báo giá ngay
-
                 </a>
+
+                <div class="header-main-actions">
+                    <i class="mobile-nav-toggle mobile-nav-show bi bi-list"></i>
+                    <i class="mobile-nav-toggle mobile-nav-hide d-none bi bi-x"></i>
+                    <nav id="navbar" class="navbar me-2">
+                        <ul>
+                            <li><a asp-controller="Home" asp-action="Index" class="@(isHomePage ? "active" : null)">Trang
+                                chủ</a></li>
+                                <li><a href="~/about.html">Giới thiệu</a></li>
+                                <li class="dropdown">
+                                    <a href="~/services.html">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                                    <ul>
+                                        <li><a href="~/services.html">Thu mua phế liệu công ty</a></li>
+                                        <li><a href="~/services.html">Thu mua phế liệu nhà dân</a></li>
+                                        <li><a href="~/services.html">Phân loại xử lý phế liệu</a></li>
+                                        <li><a href="~/services.html">Thu mua phế liệu nhà xưởng</a></li>
+                                        <li><a href="~/services.html">Thu mua phế liệu giá cao, tận nơi</a></li>
+                                        <li><a href="~/services.html">Thu mua phế liệu công trình</a></li>
+                                        <li><a href="~/services.html">Thu mua thanh lý kho xưởng</a></li>
+                                        <li><a href="~/services.html">Thu mua số lượng lớn giá cao</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="~/projects.html">Mặt hàng</a></li>
+                                <li><a href="~/blog.html">Tin tức</a></li>
+                                <li><a href="~/contact.html">Liên hệ</a></li>
+                            </ul>
+                        </nav>
+                        <a href="#quote-form" class="header-cta d-none d-lg-inline-flex">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                            Báo giá ngay
+
+                        </a>
 
                     </div>
                 </div>
