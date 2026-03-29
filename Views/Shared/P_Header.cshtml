@@ -6,7 +6,7 @@
 <header id="header" class="header">
     <div class="container-fluid home-wide-shell">
         <div class="header-top-content">
-            <div class="header-top-left">
+            <div class="heanetder-top-left">
                 <div class="header-top-item">
                     <i class="bi bi-telephone-fill"></i>
                     <a href="tel:0909123456">Hotline: 0909 123 456</a>
@@ -37,7 +37,6 @@
         <div class="header-main-bar">
             <a asp-controller="Home" asp-action="Index" class="logo d-flex align-items-center" aria-label="Trang chủ">
                 <img src="~/assets/img/logo2.png" alt="Logo Phế Liệu Thành Trung">
-
                 </a>
 
                 <div class="header-main-actions">
@@ -61,7 +60,7 @@
                                         <li><a href="~/services.html">Thu mua số lượng lớn giá cao</a></li>
                                     </ul>
                                 </li>
-                                <li><a href="~/projects.html">Mặt hàng</a></li>
+                                 <li><a asp-controller="Product" asp-action="Index">Mặt hàng</a></li>
                                 <li><a href="~/blog.html">Tin tức</a></li>
                                 <li><a href="~/contact.html">Liên hệ</a></li>
                             </ul>
