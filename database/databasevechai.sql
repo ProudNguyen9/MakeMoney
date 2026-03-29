@@ -333,3 +333,14 @@ CREATE TABLE site_settings (
     updated_at DATETIME NOT NULL DEFAULT GETDATE()
 );
 GO
+CREATE TABLE blog_images (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    blog_id INT NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    caption NVARCHAR(255) NULL,
+    order_index INT NOT NULL DEFAULT 0,
+
+    CONSTRAINT FK_blog_images_blog_posts
+        FOREIGN KEY (blog_id) REFERENCES blog_posts(id)
+);
+GO
