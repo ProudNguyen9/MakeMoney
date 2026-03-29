@@ -1,6 +1,10 @@
 @{
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    var isHomePage = string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase)
+        && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
+    var isProductPage = string.Equals(currentController, "Product", StringComparison.OrdinalIgnoreCase)
+        && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
 }
 
 <header id="header" class="header">
@@ -60,18 +64,19 @@
                                         <li><a href="~/services.html">Thu mua số lượng lớn giá cao</a></li>
                                     </ul>
                                 </li>
-                                 <li><a asp-controller="Product" asp-action="Index">Mặt hàng</a></li>
-                                <li><a href="~/blog.html">Tin tức</a></li>
-                                <li><a href="~/contact.html">Liên hệ</a></li>
-                            </ul>
-                        </nav>
-                        <a href="#quote-form" class="header-cta d-none d-lg-inline-flex">
-                            <i class="bi bi-lightning-charge-fill"></i>
-                            Báo giá ngay
+                                <li><a asp-controller="Product" asp-action="Index"
+                                           class="@(isProductPage ? "active" : null)">Mặt hàng</a></li>
+                                    <li><a href="~/blog.html">Tin tức</a></li>
+                                    <li><a href="~/contact.html">Liên hệ</a></li>
+                                </ul>
+                            </nav>
+                            <a href="#quote-form" class="header-cta d-none d-lg-inline-flex">
+                                <i class="bi bi-lightning-charge-fill"></i>
+                                Báo giá ngay
 
-                        </a>
+                            </a>
 
+                        </div>
                     </div>
                 </div>
-            </div>
-        </header>
+            </header>

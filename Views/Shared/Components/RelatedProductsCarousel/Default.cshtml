@@ -66,20 +66,6 @@
         return imageSequence.ToArray();
     }
 
-    string BuildSummary(WebThuMuaPheLieu.Models.Product product)
-    {
-        var summary = !string.IsNullOrWhiteSpace(product.ShortDescription)
-            ? product.ShortDescription
-            : product.Description;
-
-        if (string.IsNullOrWhiteSpace(summary))
-        {
-            return "Đang cập nhật thông tin sản phẩm.";
-        }
-
-        summary = summary.Trim();
-        return summary.Length > 120 ? $"{summary[..117]}..." : summary;
-    }
 }
 
 @if (products.Any())
@@ -104,7 +90,7 @@
                         </div>
                         <div class="materials-card-body">
                             <h4 class="card-title">@(product.Name ?? "Sản phẩm đang cập nhật")</h4>
-                            <p>@BuildSummary(product)</p>
+                            <p>@(product.ShortDescription ?? product.Description ?? "Đang cập nhật thông tin sản phẩm.")</p>
                             <span class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></span>
                         </div>
                     </a>

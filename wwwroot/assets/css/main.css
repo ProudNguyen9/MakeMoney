@@ -5396,7 +5396,7 @@ body {
 .home-cards-grid .materials-card-body .card-title,
 .home-cards-grid .service-card-body h3,
 .home-cards-grid .news-card-title {
-  min-height: 58px;
+  min-height: 12px;
 }
 
 .referral-highlight {
@@ -8611,6 +8611,7 @@ body.about-page .about-cta-box__actions .hero-btn-secondary {
     gap: 12px;
   }
 }
+
 .product-materials-section {
   background:
     linear-gradient(180deg, rgba(255, 249, 232, 0.72), rgba(255, 255, 255, 0.96)),
@@ -8796,6 +8797,7 @@ body.about-page .about-cta-box__actions .hero-btn-secondary {
   cursor: not-allowed;
   opacity: 0.75;
 }
+
 .service-item .icon {
   display: flex;
   align-items: center;
@@ -8808,6 +8810,7 @@ body.about-page .about-cta-box__actions .hero-btn-secondary {
 .service-item .icon i {
   font-size: 26px;
 }
+
 .product-advantages-section {
   position: relative;
   background:
@@ -8879,11 +8882,21 @@ body.about-page .about-cta-box__actions .hero-btn-secondary {
   box-shadow: 0 14px 30px rgba(255, 191, 31, 0.24);
 }
 
-.product-advantages-highlight__content h3 {
+.product-advantages-highlight__content h3,
+.detail-referral-card h3 {
+  margin-top: 20px;
   margin-bottom: 16px;
-  font-size: 32px;
-  line-height: 1.3;
-  color: var(--scrap-green-dark);
+  /* max-width: 640px; */
+  font-family: "Bungee", sans-serif;
+  font-size: 1.6rem;
+  line-height: 1.15;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--primary);
+}
+
+.product-advantages-highlight__content.detail-referral-card h3 {
+  color: #1f7a52;
 }
 
 .product-advantages-highlight__content>p {
@@ -9136,6 +9149,7 @@ body.about-page .about-cta-box__actions .hero-btn-secondary {
 }
 
 @media (max-width: 1199px) {
+
   .product-advantages-section .home-section-shell,
   .modern-cta .home-section-shell {
     padding-left: 52px;
