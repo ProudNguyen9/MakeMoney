@@ -1,0 +1,606 @@
+@model WebThuMuaPheLieu.ViewModels.ProductDetailViewModel
+@{
+  Layout = "_HomeLayout";
+}
+
+@{
+  ViewData["Title"] = Model.Product.Name;
+
+  string NormalizeAssetUrl(string? url)
+  {
+    if (string.IsNullOrWhiteSpace(url))
+    {
+      return "/images/no-image.png";
+    }
+
+    var normalized = url.Replace("\\", "/").Trim();
+
+    if (normalized.StartsWith("~/"))
+    {
+      return $"/{normalized[2..]}";
+    }
+
+    if (normalized.StartsWith("http://") || normalized.StartsWith("https://") || normalized.StartsWith("/"))
+    {
+      return normalized;
+    }
+
+    return "/" + normalized.TrimStart('/');
+  }
+
+  var galleryImages = Model.Images?.OrderBy(x => x.OrderIndex).ToList() ?? new List<ProductImage>();
+
+  var coverImage = !string.IsNullOrWhiteSpace(Model.Product.PrimaryImage)
+      ? NormalizeAssetUrl(Model.Product.PrimaryImage)
+      : (galleryImages.Any() ? NormalizeAssetUrl(galleryImages.First().ImageUrl) : "/images/no-image.png");
+
+  var primaryImage = coverImage;
+  var primaryAlt = Model.Product.Name;
+  var heroTitle = Model.Product.Name;
+  var heroDescription = !string.IsNullOrWhiteSpace(Model.Product.Description)
+  ? Model.Product.Description
+  : !string.IsNullOrWhiteSpace(Model.Product.ShortDescription)
+      ? Model.Product.ShortDescription
+      : "Thông tin sản phẩm đang được cập nhật.";
+  var shortDescription = !string.IsNullOrWhiteSpace(Model.Product.ShortDescription)
+      ? Model.Product.ShortDescription
+      : !string.IsNullOrWhiteSpace(Model.Product.Description)
+          ? Model.Product.Description
+          : "Thông tin đang được cập nhật.";
+  var formattedPrice = !string.IsNullOrWhiteSpace(Model.Product.PriceLabel)
+      ? Model.Product.PriceLabel
+      : (Model.Product.PriceValue.HasValue
+          ? $"{Model.Product.PriceValue.Value:N0} đ/{Model.Product.Unit}"
+          : "Liên hệ");
+
+  var priceLabel = "Giá thu mua";
+  var priceNote = "Giá có thể thay đổi theo chất lượng và số lượng";
+
+  var trendIcon = "info";
+  var trendText = "Giá mớí nhất ";
+
+  var histories = Model.PriceHistories?
+      .Where(x => x.PriceValue.HasValue)
+      .OrderByDescending(x => x.EffectiveDate)
+      .ToList() ?? new List<PriceHistory>();
+
+  if (histories.Count >= 2)
+  {
+    var latestPrice = histories[0].PriceValue ?? 0;
+    var previousPrice = histories[1].PriceValue ?? 0;
+
+    if (previousPrice > 0)
+    {
+      var percentChange = ((latestPrice - previousPrice) / previousPrice) * 100;
+
+      if (percentChange > 0)
+      {
+        trendIcon = "trending_up";
+        trendText = $"Tăng {Math.Abs(percentChange):0.#}% so với kỳ trước";
+      }
+      else if (percentChange < 0)
+      {
+        trendIcon = "trending_down";
+        trendText = $"Giảm {Math.Abs(percentChange):0.#}% so với kỳ trước";
+      }
+      else
+      {
+        trendIcon = "trending_flat";
+        trendText = "Giá giữ ổn định so với kỳ trước";
+      }
+    }
+    else
+    {
+      trendIcon = "info";
+      trendText = "Giá vừa được cập nhật";
+    }
+  }
+  else if (histories.Count == 1)
+  {
+    trendIcon = "schedule";
+    trendText = "Giá mới nhất đã được cập nhật";
+  }
+}
+@section Styles {
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+  <link href="~/css/detail.css" rel="stylesheet" />
+}
+@section Scripts {
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    (() => {
+    const mainImage = document.getElementById('hero-main-image');
+    const mainTitle = document.getElementById('hero-main-title');
+    const mainDesc = document.getElementById('hero-main-desc');
+    const mainKicker = document.getElementById('hero-main-kicker');
+    const thumbs = document.querySelectorAll('.hero-thumb');
+
+    if (mainImage && mainTitle && mainDesc && mainKicker && thumbs.length) {
+    const setActiveThumb = (activeThumb) => {
+    thumbs.forEach((thumb) => thumb.classList.remove('active'));
+    activeThumb.classList.add('active');
+    };
+
+    thumbs.forEach((thumb) => {
+    thumb.addEventListener('click', () => {
+    const image = thumb.dataset.image;
+    const alt = thumb.dataset.alt;
+    const title = thumb.dataset.title;
+    const desc = thumb.dataset.desc;
+    const kicker = thumb.dataset.kicker;
+
+    if (image) mainImage.src = image;
+    if (alt) mainImage.alt = alt;
+    if (title) mainTitle.textContent = title;
+    if (desc) mainDesc.textContent = desc;
+    if (kicker) mainKicker.textContent = kicker;
+
+    setActiveThumb(thumb);
+    });
+    });
+    }
+
+    const relatedProductsSwiperElement = document.querySelector('.detail-related-products-swiper');
+    const prevBtn = document.querySelector('.materials-prev');
+    const nextBtn = document.querySelector('.materials-next');
+ 
+    if (relatedProductsSwiperElement && typeof Swiper !== 'undefined') {
+    const totalSlides = relatedProductsSwiperElement.querySelectorAll('.swiper-slide').length;
+    const shouldLoop = totalSlides > 4;
+ 
+    new Swiper(relatedProductsSwiperElement, {
+    speed: 900,
+    loop: shouldLoop,
+    slidesPerView: 1.15,
+    spaceBetween: 16,
+    grabCursor: true,
+    autoplay: {
+    delay: 2800,
+    disableOnInteraction: false,
+    pauseOnMouseEnter: true
+    },
+    navigation: prevBtn && nextBtn ? {
+    prevEl: prevBtn,
+    nextEl: nextBtn
+    } : undefined,
+    pagination: {
+    el: '.detail-related-pagination',
+    clickable: true
+    },
+    breakpoints: {
+    576: {
+    slidesPerView: 1.35,
+    spaceBetween: 16
+    },
+    768: {
+    slidesPerView: 2,
+    spaceBetween: 18
+    },
+    992: {
+    slidesPerView: 3,
+    spaceBetween: 20
+    },
+    1200: {
+    slidesPerView: 4,
+    spaceBetween: 20
+    }
+    }
+    });
+ 
+    relatedProductsSwiperElement.querySelectorAll('.materials-hover-image').forEach((imageElement) => {
+    const sequence = (imageElement.dataset.imageSequence || '')
+    .split('|')
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+ 
+    if (sequence.length <= 1) {
+    return;
+    }
+ 
+    const defaultImage = imageElement.dataset.defaultImage || sequence[0];
+    let currentIndex = 0;
+    let intervalId = null;
+ 
+    const startHoverRotation = function () {
+    if (intervalId) {
+    return;
+    }
+ 
+    intervalId = window.setInterval(() => {
+    currentIndex = (currentIndex + 1) % sequence.length;
+    imageElement.src = sequence[currentIndex];
+    }, 900);
+    };
+ 
+    const stopHoverRotation = function () {
+    if (intervalId) {
+    window.clearInterval(intervalId);
+    intervalId = null;
+    }
+ 
+    currentIndex = 0;
+    imageElement.src = defaultImage;
+    };
+ 
+    imageElement.addEventListener('mouseenter', startHoverRotation);
+    imageElement.addEventListener('mouseleave', stopHoverRotation);
+    });
+    }
+    })();
+  </script>
+}
+
+
+<main class="detail-main detail-page-shell">
+  <section class="detail-section">
+    <div class="detail-shell container-fluid">
+      <div class="detail-grid-hero">
+        <div class="detail-gallery-stack">
+          <div class="detail-hero-main">
+            <img id="hero-main-image" src="@primaryImage" alt="@primaryAlt" />
+            <div class="detail-hero-overlay">
+              <div class="detail-hero-overlay-inner">
+                <div>
+                  <p id="hero-main-kicker" class="detail-hero-kicker">@(Model.Category?.Name ?? "Sản phẩm nổi bật")</p>
+                  <h2 id="hero-main-title" class="detail-hero-title">@heroTitle</h2>
+                  <p id="hero-main-desc" class="detail-hero-desc">@shortDescription</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-thumb-grid">
+            @if (galleryImages.Any())
+            {
+              @for (var i = 0; i < Math.Min(galleryImages.Count, 3); i++)
+              {
+                var image = galleryImages[i];
+                var imageUrl = NormalizeAssetUrl(image.ImageUrl);
+                var imageCaption = !string.IsNullOrWhiteSpace(image.Caption) ? image.Caption : $"Ảnh {i + 1}";
+                <button type="button" class="detail-thumb hero-thumb @(i == 0 ? "active" : "")" data-image="@imageUrl"
+                        data-alt="@imageCaption" data-title="@heroTitle" data-desc="@shortDescription"
+                        data-kicker="@(Model.Category?.Name ?? "Hình ảnh chi tiết")">
+                  <img src="@imageUrl" alt="@imageCaption" />
+                  <div class="detail-thumb-ring"></div>
+                  <div class="detail-thumb-caption">@imageCaption</div>
+                </button>
+              }
+            }
+            else
+            {
+              <button type="button" class="detail-thumb hero-thumb active" data-image="@coverImage" data-alt="@primaryAlt"
+                      data-title="@heroTitle" data-desc="@heroDescription"
+                      data-kicker="@(Model.Category?.Name ?? "Hình ảnh chi tiết")">
+                <img src="@coverImage" alt="@primaryAlt" />
+                <div class="detail-thumb-ring"></div>
+                <div class="detail-thumb-caption">@primaryAlt</div>
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="detail-content-stack">
+          <div class="detail-service-badge">
+            <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 14px;">verified</span>
+            Dịch vụ cao cấp
+          </div>
+          <div class="detail-heading-block">
+            <h1>@heroTitle</h1>
+           
+          </div>
+          <div class="detail-price-box">
+            <div class="detail-price-box-inner">
+              <div>
+                <p class="detail-price-label">@priceLabel</p>
+                <div class="detail-price-row">
+                  <span class="detail-price-value">@formattedPrice</span>
+                  <span class="detail-price-note">@priceNote</span>
+                </div>
+              </div>
+              <div class="detail-trend-pill">
+                <span class="material-symbols-outlined" style="font-size: 16px;">@trendIcon</span>
+                @trendText
+              </div>
+            </div>
+          </div>
+          <div class="detail-feature-grid">
+            <div class="detail-feature-item">
+              <div class="detail-feature-icon"><span class="material-symbols-outlined detail-new-icon-filled"
+                                                       style="font-size: 18px;">check</span></div>
+                <span>Cân đo minh bạch</span>
+              </div>
+              <div class="detail-feature-item">
+                <div class="detail-feature-icon"><span class="material-symbols-outlined detail-new-icon-filled"
+                                                         style="font-size: 18px;">check</span></div>
+                  <span>Thanh toán ngay</span>
+                </div>
+                <div class="detail-feature-item">
+                  <div class="detail-feature-icon"><span class="material-symbols-outlined detail-new-icon-filled"
+                                                           style="font-size: 18px;">check</span></div>
+                    <span>Hỗ trợ tháo dỡ</span>
+                  </div>
+                  <div class="detail-feature-item">
+                    <div class="detail-feature-icon"><span class="material-symbols-outlined detail-new-icon-filled"
+                                                             style="font-size: 18px;">check</span></div>
+                      <span>Báo giá siêu tốc</span>
+                    </div>
+                  </div>
+                  <div class="detail-action-grid">
+                    <a class="detail-btn-hotline" href="tel:YOUR_HOTLINE_NUMBER">
+                      <span class="material-symbols-outlined" style="font-size: 20px;">call</span>
+                      Gọi Hotline Ngay
+                    </a>
+                    <a class="detail-btn-zalo" href="https://zalo.me/YOUR_ZALO_ID" target="_blank">
+                      <span class="material-symbols-outlined" style="font-size: 20px;">chat</span>
+                      Nhắn Zalo Nhận Báo Giá
+                    </a>
+                  </div>
+                  <br />
+                  <p class="text-dark">@heroDescription</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="detail-soft-section" id="materials-section">
+            <div class="detail-shell container-fluid">
+              <div class="detail-soft-panel">
+                <div class="detail-amber-glow"></div>
+                <div class="detail-section-head-row">
+                  <div>
+                    <div class="detail-referral-badge">
+                      <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 16px;">inventory_2</span>
+                      Danh mục thu mua
+                    </div>
+                    <h2 class="detail-referral-title">Phế liệu khác chúng tôi thu mua</h2>
+                  </div>
+                  <div class="detail-carousel-controls">
+                    <button type="button" class="detail-carousel-btn materials-prev" aria-label="Xem card trước">
+                      <span class="material-symbols-outlined" style="font-size: 22px;">chevron_left</span>
+                    </button>
+                    <button type="button" class="detail-carousel-btn materials-next" aria-label="Xem card tiếp theo">
+                      <span class="material-symbols-outlined" style="font-size: 22px;">chevron_right</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="detail-carousel-wrap detail-related-carousel-wrap">
+                  @await Component.InvokeAsync("RelatedProductsCarousel", new
+                  {
+                    count = 8,
+                    excludeIds = new[] { Model.Product.Id
+          } })
+                  </div>
+                </div>
+              </section>
+
+                                  <section class="detail-section">
+            <div class="detail-shell container-fluid">
+              <div class="detail-two-col">
+                <div class="detail-referral-card">
+                  <div class="detail-referral-badge">
+                    <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 16px;">handshake</span>
+                      Giới thiệu nhận thưởng
+                      </div>
+                    <h2>Giới thiệu khách bán phế liệu, nhận <span>hoa hồng cao</span></h2>
+                    <p>Bạn chỉ cần gửi đầu mối khách hàng, VIET RECYCLING sẽ báo giá, điều xe và xử lý toàn bộ quy trình. Khi
+                    chốt đơn thành công, hoa hồng được thanh toán nhanh và minh bạch.</p>
+                      <div class="detail-referral-grid">
+                      <div class="detail-referral-item">
+                        <div class="detail-referral-item-inner">
+                          <span class="material-symbols-outlined detail-new-icon-filled"
+                                  style="font-size: 20px; color: #d97706; margin-top: 2px;">payments</span>
+                            <div>
+                            <h3>Hoa hồng hấp dẫn</h3>
+                              <p>Mức thưởng tốt theo từng đơn thực tế.</p>
+                              </div>
+                            </div>
+                          </div>
+                        <div class="detail-referral-item">
+                        <div class="detail-referral-item-inner">
+                          <span class="material-symbols-outlined detail-new-icon-filled"
+                                  style="font-size: 20px; color: #047857; margin-top: 2px;">local_shipping</span>
+                            <div>
+                            <h3>Xử lý trọn gói</h3>
+                              <p>Khảo sát, báo giá và thu mua tận nơi.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      <div class="detail-referral-footer">
+                      <div class="detail-referral-pill">
+                        <span class="material-symbols-outlined detail-new-icon-filled"
+                                style="font-size: 18px;">verified_user</span>
+                          Gửi đầu mối → chốt đơn → nhận hoa hồng
+                          </div>
+                        <div class="detail-referral-note">Đối soát rõ ràng từng đơn</div>
+                        </div>
+                      </div>
+
+                                          <div class="detail-referral-visual">
+                    <img
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaC2tJZGFEKbEmLbPEh2GSUOPTd_-Zt_rtQ01fV7tLMHISf79zadHnNzgnVpmNPdGPr3g_fZDosVNlq4NnY37Ci5sODVNY5q2lGtZFCch6oDBEcmmuYHDOviw3lSmnyTSNUXDS4w1OjKYa9LJQiPoqoCXSlmNkvnECYMx0Lyu7r5fN0X8cpRXWqAUHkwcvoSmlctDCrJS-FuQa87ZwGZBXmIo_xdymJfTADwd_BiK-9SgnwL_1U45h44u35ZWRCvgL_aTPss5EPw"
+                      alt="Giới thiệu khách bán phế liệu" />
+                      <div class="detail-referral-overlay">
+                      <p>Chương trình cộng tác</p>
+                        <h3>Giới thiệu càng nhiều, thu nhập càng tốt</h3>
+                        <p>Phù hợp cho người có mối quan hệ với nhà xưởng, kho bãi, công trình hoặc cơ sở sản xuất.</p>
+                        <div class="detail-referral-tags">
+                        <span>Hoa hồng cao</span>
+                          <span>Thanh toán nhanh</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                                    @await Component.InvokeAsync("RecentNewsSectionComponent")
+
+                                    <section class="detail-process-section">
+              <div class="detail-shell container-fluid">
+                <div class="detail-process-panel">
+                  <div class="detail-process-head">
+                    <div class="detail-pill justify-content-center mx-auto">
+                      <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 16px;">hub</span>
+                        Quy trình làm việc
+                        </div>
+                      <h2>Quy trình chuyên nghiệp 4 bước</h2>
+                      <p>Nhanh - rõ ràng - minh bạch ở từng bước xử lý, từ lúc tiếp nhận thông tin đến khi thanh toán hoàn tất.
+                      </p>
+                      </div>
+                    <div class="detail-process-grid-wrap">
+                    <div class="detail-process-line"></div>
+                      <div class="detail-process-grid">
+                      <article class="detail-process-card">
+                        <div class="detail-process-top">
+                          <div class="detail-process-icon"><span class="material-symbols-outlined detail-new-icon-filled"
+                                                                   style="font-size: 26px;">call</span></div>
+                              <div class="detail-process-number">01</div>
+                              </div>
+                            <div class="detail-process-step-label">Bước mở đầu</div>
+                            <h4>Tiếp nhận thông tin</h4>
+                            <p>Khách hàng chỉ cần gửi hình ảnh qua Zalo hoặc gọi Hotline, đội ngũ sẽ phản hồi cực nhanh để nắm nhu
+                            cầu ban đầu.</p>
+                              </article>
+                            <article class="detail-process-card">
+                            <div class="detail-process-top">
+                              <div class="detail-process-icon"><span class="material-symbols-outlined detail-new-icon-filled"
+                                                                       style="font-size: 26px;">search</span></div>
+                                  <div class="detail-process-number">02</div>
+                                  </div>
+                                <div class="detail-process-step-label">Bước thẩm định</div>
+                                <h4>Khảo sát & Báo giá</h4>
+                                <p>Chuyên viên đến tận nơi để xem thực tế, phân loại rõ ràng và chốt giá minh bạch ngay tại chỗ để khách
+                                dễ quyết định.</p>
+                                  </article>
+                                <article class="detail-process-card">
+                                <div class="detail-process-top">
+                                  <div class="detail-process-icon"><span class="material-symbols-outlined detail-new-icon-filled"
+                                                                           style="font-size: 26px;">local_shipping</span></div>
+                                      <div class="detail-process-number">03</div>
+                                      </div>
+                                    <div class="detail-process-step-label">Bước xử lý</div>
+                                    <h4>Vận chuyển</h4>
+                                    <p>Đội xe chuyên dụng và nhân sự bốc xếp triển khai nhanh, gọn, sạch, hạn chế ảnh hưởng đến hoạt động
+                                    của kho xưởng.</p>
+                                      </article>
+                                    <article class="detail-process-card">
+                                    <div class="detail-process-top">
+                                      <div class="detail-process-icon"><span class="material-symbols-outlined detail-new-icon-filled"
+                                                                               style="font-size: 26px;">payments</span></div>
+                                          <div class="detail-process-number">04</div>
+                                          </div>
+                                        <div class="detail-process-step-label">Bước hoàn tất</div>
+                                        <h4>Thanh toán</h4>
+                                        <p>Thanh toán tiền mặt hoặc chuyển khoản ngay sau khi hoàn tất cân đo, bảo đảm đủ 100% và rõ ràng chứng
+                                        từ.</p>
+                                          </article>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </section>
+
+                                @await Component.InvokeAsync("ScrapPurchaseServicesSectionComponent")
+ 
+                                                    <section class="detail-trust-section">
+                              <div class="detail-shell container-fluid">
+                                <div class="detail-trust-grid">
+                                  <div class="detail-trust-highlight">
+                                    <div class="detail-trust-highlight-inner">
+                                      <div class="detail-trust-badge">
+                                        <span class="material-symbols-outlined detail-new-icon-filled"
+                                                style="font-size: 16px;">workspace_premium</span>
+                                          Đối tác đồng hành
+                                          </div>
+                                        <h2>Được hàng ngàn đối tác tin tưởng</h2>
+                                        <p>Con số nói lên tất cả về sự tận tâm và chuyên nghiệp của Viet Recycling trong suốt thập kỷ qua.</p>
+                                        <div class="detail-trust-stats">
+                                        <div class="detail-trust-stat">
+                                          <strong>500+</strong>
+                                            <span>Khách hàng DN</span>
+                                            </div>
+                                          <div class="detail-trust-stat">
+                                          <strong>10k+</strong>
+                                            <span>Tấn phế liệu/năm</span>
+                                            </div>
+                                          </div>
+                                        <div class="detail-trust-tags">
+                                        <div>15+<br />Năm kinh nghiệm</div>
+                                          <div>24/7<br />Hỗ trợ phản hồi</div>
+                                          <div>Toàn miền Nam<br />Thu mua tận nơi</div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                                          <div class="detail-review-list">
+                                    <article class="detail-review-card">
+                                      <div class="detail-review-top">
+                                        <div class="detail-review-user">
+                                          <div class="detail-review-avatar">
+                                            <img
+                                              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpkCzoEOugVHLqWPLmvJAfNLKP6bWC4DgvgKDEDdZoP2IT-_TxxYYgulnC_-wqjx-O2KaOjXHlukw3Bu6-wH8snq2jx1UNVGaetB0NIYyMZciaYvGlMioVR-YmYZHxEZ74-ZSKdz-7vM_eXEKtCptNEjn_QnIqK3-Rhdhivd22ZN4oge9gIRjmdaQ_dJ3fpZHGUObmGaOfXNQKape01KZnw9Yqsmcd-0-2A-CITpVfoUCQSfSHBQG2w2Sewa303P4t1dnWLMipCQ"
+                                              alt="Anh Hữu Hào" />
+                                              </div>
+                                            <div>
+                                            <h5>Anh Hữu Hào</h5>
+                                              <p>Giám đốc SX, Nội thất Gỗ Xinh</p>
+                                              </div>
+                                            </div>
+                                          <div class="detail-review-quote-icon">
+                                          <span class="material-symbols-outlined detail-new-icon-filled">format_quote</span>
+                                            </div>
+                                          </div>
+                                        <p class="detail-review-text">“Dịch vụ thu mua rất chuyên nghiệp, cân đo chuẩn xác và thanh toán ngay sau
+                                        khi bốc hàng xong. Tôi đã làm việc cùng Viet Recycling được 3 năm và rất hài lòng.”</p>
+                                          <div class="detail-review-footer">
+                                          <div class="detail-stars">
+                                            <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                              <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                              <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                              <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                              <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                              </div>
+                                            <span class="detail-review-score">Đánh giá 5.0</span>
+                                            </div>
+                                          </article>
+
+                                                              <article class="detail-review-card">
+                                        <div class="detail-review-top">
+                                          <div class="detail-review-user">
+                                            <div class="detail-review-avatar">
+                                              <img
+                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAbvkD9_Nrg2V9mkpdd01vU_neQ91qzFMrWGinPWgQRYTMa50opeiWjYTXgtwRfu6k4Yoz1pWyByGmvt0ktmE9MQETmDrpwLQf_5iBk59nudHwAP49RB8CdO7l4dANRhySLdVrxMW0dOa-qQ0JfQV6CCSQAuAbPVTrA6C0AOZF-OwRRE9ENm55zPSoK-1t2jA7OCgJgZ14jrVhgtfu5xWpLgy-1TD5qg9flZHME1Umu8u_SpnWpkPtGiGo9w1RO0yBtVSu4hr-BA"
+                                                alt="Chị Mai Lan" />
+                                                </div>
+                                              <div>
+                                              <h5>Chị Hoàng Doanh</h5>
+                                                <p>Chủ kho phế liệu, Bình Dương</p>
+                                                </div>
+                                              </div>
+                                            <div class="detail-review-quote-icon">
+                                            <span class="material-symbols-outlined detail-new-icon-filled">format_quote</span>
+                                              </div>
+                                            </div>
+                                          <p class="detail-review-text">“Giá đồng đỏ ở đây luôn thuộc top cao nhất thị trường. Nhân viên nhiệt tình,
+                                          hỗ trợ tháo dỡ dây cáp rất nhanh gọn, sạch sẽ kho bãi.”</p>
+                                            <div class="detail-review-footer">
+                                            <div class="detail-stars">
+                                              <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                                <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                                <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                                <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                                <span class="material-symbols-outlined detail-new-icon-filled" style="font-size: 18px;">star</span>
+                                                </div>
+                                              <span class="detail-review-score">Đánh giá 5.0</span>
+                                              </div>
+                                            </article>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </section>
+                                  </main>

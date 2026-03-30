@@ -40,8 +40,10 @@ public class ProductController : Controller
             products = viewModel.Products.Select(product => new
             {
                 id = product.Id,
+                slug = product.Slug,
                 name = product.Name,
                 categoryName = product.CategoryName,
+                categoryIcon = product.CategoryIcon,
                 shortDescription = product.ShortDescription,
                 description = product.Description,
                 priceLabel = product.PriceLabel,
@@ -72,6 +74,8 @@ public class ProductController : Controller
                 return new ProductCardViewModel
                 {
                     Id = product.Id,
+                    Slug = product.Slug,
+                    CategoryIcon = GetCategoryIcon(product.Category?.Name),
                     Name = product.Name ?? string.Empty,
                     CategoryName = product.Category?.Name,
                     ShortDescription = product.ShortDescription,
@@ -156,6 +160,23 @@ public class ProductController : Controller
         return images.Count > 0
             ? images
             : [Url.Content(normalizedPrimaryImage)];
+    }
+
+    private static string GetCategoryIcon(string? categoryName)
+    {
+        if (string.IsNullOrWhiteSpace(categoryName)) return "box-seam";
+
+        return categoryName.ToLower() switch
+        {
+            var c when c.Contains("sắt") || c.Contains("thép") || c.Contains("kim loại") => "building",
+            var c when c.Contains("đồng") || c.Contains("nhôm") || c.Contains("inox") => "gem",
+            var c when c.Contains("giấy") || c.Contains("carton") => "box-seam",
+            var c when c.Contains("máy") || c.Contains("điện") || c.Contains("cáp") => "cpu",
+            var c when c.Contains("xưởng") || c.Contains("công nghiệp") => "gear-wide-connected",
+            var c when c.Contains("dân dụng") || c.Contains("gia đình") => "house-door-fill",
+            var c when c.Contains("nhựa") => "recycle",
+            _ => "box-seam"
+        };
     }
 
     public IActionResult Privacy()
