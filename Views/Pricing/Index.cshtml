@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet" />
 
     <style>
         .pricing-page {
@@ -35,7 +36,7 @@
             padding: 88px 0 150px 0;
             color: white;
             background-color: var(--pricing-primary-green);
-            background-image: linear-gradient(rgba(21, 128, 61, 0.88), rgba(21, 128, 61, 0.9)), url('https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?q=80&w=2070&auto=format&fit=crop');
+            background-image: linear-gradient(rgba(21, 128, 61, 0.88), rgba(21, 128, 61, 0.9)), url('/assets/default/ảnh%20nền.png');
             background-size: cover;
             background-position: center;
         }
@@ -104,7 +105,7 @@
             color: #451a03;
             border: none;
             padding: 0.75rem 1.5rem;
-            font-weight: 800;
+         
             border-radius: 0.75rem;
             transition: all 0.3s ease;
         }
@@ -239,8 +240,8 @@
             position: absolute;
             inset: 0;
             background:
-                radial-gradient(circle at top left, rgba(255,255,255,0.24), transparent 32%),
-                radial-gradient(circle at bottom right, rgba(255,255,255,0.16), transparent 28%);
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.24), transparent 32%),
+                radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.16), transparent 28%);
             pointer-events: none;
         }
 
@@ -443,20 +444,28 @@
             color: #ffffff;
         }
 
-        .pricing-page .hero-text {
-            max-width: 760px;
-            margin: 0 auto;
-            color: rgba(255, 255, 255, 0.88);
+        .pricing-page .pricing-hero-heading,
+        .pricing-page .featured-products-section--pricing .section-header {
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .pricing-page .hero-text p {
-            margin-bottom: 0;
-            font-size: 1.05rem;
-            line-height: 1.85;
-            color: inherit;
+        .pricing-page .pricing-hero-heading h2,
+        .pricing-page .featured-products-section--pricing .section-header h2 {
+            font-family: "Bungee", sans-serif !important;
+            font-size: 30px !important;
+            font-weight: 400 !important;
+            line-height: 1.2 !important;
+            letter-spacing: 0.03em !important;
+        }
+
+        .pricing-page .pricing-hero-heading h2 {
+            color: #ffffff !important;
         }
 
         @@media (max-width: 991.98px) {
+
             .pricing-page .pricing-cta,
             .pricing-page .pricing-cta-panel {
                 padding: 2rem;
@@ -493,7 +502,11 @@
                 font-size: 2rem;
             }
 
-            .pricing-page .hero-text p,
+            .pricing-page .pricing-hero-heading h2,
+            .pricing-page .featured-products-section--pricing .section-header h2 {
+                font-size: 24px !important;
+            }
+
             .pricing-page .hero-summary {
                 font-size: 0.98rem;
                 line-height: 1.7;
@@ -506,6 +519,10 @@
 
             .pricing-page .pricing-cta-title {
                 font-size: 1.7rem;
+            }
+
+            .form-select {
+                font-size: 0.8rem !important;
             }
         }
     </style>
@@ -520,19 +537,19 @@
                         <span class="material-symbols-outlined">monitoring</span>
                         BẢNG GIÁ CẬP NHẬT MỚI
                     </span>
-                    <div class="section-header mb-0 hero-text">
-                        <h2 style="color: #ffffff;">Bảng Giá Phế Liệu Hôm Nay</h2>
-                     
+                    <div class="section-header mb-0 pricing-hero-heading">
+                        <h2 class="materials-title">Bảng Giá Phế Liệu Hôm Nay</h2>
                     </div>
-                    <p class="hero-summary mt-4 mb-0">
-                        Theo dõi biến động giá mới nhất, đối chiếu đơn vị thu mua dễ dàng và chủ động hơn trước khi liên hệ chốt giá.
+                    <p class="hero-summary mb-0">
+                        Theo dõi biến động giá mới nhất, đối chiếu đơn vị thu mua dễ dàng và chủ động hơn trước khi liên
+                        hệ chốt giá.
                     </p>
                 </div>
             </div>
         </section>
 
-        <div class="container pb-5">
-            <div class="card pricing-card">
+        <div class="container-fluid px-3 px-lg-4 pb-5">
+            <div class="card pricing-card mx-lg-3">
                 <div class="filter-bar">
                     <div class="row g-3 align-items-center">
                         <div class="col-md-6 col-lg-7">
@@ -540,18 +557,21 @@
                                 <span class="input-group-text bg-light border-0">
                                     <span class="material-symbols-outlined text-muted">search</span>
                                 </span>
-                                <input id="pricingSearchInput" class="form-control border-0 bg-light" placeholder="Tìm kiếm tên phế liệu..." type="text" />
+                                <input id="pricingSearchInput" class="form-control border-0 bg-light"
+                                       placeholder="Tìm kiếm tên phế liệu..." type="text" />
                             </div>
                         </div>
-                        <div class="col-md-3 col-lg-2">
-                            <select id="pricingCategoryFilter" class="form-select border-0 bg-light">
+                        <div class="col-md-4 col-lg-3">
+                            <select id="pricingCategoryFilter" class="form-select border-0 bg-light"
+                                    style="font-size: 0.8rem;">
                                 <option value="">Tất cả danh mục</option>
                             </select>
                         </div>
-                        <div class="col-md-3 col-lg-3">
-                            <a class="btn btn-secondary-yellow w-100 d-flex align-items-center justify-content-center gap-2" href="tel:0888.03.7777">
+                        <div class="col-md-3 col-lg-2">
+                            <a class="btn btn-secondary-yellow w-100 d-flex align-items-center justify-content-center px-3 py-2 text-nowrap"
+                                   href="tel:0888.03.7777">
                                 <span class="material-symbols-outlined fs-5">request_quote</span>
-                                LIÊN HỆ BÁO GIÁ
+                                Liên hệ báo giá
                             </a>
                         </div>
                     </div>
@@ -576,11 +596,13 @@
                                 {
                                     foreach (var item in Model.Prices)
                                     {
-                                        <tr class="pricing-row" data-product-name="@item.ProductName" data-category-name="@item.CategoryName">
+                                        <tr class="pricing-row" data-product-name="@item.ProductName"
+                                            data-category-name="@item.CategoryName">
                                             <td class="text-muted fw-bold">@item.OrderNumber.ToString("D2")</td>
                                             <td class="fw-bold text-dark">@item.ProductName</td>
-                                            <td><span class="badge bg-light text-secondary px-2 py-1">@item.CategoryName</span></td>
-                                            <td class="price-text">@item.PriceText</td>
+                                            <td><span class="badge bg-light text-secondary px-2 py-1">@item.CategoryName</span>
+                                            </td>
+                                            <td class="price-text " style="font-size: 0.8rem;">@item.PriceText</td>
                                             <td class="text-muted">@item.UnitText</td>
                                             <td><span class="badge-status @item.StatusCssClass">@item.StatusText</span></td>
                                             <td class="text-muted fst-italic small">@item.UpdatedText</td>
@@ -607,171 +629,71 @@
             </div>
         </div>
 
+        @await Component.InvokeAsync("FeaturedProductsSection", new { viewName = "Pricing" })
+ 
         <script>
-            (() => {
-                const searchInput = document.getElementById('pricingSearchInput');
-                const categoryFilter = document.getElementById('pricingCategoryFilter');
-                const rows = Array.from(document.querySelectorAll('.pricing-page .pricing-row'));
+                    (() => {
+                        const searchInput = document.getElementById('pricingSearchInput');
+                        const categoryFilter = document.getElementById('pricingCategoryFilter');
+                        const rows = Array.from(document.querySelectorAll('.pricing-page .pricing-row'));
 
-                if (!searchInput || !categoryFilter || rows.length === 0) {
-                    return;
-                }
-
-                const normalizeText = (value) => (value || '')
-                    .toString()
-                    .trim()
-                    .toLowerCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '');
-
-                const categories = [...new Set(rows
-                    .map((row) => row.dataset.categoryName || '')
-                    .filter((value) => value.trim().length > 0))].sort((a, b) => a.localeCompare(b, 'vi'));
-
-                categories.forEach((category) => {
-                    const option = document.createElement('option');
-                    option.value = category;
-                    option.textContent = category;
-                    categoryFilter.appendChild(option);
-                });
-
-                const emptyRow = document.createElement('tr');
-                emptyRow.id = 'pricingEmptyState';
-                emptyRow.hidden = true;
-                emptyRow.innerHTML = '<td class="text-center text-muted py-4" colspan="7">Không tìm thấy dữ liệu phù hợp.</td>';
-
-                const tbody = rows[0].closest('tbody');
-                if (tbody) {
-                    tbody.appendChild(emptyRow);
-                }
-
-                const applyFilters = () => {
-                    const keyword = normalizeText(searchInput.value);
-                    const selectedCategory = normalizeText(categoryFilter.value);
-                    let visibleCount = 0;
-
-                    rows.forEach((row) => {
-                        const productName = normalizeText(row.dataset.productName);
-                        const categoryName = normalizeText(row.dataset.categoryName);
-                        const matchesKeyword = !keyword || productName.includes(keyword);
-                        const matchesCategory = !selectedCategory || categoryName === selectedCategory;
-                        const isVisible = matchesKeyword && matchesCategory;
-
-                        row.hidden = !isVisible;
-                        if (isVisible) {
-                            visibleCount += 1;
+                        if (!searchInput || !categoryFilter || rows.length === 0) {
+                            return;
                         }
-                    });
 
-                    if (emptyRow) {
-                        emptyRow.hidden = visibleCount !== 0;
-                    }
-                };
+                        const normalizeText = (value) => (value || '')
+                            .toString()
+                            .trim()
+                            .toLowerCase()
+                            .normalize('NFD')
+                            .replace(/[\u0300-\u036f]/g, '');
 
-                searchInput.addEventListener('input', applyFilters);
-                categoryFilter.addEventListener('change', applyFilters);
-            })();
+                        const categories = [...new Set(rows
+                            .map((row) => row.dataset.categoryName || '')
+                            .filter((value) => value.trim().length > 0))].sort((a, b) => a.localeCompare(b, 'vi'));
+
+                        categories.forEach((category) => {
+                            const option = document.createElement('option');
+                            option.value = category;
+                            option.textContent = category;
+                            categoryFilter.appendChild(option);
+                        });
+
+                        const emptyRow = document.createElement('tr');
+                        emptyRow.id = 'pricingEmptyState';
+                        emptyRow.hidden = true;
+                        emptyRow.innerHTML = '<td class="text-center text-muted py-4" colspan="7">Không tìm thấy dữ liệu phù hợp.</td>';
+
+                        const tbody = rows[0].closest('tbody');
+                        if (tbody) {
+                            tbody.appendChild(emptyRow);
+                        }
+
+                        const applyFilters = () => {
+                            const keyword = normalizeText(searchInput.value);
+                            const selectedCategory = normalizeText(categoryFilter.value);
+                            let visibleCount = 0;
+
+                            rows.forEach((row) => {
+                                const productName = normalizeText(row.dataset.productName);
+                                const categoryName = normalizeText(row.dataset.categoryName);
+                                const matchesKeyword = !keyword || productName.includes(keyword);
+                                const matchesCategory = !selectedCategory || categoryName === selectedCategory;
+                                const isVisible = matchesKeyword && matchesCategory;
+
+                                row.hidden = !isVisible;
+                                if (isVisible) {
+                                    visibleCount += 1;
+                                }
+                            });
+
+                            if (emptyRow) {
+                                emptyRow.hidden = visibleCount !== 0;
+                            }
+                        };
+
+                        searchInput.addEventListener('input', applyFilters);
+                        categoryFilter.addEventListener('change', applyFilters);
+                    })();
         </script>
-
-        <section class="container py-5">
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="benefit-card">
-                        <div class="icon-box">
-                            <span class="material-symbols-outlined">local_shipping</span>
-                        </div>
-                        <h5 class="fw-bold mb-3">Thu mua tận nơi</h5>
-                        <p class="text-muted small mb-0">Đội ngũ xe tải chuyên dụng có mặt nhanh chóng tại xưởng/công trình.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="benefit-card">
-                        <div class="icon-box">
-                            <span class="material-symbols-outlined">speed</span>
-                        </div>
-                        <h5 class="fw-bold mb-3">Báo giá nhanh</h5>
-                        <p class="text-muted small mb-0">Nhận báo giá chính xác qua Zalo/Phone chỉ sau 5 phút gửi ảnh.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="benefit-card">
-                        <div class="icon-box">
-                            <span class="material-symbols-outlined">payments</span>
-                        </div>
-                        <h5 class="fw-bold mb-3">Thanh toán ngay</h5>
-                        <p class="text-muted small mb-0">Chuyển khoản hoặc tiền mặt ngay khi bốc hàng xong.</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="benefit-card">
-                        <div class="icon-box">
-                            <span class="material-symbols-outlined">support_agent</span>
-                        </div>
-                        <h5 class="fw-bold mb-3">Hỗ trợ 24/7</h5>
-                        <p class="text-muted small mb-0">Luôn sẵn sàng tư vấn và giải đáp thắc mắc của khách hàng.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="container mb-10">
-            <div class="cta-banner">
-                <div class="row align-items-center g-0">
-                    <div class="col-lg-7">
-                        <div class="pricing-cta">
-                            <span class="pricing-cta-badge">
-                                <i class="bi bi-stars"></i>
-                                Giải pháp thu mua hiện đại
-                            </span>
-                            <h2 class="pricing-cta-title fw-extrabold">Tối ưu báo giá, rút ngắn thời gian đối chiếu và hạn chế sai lệch khi thu mua số lượng lớn</h2>
-                            <p class="pricing-cta-description">
-                                Với từng nhóm như đồng, sắt, nhôm, inox, nhựa, cáp điện hay hàng công trình, chúng tôi tách loại rõ ràng để báo giá sát thực tế hơn, hỗ trợ doanh nghiệp kiểm soát khối lượng và chốt giao dịch minh bạch.
-                            </p>
-
-                            <div class="pricing-cta-stats">
-                                <div class="pricing-cta-stat">
-                                    <strong>Báo giá theo từng loại</strong>
-                                    <span>Không gom chung đơn giá, giúp tối ưu giá trị của từng nhóm vật liệu.</span>
-                                </div>
-                                <div class="pricing-cta-stat">
-                                    <strong>Rút ngắn thời gian xử lý</strong>
-                                    <span>Khảo sát nhanh, lên phương án thu gom và chốt lịch trong thời gian ngắn.</span>
-                                </div>
-                                <div class="pricing-cta-stat">
-                                    <strong>Dễ đối chiếu khi cân hàng</strong>
-                                    <span>Khối lượng và giá trị được ghi nhận rõ ràng, hạn chế chênh lệch khi thanh toán.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="pricing-cta-panel">
-                            <div class="pricing-cta-panel-card">
-                                <div class="pricing-cta-panel-icon">
-                                    <i class="bi bi-clipboard2-data"></i>
-                                </div>
-                                <h4 class="fw-bold">Quy trình thu mua minh bạch và gọn hơn</h4>
-                                <ul>
-                                    <li><i class="bi bi-check-circle-fill"></i> Khảo sát nhanh theo nhóm vật liệu và khối lượng thực tế</li>
-                                    <li><i class="bi bi-check-circle-fill"></i> Báo giá trước khi bốc xếp để dễ so sánh và phê duyệt</li>
-                                    <li><i class="bi bi-check-circle-fill"></i> Cân tách loại rõ ràng, hỗ trợ đối chiếu ngay tại chỗ</li>
-                                    <li><i class="bi bi-check-circle-fill"></i> Thanh toán nhanh, đầy đủ thông tin cho doanh nghiệp lưu hồ sơ</li>
-                                </ul>
-                                <div class="pricing-cta-actions">
-                                    <a class="btn btn-secondary-yellow d-inline-flex align-items-center justify-content-center gap-2" href="tel:19001234">
-                                        <span class="material-symbols-outlined">call</span>
-                                        GỌI NGAY 1900 XXXX
-                                    </a>
-                                    <button class="btn pricing-cta-outline d-inline-flex align-items-center justify-content-center gap-2" type="button">
-                                        GỬI YÊU CẦU BÁO GIÁ
-                                        <span class="material-symbols-outlined">arrow_forward</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-</div>
+            

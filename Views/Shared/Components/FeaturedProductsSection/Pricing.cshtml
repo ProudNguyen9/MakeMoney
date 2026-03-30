@@ -1,0 +1,225 @@
+@model WebThuMuaPheLieu.ViewModels.FeaturedProductsSectionViewModel
+@{
+    var products = Model?.Products?.ToList() ?? new List<WebThuMuaPheLieu.Models.Product>();
+    var swiperClass = "featured-products-swiper-pricing";
+    var paginationClass = "featured-products-pagination-pricing";
+}
+
+@functions {
+    string GetCategoryIcon(string? categoryName)
+    {
+        if (string.IsNullOrWhiteSpace(categoryName)) return "box-seam";
+
+        return categoryName.ToLower() switch
+        {
+            var c when c.Contains("sắt") || c.Contains("thép") || c.Contains("kim loại") => "building",
+            var c when c.Contains("đồng") || c.Contains("nhôm") || c.Contains("inox") => "gem",
+            var c when c.Contains("giấy") || c.Contains("carton") => "box-seam",
+            var c when c.Contains("máy") || c.Contains("điện") || c.Contains("cáp") => "cpu",
+            var c when c.Contains("xưởng") || c.Contains("công nghiệp") => "gear-wide-connected",
+            var c when c.Contains("dân dụng") || c.Contains("gia đình") => "house-door-fill",
+            var c when c.Contains("nhựa") => "recycle",
+            _ => "box-seam"
+        };
+    }
+
+    string NormalizeImagePath(string? imagePath)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+        {
+            return "/assets/images/products/satdac1.jpg";
+        }
+
+        var normalized = imagePath.Replace("\\", "/").Trim();
+
+        if (normalized.StartsWith("~/"))
+        {
+            return $"/{normalized[2..]}";
+        }
+
+        if (normalized.StartsWith("http://") || normalized.StartsWith("https://") || normalized.StartsWith("/"))
+        {
+            return normalized;
+        }
+
+        return $"/{normalized.TrimStart('/')}";
+    }
+
+    string[] BuildImageSequence(WebThuMuaPheLieu.Models.Product product)
+    {
+        var imageSequence = (product.ProductImages ?? new List<WebThuMuaPheLieu.Models.ProductImage>())
+            .OrderBy(image => image.OrderIndex ?? int.MaxValue)
+            .Select(image => NormalizeImagePath(image.ImageUrl))
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Distinct()
+            .ToList();
+
+        var primaryImage = NormalizeImagePath(product.PrimaryImage);
+
+        if (!imageSequence.Any())
+        {
+            imageSequence.Add(primaryImage);
+        }
+        else if (!imageSequence.Any(path => string.Equals(path, primaryImage, StringComparison.OrdinalIgnoreCase)))
+        {
+            imageSequence.Insert(0, primaryImage);
+        }
+
+        return imageSequence.ToArray();
+    }
+}
+
+<section class="services py-5 home-card-section featured-products-section featured-products-section--pricing">
+    <div class="container-fluid home-section-shell" data-aos="fade-up">
+        <div class="section-header mb-0">
+            <h2 class="materials-title">Những sản phẩm thu mua nổi bật</h2>
+            <p style="font-size: 21px; text-transform: lowercase; font-weight: 400;">Các mặt hàng nổi bật được chọn lọc từ danh sách đang thu mua để khách hàng dễ tham khảo nhanh nhóm sản phẩm phổ biến, hình ảnh thực tế và thông tin cơ bản trước khi liên hệ báo giá.</p>
+        </div>
+
+        @if (products.Any())
+        {
+            <div class="materials-grid-swiper swiper @swiperClass" data-aos="fade-up" data-aos-delay="100">
+                <div class="swiper-wrapper">
+                    @foreach (var product in products)
+                    {
+                        var imageSequence = BuildImageSequence(product);
+
+                        <div class="swiper-slide">
+                            <a asp-controller="Home" asp-action="Detail" asp-route-slug="@product.Slug" asp-route-id="@product.Id"
+                               class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
+                                <div class="materials-card-media">
+                                    <img src="@imageSequence[0]"
+                                         data-image-sequence="@string.Join("|", imageSequence)"
+                                         data-default-image="@imageSequence[0]"
+                                         alt="@(product.Name ?? "Sản phẩm phế liệu")"
+                                         class="img-fluid w-100 materials-hover-image"
+                                         loading="lazy">
+                                    <span class="materials-badge">
+                                        <i class="bi bi-@(GetCategoryIcon(product.Category?.Name))"></i>
+                                        @(product.Category?.Name ?? "Phế liệu")
+                                    </span>
+                                </div>
+                                <div class="materials-card-body">
+                                    <h4 class="card-title">@(product.Name ?? "Sản phẩm đang cập nhật")</h4>
+                                    <p>@(product.ShortDescription ?? product.Description ?? "Đang cập nhật thông tin sản phẩm.")</p>
+                                    <span class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></span>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <div class="materials-products-pagination swiper-pagination @paginationClass"></div>
+            </div>
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <p class="text-muted mb-0">Đang cập nhật danh sách sản phẩm nổi bật...</p>
+            </div>
+        }
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const featuredProductsSwiperElement = document.querySelector('.@swiperClass');
+
+        if (featuredProductsSwiperElement && typeof Swiper !== 'undefined') {
+            new Swiper(featuredProductsSwiperElement, {
+                speed: 800,
+                loop: false,
+                rewind: true,
+                slidesPerView: 1,
+                slidesPerGroup: 1,
+                spaceBetween: 16,
+                grabCursor: true,
+                allowTouchMove: true,
+                simulateTouch: true,
+                touchStartPreventDefault: false,
+                watchOverflow: true,
+                grid: {
+                    rows: 2,
+                    fill: 'row'
+                },
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: false,
+                    stopOnLastSlide: false
+                },
+                pagination: {
+                    el: '.@paginationClass',
+                    clickable: true
+                },
+                breakpoints: {
+                    576: {
+                        slidesPerView: 2,
+                        spaceBetween: 18,
+                        grid: {
+                            rows: 2,
+                            fill: 'row'
+                        }
+                    },
+                    992: {
+                        slidesPerView: 3,
+                        spaceBetween: 20,
+                        grid: {
+                            rows: 2,
+                            fill: 'row'
+                        }
+                    },
+                    1200: {
+                        slidesPerView: 4,
+                        spaceBetween: 20,
+                        grid: {
+                            rows: 2,
+                            fill: 'row'
+                        }
+                    }
+                }
+            });
+        }
+
+        document.querySelectorAll('.@swiperClass .materials-hover-image').forEach(function (imageElement) {
+            const sequence = (imageElement.dataset.imageSequence || '')
+                .split('|')
+                .filter(Boolean);
+
+            if (sequence.length <= 1) {
+                return;
+            }
+
+            const defaultImage = imageElement.dataset.defaultImage || sequence[0];
+            let intervalId = null;
+            let currentIndex = 0;
+
+            const startHoverRotation = function () {
+                if (intervalId) {
+                    return;
+                }
+
+                currentIndex = sequence.length > 1 ? 1 : 0;
+                imageElement.src = sequence[currentIndex];
+
+                intervalId = setInterval(function () {
+                    currentIndex = (currentIndex + 1) % sequence.length;
+                    imageElement.src = sequence[currentIndex];
+                }, 900);
+            };
+
+            const stopHoverRotation = function () {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                    intervalId = null;
+                }
+
+                currentIndex = 0;
+                imageElement.src = defaultImage;
+            };
+
+            imageElement.addEventListener('mouseenter', startHoverRotation);
+            imageElement.addEventListener('mouseleave', stopHoverRotation);
+        });
+    });
+</script>
