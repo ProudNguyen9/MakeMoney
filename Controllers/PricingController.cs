@@ -17,35 +17,28 @@ public class PricingController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var latestPriceHistories = await _context.PriceHistories
+        var products = await _context.Products
             .AsNoTracking()
-            .Include(price => price.Product)
-                .ThenInclude(product => product!.Category)
-            .Where(price => price.ProductId.HasValue
-                && price.Product != null
-                && price.Product.Status == "active")
-            .OrderByDescending(price => price.EffectiveDate)
-            .ThenByDescending(price => price.RecordedAt)
+            .Include(product => product.Category)
+            .Where(product => product.Status == "active")
+            .OrderBy(product => product.Category!.Name)
+            .ThenBy(product => product.Name)
             .ToListAsync();
 
-        var pricingRows = latestPriceHistories
-            .GroupBy(price => price.ProductId!.Value)
-            .Select(group => group.First())
-            .OrderBy(price => price.Product!.Category!.Name)
-            .ThenBy(price => price.Product!.Name)
-            .Select((price, index) => new PricingRowViewModel
+        var pricingRows = products
+            .Select((product, index) => new PricingRowViewModel
             {
-                Id = price.Id,
+                Id = product.Id,
                 OrderNumber = index + 1,
-                ProductName = price.Product?.Name ?? "Chưa có tên",
-                CategoryName = price.Product?.Category?.Name ?? "Chưa phân loại",
-                PriceValue = price.PriceValue,
-                PriceText = FormatPrice(price.PriceValue),
-                UnitText = BuildUnitText(price.PriceUnit ?? price.Product?.Unit),
-                StatusText = price.PriceType?.Trim() ?? "Đang thu",
-                StatusCssClass = ResolveStatusCssClass(price.PriceType, price.Note),
-                UpdatedAt = price.RecordedAt ?? ConvertToDateTime(price.EffectiveDate),
-                UpdatedText = FormatUpdatedText(price.RecordedAt, price.EffectiveDate)
+                ProductName = product.Name ?? "Chưa có tên",
+                CategoryName = product.Category?.Name ?? "Chưa phân loại",
+                PriceValue = product.PriceValue,
+                PriceText = FormatPrice(product.PriceValue, product.PriceLabel),
+                UnitText = BuildUnitText(product.Unit),
+                StatusText = "Đang thu",
+                StatusCssClass = ResolveStatusCssClass(product.Status, product.PriceLabel),
+                UpdatedAt = product.UpdatedAt,
+                UpdatedText = FormatUpdatedText(product.UpdatedAt, null)
             })
             .ToList();
 
@@ -57,8 +50,16 @@ public class PricingController : Controller
         return View(viewModel);
     }
 
-    private static string FormatPrice(decimal? priceValue)
+    private static string FormatPrice(decimal? priceValue, string? priceLabel)
     {
+        var normalizedLabel = priceLabel?.Trim();
+
+        if (priceValue.GetValueOrDefault() == 0
+            && string.Equals(normalizedLabel, "Liên hệ báo giá", StringComparison.OrdinalIgnoreCase))
+        {
+            return normalizedLabel;
+        }
+
         return priceValue.HasValue
             ? string.Format(CultureInfo.GetCultureInfo("vi-VN"), "{0:N0}", priceValue.Value)
             : "Liên hệ";
