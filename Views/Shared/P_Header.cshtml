@@ -5,6 +5,10 @@
         && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
     var isProductPage = string.Equals(currentController, "Product", StringComparison.OrdinalIgnoreCase)
         && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
+
+    var isPricingPage = string.Equals(currentController, "Pricing", StringComparison.OrdinalIgnoreCase)
+        && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
+
 }
 
 <header id="header" class="header">
@@ -67,6 +71,10 @@
                                 <li><a asp-controller="Product" asp-action="Index"
                                            class="@(isProductPage ? "active" : null)">Mặt hàng</a></li>
                                     <li><a href="~/blog.html">Tin tức</a></li>
+
+                                    <li><a asp-controller="Pricing" asp-action="Index"
+                                           class="@(isPricingPage ? "active" : null)">Bảng giá</a></li>
+
                                     <li><a href="~/contact.html">Liên hệ</a></li>
                                 </ul>
                             </nav>
