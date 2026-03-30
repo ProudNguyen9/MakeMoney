@@ -1,0 +1,88 @@
+@model WebThuMuaPheLieu.ViewModels.ScrapPurchaseServicesSectionComponentViewModel
+@{
+    var serviceBlogPosts = Model?.Posts?.ToList() ?? new List<WebThuMuaPheLieu.Models.BlogPost>();
+}
+
+@functions {
+    string NormalizeBlogImagePath(string? coverImage)
+    {
+        if (string.IsNullOrWhiteSpace(coverImage))
+        {
+            return "/assets/images/blogs/service/default.jpg";
+        }
+
+        var normalized = coverImage.Replace("\\", "/").Trim();
+
+        if (normalized.StartsWith("~/"))
+        {
+            return $"/{normalized[2..]}";
+        }
+
+        if (normalized.StartsWith("http://") || normalized.StartsWith("https://") || normalized.StartsWith("/"))
+        {
+            return normalized;
+        }
+
+        return $"/{normalized.TrimStart('/')}";
+    }
+
+    string BuildBlogSummary(WebThuMuaPheLieu.Models.BlogPost post)
+    {
+        var summary = !string.IsNullOrWhiteSpace(post.Excerpt)
+            ? post.Excerpt
+            : post.Content;
+
+        if (string.IsNullOrWhiteSpace(summary))
+        {
+            return "Nội dung bài viết đang được cập nhật.";
+        }
+
+        summary = summary.Trim();
+        return summary.Length > 160 ? $"{summary[..157]}..." : summary;
+    }
+}
+
+<section id="services" class="services section-bg py-5 home-card-section">
+    <div class="container-fluid home-section-shell" data-aos="fade-up">
+        <div class="section-header">
+            <h2>Dịch vụ thu mua phế liệu</h2>
+            <p>Dịch vụ thu mua được trình bày theo hướng trọn gói để khách hàng dễ hình dung ngay từ đầu: chúng tôi hỗ
+                trợ từ khâu tiếp nhận thông tin, khảo sát tận nơi, phân loại hàng hóa, báo giá minh bạch cho đến bốc
+                xếp, vận chuyển và thanh toán, qua đó giúp khách cá nhân lẫn doanh nghiệp tiết kiệm thời gian, giảm công
+                sức xử lý và tối ưu giá trị khi thanh lý phế liệu.</p>
+            </div>
+
+            @if (serviceBlogPosts.Any())
+            {
+                <div class="home-cards-grid">
+                    @for (var index = 0; index < serviceBlogPosts.Count; index++)
+                    {
+                        var post = serviceBlogPosts[index];
+                        var animationDelay = 100 + (index * 100);
+
+                        <div data-aos="fade-up" data-aos-delay="@animationDelay">
+                            <div class="service-card-v2">
+                                <a href="~/blog.html" class="service-card-media"
+                                       aria-label="@(post.Title ?? "Xem chi tiết dịch vụ thu mua phế liệu")">
+                                    <img src="@NormalizeBlogImagePath(post.CoverImage)"
+                                         alt="@(post.Title ?? "Dịch vụ thu mua phế liệu")" class="img-fluid w-100" loading="lazy">
+                                    <span class="service-badge"><i class="bi bi-briefcase-fill"></i> Dịch vụ</span>
+                                </a>
+                                <div class="service-card-body">
+                                    <h3><a href="~/blog.html">@(post.Title ?? "Dịch vụ thu mua phế liệu")</a></h3>
+                                    <p>@BuildBlogSummary(post)</p>
+                                    <a href="~/blog.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted mb-0">Đang cập nhật nội dung dịch vụ...</p>
+                </div>
+            }
+        </div>
+    </section>
