@@ -1,0 +1,11 @@
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.csproj.AssemblyReference.cache
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\rpswa.dswa.cache.json
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.AssemblyInfoInputs.cache
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.AssemblyInfo.cs
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.csproj.CoreCompileInputs.cache
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.MvcApplicationPartsAssemblyInfo.cs
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.MvcApplicationPartsAssemblyInfo.cache
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.RazorAssemblyInfo.cache
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.RazorAssemblyInfo.cs
+c:\Users\Hoang Dinh Doanh\Desktop\vechai26-3\MakeMoney\obj\VerifyBuild\Debug\net10.0\WebThuMuaPheLieu.sourcelink.json

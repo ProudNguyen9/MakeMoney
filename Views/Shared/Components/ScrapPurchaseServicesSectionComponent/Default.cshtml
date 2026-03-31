@@ -62,16 +62,16 @@
 
                         <div data-aos="fade-up" data-aos-delay="@animationDelay">
                             <div class="service-card-v2">
-                                <a href="~/blog.html" class="service-card-media"
+                                <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(post.Slug) ? post.Slug : post.Id.ToString())" class="service-card-media"
                                        aria-label="@(post.Title ?? "Xem chi tiết dịch vụ thu mua phế liệu")">
                                     <img src="@NormalizeBlogImagePath(post.CoverImage)"
                                          alt="@(post.Title ?? "Dịch vụ thu mua phế liệu")" class="img-fluid w-100" loading="lazy">
                                     <span class="service-badge"><i class="bi bi-briefcase-fill"></i> Dịch vụ</span>
                                 </a>
                                 <div class="service-card-body">
-                                    <h3><a href="~/blog.html">@(post.Title ?? "Dịch vụ thu mua phế liệu")</a></h3>
+                                    <h3><a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(post.Slug) ? post.Slug : post.Id.ToString())">@(post.Title ?? "Dịch vụ thu mua phế liệu")</a></h3>
                                     <p>@BuildBlogSummary(post)</p>
-                                    <a href="~/blog.html" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
+                                    <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(post.Slug) ? post.Slug : post.Id.ToString())" class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></a>
                                 </div>
                             </div>
                         </div>
