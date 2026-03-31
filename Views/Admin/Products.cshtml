@@ -1,0 +1,56 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<header class="topbar" id="products-section">
+    <div class="topbar__title-wrap">
+        <button class="sidebar-toggle" type="button" aria-label="Mở menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div>
+            <p class="eyebrow">Admin / Products</p>
+            <h2>Quản lý sản phẩm</h2>
+            <div class="overview-hero__chips">
+                <span>Danh sách</span>
+                <span>Featured</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="panel panel--products">
+    <div class="panel__head">
+        <div>
+            <p class="eyebrow">Scaffold</p>
+            <h3>Danh sách sản phẩm</h3>
+        </div>
+        <div class="panel__head-actions">
+            <button type="button">Thêm sản phẩm</button>
+        </div>
+    </div>
+    <div class="table-shell">
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Tên sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th>Trạng thái</th>
+                    <th>Cập nhật</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="product-info"><strong>Đang chờ dữ liệu thật</strong><span>View quản trị sản phẩm đã
+                            sẵn sàng.</span></div>
+                        </td>
+                        <td>Phế liệu</td>
+                        <td>Draft UI</td>
+                        <td>Vừa tạo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>

@@ -1,0 +1,91 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<header class="topbar" id="overview-page">
+    <div class="topbar__title-wrap">
+        <button class="sidebar-toggle" type="button" aria-label="Mở menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div>
+            <p class="eyebrow">Admin hub</p>
+            <h2>Tổng quan hệ thống</h2>
+            <div class="overview-hero__chips">
+                <span>Dashboard</span>
+                <span>Realtime</span>
+            </div>
+        </div>
+    </div>
+    <div class="topbar__actions">
+        <label class="search-box" aria-label="Tìm nhanh module admin">
+            <span class="search-box__icon" aria-hidden="true">⌕</span>
+            <input type="search" placeholder="Tìm nhanh..." />
+        </label>
+    </div>
+</header>
+
+<section class="overview-hero">
+    <article class="overview-hero__main">
+        <div class="overview-hero__content">
+            <p class="eyebrow">Điều phối</p>
+            <h3>Trung tâm quản trị cho sản phẩm, bảng giá, bài viết và marketing.</h3>
+            <p>Các khu vực quản trị đã được nối route MVC để tiếp tục gắn dữ liệu thật ở bước sau.</p>
+        </div>
+        <div class="overview-hero__chips">
+            <span>Products</span>
+            <span>Pricing</span>
+            <span>Posts</span>
+            <span>SEO</span>
+        </div>
+    </article>
+    <article class="overview-hero__score">
+        <span class="eyebrow">Trạng thái</span>
+        <strong>Ready</strong>
+        <p>Layout admin và controller cơ bản đã sẵn sàng.</p>
+    </article>
+</section>
+
+<section class="stats-grid overview-stats" aria-label="Thống kê nhanh">
+    <article class="stat-card stat-card--featured"><span>Tổng module</span><strong>5</strong><small>Đã map route</small>
+    </article>
+    <article class="stat-card stat-card--featured"><span>Layout dùng chung</span><strong>1</strong><small>Shared admin
+        shell</small></article>
+        <article class="stat-card stat-card--featured"><span>Màn hình khởi tạo</span><strong>5</strong><small>Scaffold cơ
+            bản</small></article>
+            <article class="stat-card stat-card--featured"><span>Bước kế tiếp</span><strong>Data</strong><small>Gắn truy vấn
+                thật</small></article>
+            </section>
+
+            <section class="overview-grid">
+                <article class="panel overview-panel overview-panel--wide">
+                    <div class="panel__head panel__head--tight">
+                        <div>
+                            <p class="eyebrow">Lộ trình</p>
+                            <h3>Các phần quản trị đã có</h3>
+                        </div>
+                    </div>
+                    <div class="summary-list">
+                        <div class="summary-list__item"><strong>Tổng quan</strong><span>Theo dõi snapshot toàn hệ thống.</span>
+                        </div>
+                        <div class="summary-list__item"><strong>Sản phẩm</strong><span>Quản lý danh sách sản phẩm thu mua.</span>
+                        </div>
+                        <div class="summary-list__item"><strong>Bảng giá</strong><span>Kiểm soát nội dung giá và trạng thái cập
+                            nhật.</span></div>
+                        </div>
+                    </article>
+                    <article class="panel overview-panel">
+                        <div class="panel__head panel__head--tight">
+                            <div>
+                                <p class="eyebrow">Ghi chú</p>
+                                <h3>Triển khai hiện tại</h3>
+                            </div>
+                        </div>
+                        <div class="metric-stack">
+                            <div class="metric-stack__item"><span>Controller</span><strong>AdminController</strong></div>
+                            <div class="metric-stack__item"><span>Layout</span><strong>_AdminLayout</strong></div>
+                            <div class="metric-stack__item"><span>Views</span><strong>Scaffold cơ bản</strong></div>
+                        </div>
+                    </article>
+                </section>

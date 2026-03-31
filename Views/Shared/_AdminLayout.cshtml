@@ -25,7 +25,8 @@
             </div>
 
             <nav class="sidebar__nav">
-                <a class="sidebar__item" href="/admin/overview">
+                <a class="sidebar__item @(string.Equals(ViewData["AdminSection"] as string, "Overview", StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty)"
+                       asp-controller="Admin" asp-action="Overview">
                     <span class="sidebar__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none">
                             <path d="M4 11.5 12 4l8 7.5v7A1.5 1.5 0 0 1 18.5 20H14v-4h-4v4H5.5A1.5 1.5 0 0 1 4 18.5v-7Z"
@@ -36,7 +37,8 @@
                     <span>Tổng quan</span>
                 </a>
 
-                <a class="sidebar__item" href="/admin/products">
+                <a class="sidebar__item @(string.Equals(ViewData["AdminSection"] as string, "Products", StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty)"
+                       asp-controller="Admin" asp-action="Products">
                     <span class="sidebar__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none">
                             <path
@@ -48,7 +50,8 @@
                     <span>Sản phẩm</span>
                 </a>
 
-                <a class="sidebar__item" href="/admin/prices">
+                <a class="sidebar__item @(string.Equals(ViewData["AdminSection"] as string, "Prices", StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty)"
+                       asp-controller="Admin" asp-action="Prices">
                     <span class="sidebar__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none">
                             <path d="M12 3v18M16.5 7.5h-6a2.5 2.5 0 0 0 0 5h3a2.5 2.5 0 0 1 0 5h-6"
@@ -59,7 +62,8 @@
                     <span>Bảng giá</span>
                 </a>
 
-                <a class="sidebar__item" href="/admin/posts">
+                <a class="sidebar__item @(string.Equals(ViewData["AdminSection"] as string, "Posts", StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty)"
+                       asp-controller="Admin" asp-action="Posts">
                     <span class="sidebar__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none">
                             <path
@@ -73,7 +77,8 @@
                     <span>Bài viết</span>
                 </a>
 
-                <a class="sidebar__item" href="/admin/marketing">
+                <a class="sidebar__item @(string.Equals(ViewData["AdminSection"] as string, "Marketing", StringComparison.OrdinalIgnoreCase) ? "is-active" : string.Empty)"
+                       asp-controller="Admin" asp-action="Marketing">
                     <span class="sidebar__icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none">
                             <path
