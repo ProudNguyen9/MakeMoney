@@ -1,0 +1,112 @@
+@model WebThuMuaPheLieu.ViewModels.FeaturedProductsSectionViewModel
+@using System.Globalization
+@{
+    var products = Model?.Products?.ToList() ?? new List<WebThuMuaPheLieu.Models.Product>();
+
+    string NormalizeImagePath(string? imagePath)
+    {
+        if (string.IsNullOrWhiteSpace(imagePath))
+        {
+            return "/assets/images/products/satdac1.jpg";
+        }
+
+        var normalized = imagePath.Replace("\\", "/").Trim();
+
+        if (normalized.StartsWith("~/"))
+        {
+            return $"/{normalized[2..]}";
+        }
+
+        if (normalized.StartsWith("http://") || normalized.StartsWith("https://") || normalized.StartsWith("/"))
+        {
+            return normalized;
+        }
+
+        return $"/{normalized.TrimStart('/')}";
+    }
+
+    string BuildProductSummary(WebThuMuaPheLieu.Models.Product product)
+    {
+        var source = !string.IsNullOrWhiteSpace(product.ShortDescription)
+            ? product.ShortDescription
+            : product.Description;
+
+        if (string.IsNullOrWhiteSpace(source))
+        {
+            return "Thông tin sản phẩm đang được cập nhật để khách hàng tham khảo nhanh trước khi liên hệ báo giá.";
+        }
+
+        var normalized = source.Trim();
+        return normalized.Length > 92 ? $"{normalized[..89].TrimEnd()}..." : normalized;
+    }
+
+    string BuildMeta(WebThuMuaPheLieu.Models.Product product)
+    {
+        if (product.PriceValue.HasValue)
+        {
+            var unit = string.IsNullOrWhiteSpace(product.Unit) ? "kg" : product.Unit.Trim();
+            return $"Từ {product.PriceValue.Value.ToString("N0", CultureInfo.InvariantCulture)}đ/{unit}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(product.PriceLabel))
+        {
+            return product.PriceLabel.Trim();
+        }
+
+        return string.IsNullOrWhiteSpace(product.Category?.Name)
+            ? "Sản phẩm nổi bật"
+            : product.Category!.Name!;
+    }
+}
+
+<section class="featured-products-section featured-products-section--sidebar-like">
+    <div class="sidebar-card featured-products-sidebar-card">
+        <h4>Sản phẩm thu mua nổi bật</h4>
+
+        @if (products.Any())
+        {
+            @foreach (var product in products)
+            {
+                var productSlug = !string.IsNullOrWhiteSpace(product.Slug)
+                    ? product.Slug
+                    : product.Id.ToString();
+                var productImage = NormalizeImagePath(product.PrimaryImage);
+                var productSummary = BuildProductSummary(product);
+                var productMeta = BuildMeta(product);
+
+                <a class="mini-post featured-product-post"
+                   asp-controller="Home"
+                   asp-action="Detail"
+                   asp-route-slug="@productSlug"
+                   asp-route-id="@product.Id">
+                    <div class="mini-thumb featured-product-thumb">
+                        <img src="@productImage" alt="@(product.Name ?? "Sản phẩm phế liệu")" loading="lazy" />
+                    </div>
+                    <div class="mini-post-content featured-product-content">
+                        <span><i class="bi bi-stars"></i> @productMeta</span>
+                        <h5>@(product.Name ?? "Sản phẩm đang cập nhật")</h5>
+                        <p>@productSummary</p>
+                    </div>
+                </a>
+            }
+        }
+        else
+        {
+            <div class="mini-post featured-product-post">
+                <div class="mini-thumb featured-product-thumb">
+                    <svg viewBox="0 0 90 72" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="90" height="72" rx="16" fill="#edf7f1" />
+                        <rect x="16" y="18" width="18" height="34" rx="8" fill="#cbd5e1" />
+                        <rect x="40" y="14" width="20" height="40" rx="10" fill="#86efac" />
+                        <rect x="17" y="56" width="46" height="6" rx="3" fill="#d9f99d" />
+                    </svg>
+                </div>
+                <div class="mini-post-content featured-product-content">
+                    <span><i class="bi bi-stars"></i> Sản phẩm nổi bật</span>
+                    <h5>Đang cập nhật sản phẩm thu mua nổi bật</h5>
+                    <p>Danh sách sản phẩm nổi bật sẽ hiển thị tại đây khi có dữ liệu mới.</p>
+                </div>
+            </div>
+        }
+    </div>
+</section>

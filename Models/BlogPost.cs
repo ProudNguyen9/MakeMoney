@@ -23,9 +23,13 @@ public partial class BlogPost
 
     public string? Status { get; set; }
 
+    public int? LikeCount { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
     public virtual Admin? Author { get; set; }
+
+    public virtual ICollection<BlogImage> BlogImages { get; set; } = new List<BlogImage>();
 }

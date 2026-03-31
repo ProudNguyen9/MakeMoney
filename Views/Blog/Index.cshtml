@@ -1,0 +1,800 @@
+@model WebThuMuaPheLieu.Models.BlogIndexViewModel
+
+@{
+    Layout = "_HomeLayout";
+    ViewData["Title"] = "Tin tức";
+}
+
+@section Styles {
+    <style>
+        body.blog-page #blog-list>[class*="col-"] {
+            display: flex;
+        }
+
+        body.blog-page #blog-list .post-card {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        body.blog-page #blog-list .post-visual {
+            padding: 0;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+        }
+
+        body.blog-page #blog-list .post-visual img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        body.blog-page #blog-list .post-body {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        body.blog-page #blog-list .post-excerpt {
+            flex: 1;
+        }
+
+        body.blog-page #blog-list .post-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        body.blog-page #blog-list .post-useful-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #bbf7d0;
+            border-radius: 999px;
+            background: #f0fdf4;
+            color: #166534;
+            padding: 10px 16px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+
+        body.blog-page #blog-list .post-useful-btn:hover {
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+
+        body.blog-page #blog-list .post-useful-btn:disabled,
+        body.blog-page #blog-list .post-useful-btn.is-cooldown {
+            opacity: 0.75;
+            cursor: not-allowed;
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+
+        body.blog-page #blog-list .post-like-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #15803d;
+            font-weight: 700;
+        }
+
+        body.blog-page #blog-list .post-useful-feedback {
+            min-height: 22px;
+            margin: 10px 0 0;
+            color: #166534;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        body.blog-page #blog-list .post-useful-feedback.is-error {
+            color: #b91c1c;
+        }
+
+        body.blog-page #blog-list .post-link {
+            margin-top: 14px;
+        }
+
+        body.blog-page .category-list .active>a,
+        body.blog-page .category-list a.active {
+            color: #15803d;
+            font-weight: 700;
+        }
+
+        body.blog-page .category-list .active span {
+            background-color: #15803d;
+            color: #fff;
+        }
+
+        body.blog-page .blog-sidebar-wrap .mini-post {
+            align-items: flex-start;
+        }
+
+        body.blog-page .blog-sidebar-wrap .mini-thumb {
+            width: 86px;
+            height: 72px;
+            flex: 0 0 86px;
+            overflow: hidden;
+            border-radius: 16px;
+            background: #eef3ea;
+        }
+
+        body.blog-page .blog-sidebar-wrap .mini-thumb img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+}
+
+<main id="main" class="blog-page-main">
+    <section id="blog-posts" class="blog-layout home-card-section">
+        <div class="container-fluid home-section-shell" data-aos="fade-up">
+            <div class="section-header blog-section-header">
+            </div>
+            <div class="row gy-5">
+                <div class="col-lg-8">
+                    @if (Model.Posts.Any())
+                    {
+                        <div id="blog-list" class="row gy-4" data-search-term="@Model.SearchTerm"
+                             data-category-name="@Model.SelectedCategoryName">
+                            @for (var index = 0; index < Model.Posts.Count; index++)
+                            {
+                                var post = Model.Posts[index];
+                                var animationDelay = 100 + (index % 6) * 50;
+
+                                <div class="col-md-6" data-aos="fade-up" data-aos-delay="@animationDelay">
+                                    <article class="post-card h-100 js-post-card"
+                                             data-detail-url="@Url.Action("Detail", "Blog", new { slug = post.Slug })">
+                                        <div class="post-visual">
+                                            <img src="@post.CoverImage" alt="@post.Title" class="img-fluid w-100 h-100"
+                                                 loading="lazy" style="object-fit: cover;">
+                                        </div>
+                                        <div class="post-body">
+                                            <div class="post-meta">
+                                                <span><i class="bi bi-calendar-event"></i>
+                                                    @(post.PublishedAt?.ToString("dd/MM/yyyy") ?? "Đang cập nhật")</span>
+                                                    <span><i class="bi bi-folder2-open"></i> @post.CategoryName</span>
+                                                </div>
+                                                <h3>@post.Title</h3>
+                                                <p class="post-excerpt">@post.Summary</p>
+                                                <div class="post-actions">
+                                                    <button type="button" class="post-useful-btn js-post-useful-btn"
+                                                            data-post-id="@post.Id" data-default-label="Hữu ích">
+                                                        <i class="bi bi-hand-thumbs-up"></i>
+                                                        <span class="js-post-useful-btn-label">Hữu ích</span>
+                                                    </button>
+                                                    <span class="post-like-count">
+                                                        <i class="bi bi-heart-fill"></i>
+                                                        <span class="js-post-like-count">@post.LikeCount</span> lượt hữu ích
+                                                    </span>
+                                                </div>
+                                       
+                                                <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@post.Slug"
+                                                   class="post-link"><i class="bi bi-arrow-right-circle-fill"></i> Xem chi tiết</a>
+                                            </div>
+                                        </article>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    else
+                        {
+                            <div id="blog-list" class="row gy-4" data-search-term="@Model.SearchTerm"
+                                 data-category-name="@Model.SelectedCategoryName">
+                                <div class="col-12 text-center py-4">
+                                    <p class="text-muted mb-0">
+                                        @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) &&
+                                                                                    !string.IsNullOrWhiteSpace(Model.SelectedCategoryName))
+                                        {
+                                            <text>Không tìm thấy bài viết nào phù hợp với từ khóa "@Model.SearchTerm" trong chuyên
+                                                mục "@Model.SelectedCategoryName".</text>
+                                            }
+                                        else if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                                            {
+                                                @:Không tìm thấy bài viết nào phù hợp với từ khóa "@Model.SearchTerm".
+                                            }
+                                            else if (!string.IsNullOrWhiteSpace(Model.SelectedCategoryName))
+                                            {
+                                                @:Chưa có bài viết nào trong chuyên mục "@Model.SelectedCategoryName".
+                                            }
+                                            else
+                                            {
+                                                @:Đang cập nhật bài viết mới...
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            }
+
+                            <nav class="product-pagination mt-5 @(Model.TotalPages > 1 ? string.Empty : "d-none")">
+                                <ul id="blog-pagination" class="pagination justify-content-center">
+                                    @if (Model.TotalPages > 1)
+                                    {
+                                        <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : string.Empty)">
+                                            <a class="page-link js-blog-page-link"
+                                               href='@Url.Action("Index", "Blog", new { searchTerm = Model.SearchTerm, categoryName = Model.SelectedCategoryName, page = Model.CurrentPage - 1 })'
+                                               data-page="@(Model.CurrentPage - 1)">Trước</a>
+                                        </li>
+
+                                        @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                                        {
+                                            <li class="page-item @(pageNumber == Model.CurrentPage ? "active" : string.Empty)">
+                                                <a class="page-link js-blog-page-link"
+                                                   href='@Url.Action("Index", "Blog", new { searchTerm = Model.SearchTerm, categoryName = Model.SelectedCategoryName, page = pageNumber })'
+                                                   data-page="@pageNumber">@pageNumber</a>
+                                            </li>
+                                        }
+
+                                        <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : string.Empty)">
+                                            <a class="page-link js-blog-page-link"
+                                               href='@Url.Action("Index", "Blog", new { searchTerm = Model.SearchTerm, categoryName = Model.SelectedCategoryName, page = Model.CurrentPage + 1 })'
+                                               data-page="@(Model.CurrentPage + 1)">Sau</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <div class="col-lg-4 blog-sidebar-wrap">
+                            <div class="sidebar-card">
+                                <h4>Tìm kiếm bài viết</h4>
+                                <form asp-controller="Blog" asp-action="Index" method="get" class="search-box">
+                                    <input type="hidden" name="categoryName" value="@Model.SelectedCategoryName">
+                                    <input type="text" name="searchTerm" value="@Model.SearchTerm"
+                                           placeholder="Nhập từ khóa...">
+                                    <button type="submit"><i class="bi bi-search"></i></button>
+                                </form>
+                            </div>
+
+                            <div class="sidebar-card">
+                                <h4>Chuyên mục</h4>
+                                <ul class="category-list">
+                                    <li
+                                        class="@(string.IsNullOrWhiteSpace(Model.SelectedCategoryName) ? "active" : string.Empty)">
+                                        <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="@Model.SearchTerm"
+                                           class="js-blog-category-link" data-category-name="">Tất cả bài viết</a>
+                                        <span>@Model.TotalPublishedPosts.ToString("D2")</span>
+                                    </li>
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <li
+                                            class="@(string.Equals(category.Name, Model.SelectedCategoryName, StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)">
+                                            <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="@Model.SearchTerm"
+                                               asp-route-categoryName="@category.Name" class="js-blog-category-link"
+                                               data-category-name="@category.Name">@category.Name</a>
+                                            <span>@category.PostCount.ToString("D2")</span>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+
+                            <div class="sidebar-card">
+                                <h4>Bài viết nổi bật</h4>
+
+                                @if (Model.FeaturedPosts.Any())
+                                {
+                                    @foreach (var featuredPost in Model.FeaturedPosts.Take(5))
+                                    {
+                                        var featuredWordCount = string.IsNullOrWhiteSpace(featuredPost.Summary)
+                                            ? 0
+                                            : featuredPost.Summary.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+                                        var featuredReadingMinutes = Math.Max(3, (int)Math.Ceiling((featuredWordCount + 35) / 35d));
+                                        var featuredSummary = featuredPost.Summary?.Length > 58
+                                            ? $"{featuredPost.Summary[..55].TrimEnd()}..."
+                                            : featuredPost.Summary;
+
+                                        <a class="mini-post" asp-controller="Blog" asp-action="Detail"
+                                               asp-route-slug="@featuredPost.Slug">
+                                            <div class="mini-thumb">
+                                                <img src="@featuredPost.CoverImage" alt="@featuredPost.Title" loading="lazy">
+                                            </div>
+                                            <div>
+                                                <span><i class="bi bi-heart-fill"></i> @featuredPost.LikeCount lượt thích</span>
+                                                <h5>@featuredPost.Title</h5>
+                                                <p>@featuredSummary</p>
+                                            </div>
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="mini-post">
+                                        <div class="mini-thumb">
+                                            <svg viewBox="0 0 90 72" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                                                <rect width="90" height="72" rx="16" fill="#edf7f1" />
+                                                <rect x="18" y="18" width="18" height="34" rx="8" fill="#d09d65" />
+                                                <rect x="42" y="16" width="22" height="38" rx="10" fill="#4ca7c8" />
+                                                <rect x="18" y="56" width="48" height="6" rx="3" fill="#c8d8d0" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <span><i class="bi bi-heart-fill"></i> 0 lượt thích</span>
+                                            <h5>Đang cập nhật bài viết nổi bật</h5>
+                                            <p>Danh sách 5 bài được thích nhiều nhất sẽ hiển thị tại đây.</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="sidebar-card">
+                                <h4>Từ khóa phổ biến</h4>
+                                <div class="tag-cloud">
+                                    <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="giá phế liệu"
+                                       class="tag js-popular-tag" data-keyword="giá phế liệu">giá phế liệu</a>
+                                    <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="đồng đỏ"
+                                       class="tag js-popular-tag" data-keyword="đồng đỏ">đồng đỏ</a>
+                                    <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="sắt thép"
+                                       class="tag js-popular-tag" data-keyword="sắt thép">sắt thép</a>
+                                    <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="thanh lý kho"
+                                       class="tag js-popular-tag" data-keyword="thanh lý kho">thanh lý kho</a>
+                                    <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="máy móc cũ"
+                                       class="tag js-popular-tag" data-keyword="máy móc cũ">máy móc cũ</a>
+                                    <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="giấy carton"
+                                       class="tag js-popular-tag" data-keyword="giấy carton">giấy carton</a>
+                                    <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="nhựa công nghiệp"
+                                       class="tag js-popular-tag" data-keyword="nhựa công nghiệp">nhựa công nghiệp</a>
+                                    <a asp-controller="Blog" asp-action="Index" asp-route-searchTerm="inox"
+                                       class="tag js-popular-tag" data-keyword="inox">inox</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        @section Scripts {
+            <script>
+                document.body.classList.add('blog-page');
+    
+                (() => {
+                    document.addEventListener('click', handlePostCardClick);
+                    const blogList = document.getElementById('blog-list');
+                    const pagination = document.getElementById('blog-pagination');
+                    const paginationNav = pagination?.closest('nav');
+                    const searchForm = document.querySelector('.search-box');
+                    const searchInput = document.querySelector('input[name="searchTerm"]');
+                    const categoryInput = document.querySelector('input[name="categoryName"]');
+                    const popularTagLinks = document.querySelectorAll('.js-popular-tag');
+                    let lastSearchTerm = searchInput?.value?.trim() ?? '';
+                    let lastCategoryName = categoryInput?.value?.trim() ?? blogList?.dataset.categoryName?.trim() ?? '';
+
+                    function getCurrentSearchTerm() {
+                        return searchInput?.value?.trim() ?? '';
+                    }
+
+                    function getCurrentCategoryName() {
+                        return categoryInput?.value?.trim() ?? '';
+                    }
+
+                    function setCurrentCategoryName(categoryName) {
+                        const normalizedCategoryName = categoryName?.trim() ?? '';
+
+                        if (categoryInput) {
+                            categoryInput.value = normalizedCategoryName;
+                        }
+
+                        if (blogList) {
+                            blogList.dataset.categoryName = normalizedCategoryName;
+                        }
+                    }
+
+                    function updateCategorySelection(categoryName) {
+                        const normalizedCategoryName = categoryName?.trim() ?? '';
+
+                        document.querySelectorAll('.category-list li').forEach(item => {
+                            const link = item.querySelector('.js-blog-category-link');
+                            const itemCategoryName = link?.dataset.categoryName?.trim() ?? '';
+                            const isActive = itemCategoryName === normalizedCategoryName;
+
+                            item.classList.toggle('active', isActive);
+
+                            if (link) {
+                                link.classList.toggle('active', isActive);
+                            }
+                        });
+                    }
+
+                    function buildEmptyStateMessage(keyword, categoryName) {
+                        if (keyword && categoryName) {
+                            return `Không tìm thấy bài viết nào phù hợp với từ khóa "${keyword}" trong chuyên mục "${categoryName}".`;
+                        }
+
+                        if (keyword) {
+                            return `Không tìm thấy bài viết nào phù hợp với từ khóa "${keyword}".`;
+                        }
+
+                        if (categoryName) {
+                            return `Chưa có bài viết nào trong chuyên mục "${categoryName}".`;
+                        }
+
+                        return 'Đang cập nhật bài viết mới...';
+                    }
+
+                    function resetUsefulButton(button) {
+                        if (!button) return;
+
+                        window.clearTimeout(button._cooldownTimerId);
+                        button.disabled = false;
+                        button.classList.remove('is-cooldown', 'is-loading');
+
+                        const label = button.querySelector('.js-post-useful-btn-label');
+                        if (label) {
+                            label.textContent = button.dataset.defaultLabel ?? 'Hữu ích';
+                        }
+                    }
+
+                    function setUsefulButtonCooldown(button, cooldownSecondsRemaining) {
+                        if (!button) return;
+
+                        const normalizedCooldown = Math.max(0, Number(cooldownSecondsRemaining) || 0);
+                        const label = button.querySelector('.js-post-useful-btn-label');
+
+                        window.clearTimeout(button._cooldownTimerId);
+                        button.disabled = true;
+                        button.classList.remove('is-loading');
+                        button.classList.add('is-cooldown');
+
+                        if (label) {
+                            label.textContent = 'Đã hữu ích';
+                        }
+
+                        if (normalizedCooldown > 0) {
+                            button._cooldownTimerId = window.setTimeout(() => {
+                                resetUsefulButton(button);
+                            }, normalizedCooldown * 1000);
+                        }
+                    }
+
+                    function setUsefulFeedback(postCard, message, isError = false) {
+                        const feedback = postCard?.querySelector('.js-post-useful-feedback');
+                        if (!feedback) return;
+
+                        feedback.textContent = message ?? '';
+                        feedback.classList.toggle('is-error', !!isError);
+                    }
+
+                    function updateUsefulCount(postCard, likeCount) {
+                        const count = postCard?.querySelector('.js-post-like-count');
+                        if (!count) return;
+
+                        count.textContent = String(Math.max(0, Number(likeCount) || 0));
+                    }
+
+                    async function handleUsefulButtonClick(button) {
+                        if (!button || button.disabled) {
+                            return;
+                        }
+
+                        const postId = Number(button.dataset.postId);
+                        if (!postId) {
+                            return;
+                        }
+
+                        const postCard = button.closest('.post-card');
+                        const label = button.querySelector('.js-post-useful-btn-label');
+
+                        button.disabled = true;
+                        button.classList.add('is-loading');
+
+                        if (label) {
+                            label.textContent = 'Đang lưu...';
+                        }
+
+                        setUsefulFeedback(postCard, '');
+
+                        try {
+                            const response = await fetch('/Blog/MarkUseful', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: new URLSearchParams({
+                                    id: String(postId)
+                                })
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('Request failed');
+                            }
+
+                            const data = await response.json();
+
+                            if (typeof data.likeCount !== 'undefined') {
+                                updateUsefulCount(postCard, data.likeCount);
+                            }
+
+                            setUsefulFeedback(postCard, data.message ?? '', !data.success);
+
+                            if (data.success || Number(data.cooldownSecondsRemaining) > 0) {
+                                setUsefulButtonCooldown(button, data.cooldownSecondsRemaining);
+                                return;
+                            }
+
+                            resetUsefulButton(button);
+                        } catch {
+                            setUsefulFeedback(postCard, 'Không thể gửi đánh giá hữu ích lúc này.', true);
+                            resetUsefulButton(button);
+                        }
+                    }
+
+                    function handlePostCardClick(event) {
+                        const postCard = event.target.closest('.js-post-card');
+                        if (!postCard) {
+                            return;
+                        }
+
+                        if (event.target.closest('a, button')) {
+                            return;
+                        }
+
+                        const detailUrl = postCard.dataset.detailUrl;
+                        if (!detailUrl) {
+                            return;
+                        }
+
+                        window.location.href = detailUrl;
+                    }
+ 
+                    function renderPosts(posts) {
+                        if (!blogList) return;
+
+                        if (!posts || posts.length === 0) {
+                            const keyword = getCurrentSearchTerm();
+                            const categoryName = getCurrentCategoryName();
+                            const message = buildEmptyStateMessage(keyword, categoryName);
+
+                            blogList.innerHTML = `
+                                                            <div class="col-12 text-center py-4">
+                                                                <p class="text-muted mb-0">${message}</p>
+                                                            </div>`;
+                            return;
+                        }
+
+                        blogList.innerHTML = posts.map((post, index) => `
+                                                        <div class="col-md-6" data-aos="fade-up" data-aos-delay="${100 + (index % 6) * 50}">
+                                                            <article class="post-card h-100 js-post-card" data-detail-url="${post.detailUrl ?? '/Blog'}">
+                                                                <div class="post-visual">
+                                                                    <img src="${post.coverImage ?? '/assets/img/blog/blog-1.jpg'}" alt="${post.title ?? 'Tin tức'}" class="img-fluid w-100 h-100" loading="lazy" style="object-fit: cover;">
+                                                                </div>
+                                                                <div class="post-body">
+                                                                    <div class="post-meta">
+                                                                        <span><i class="bi bi-calendar-event"></i> ${post.publishedAt ?? 'Đang cập nhật'}</span>
+                                                                        <span><i class="bi bi-folder2-open"></i> ${post.categoryName ?? 'Tin tức'}</span>
+                                                                    </div>
+                                                                    <h3>${post.title ?? 'Tin tức đang cập nhật'}</h3>
+                                                                    <p class="post-excerpt">${post.summary ?? 'Nội dung bài viết đang được cập nhật.'}</p>
+                                                                    <div class="post-actions">
+                                                                        <button type="button"
+                                                                                class="post-useful-btn js-post-useful-btn"
+                                                                                data-post-id="${post.id}"
+                                                                                data-default-label="Hữu ích">
+                                                                            <i class="bi bi-hand-thumbs-up"></i>
+                                                                            <span class="js-post-useful-btn-label">Hữu ích</span>
+                                                                        </button>
+                                                                        <span class="post-like-count">
+                                                                            <i class="bi bi-heart-fill"></i>
+                                                                            <span class="js-post-like-count">${post.likeCount ?? 0}</span> lượt hữu ích
+                                                                        </span>
+                                                                    </div>
+                                                                    <p class="post-useful-feedback js-post-useful-feedback" aria-live="polite"></p>
+                                                                    <a href="${post.detailUrl ?? '/Blog'}" class="post-link"><i class="bi bi-arrow-right-circle-fill"></i> Xem chi tiết</a>
+                                                                </div>
+                                                            </article>
+                                                        </div>`).join('');
+                    }
+
+                    function renderPagination(currentPage, totalPages) {
+                        if (!pagination || !paginationNav) return;
+
+                        if (!totalPages || totalPages <= 1) {
+                            pagination.innerHTML = '';
+                            paginationNav.classList.add('d-none');
+                            return;
+                        }
+
+                        paginationNav.classList.remove('d-none');
+
+                        const keyword = getCurrentSearchTerm();
+                        const categoryName = getCurrentCategoryName();
+                        const buildUrl = (page) => {
+                            const params = new URLSearchParams();
+                            params.set('page', String(page));
+
+                            if (keyword) {
+                                params.set('searchTerm', keyword);
+                            }
+
+                            if (categoryName) {
+                                params.set('categoryName', categoryName);
+                            }
+
+                            return `/Blog?${params.toString()}`;
+                        };
+
+                        let html = `
+                                                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                                                            <a class="page-link js-blog-page-link" href="${buildUrl(currentPage - 1)}" data-page="${currentPage - 1}">Trước</a>
+                                                        </li>`;
+
+                        for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+                            html += `
+                                                            <li class="page-item ${pageNumber === currentPage ? 'active' : ''}">
+                                                                <a class="page-link js-blog-page-link" href="${buildUrl(pageNumber)}" data-page="${pageNumber}">${pageNumber}</a>
+                                                            </li>`;
+                        }
+
+                        html += `
+                                                        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                                                            <a class="page-link js-blog-page-link" href="${buildUrl(currentPage + 1)}" data-page="${currentPage + 1}">Sau</a>
+                                                        </li>`;
+
+                        pagination.innerHTML = html;
+                        bindPaginationAjax();
+                    }
+
+                    async function loadPage(page) {
+                        if (page < 1) return;
+
+                        const keyword = getCurrentSearchTerm();
+                        const categoryName = getCurrentCategoryName();
+                        const params = new URLSearchParams();
+                        params.set('page', String(page));
+
+                        if (keyword) {
+                            params.set('searchTerm', keyword);
+                        }
+
+                        if (categoryName) {
+                            params.set('categoryName', categoryName);
+                        }
+
+                        const response = await fetch(`/Blog/GetPagedBlogs?${params.toString()}`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            return;
+                        }
+
+                        const data = await response.json();
+
+                        if (searchInput) {
+                            searchInput.value = data.searchTerm ?? '';
+                        }
+
+                        setCurrentCategoryName(data.selectedCategoryName ?? '');
+                        lastSearchTerm = (data.searchTerm ?? '').trim();
+                        lastCategoryName = (data.selectedCategoryName ?? '').trim();
+
+                        renderPosts(data.posts);
+                        renderPagination(data.currentPage, data.totalPages);
+                        updateCategorySelection(data.selectedCategoryName ?? '');
+
+                        const historyParams = new URLSearchParams();
+                        historyParams.set('page', String(data.currentPage));
+
+                        if (data.searchTerm) {
+                            historyParams.set('searchTerm', data.searchTerm);
+                        }
+
+                        if (data.selectedCategoryName) {
+                            historyParams.set('categoryName', data.selectedCategoryName);
+                        }
+
+                        window.history.pushState({}, '', `/Blog?${historyParams.toString()}`);
+                    }
+
+                    function bindPaginationAjax() {
+                        document.querySelectorAll('.js-blog-page-link').forEach(link => {
+                            link.addEventListener('click', event => {
+                                const page = Number(link.dataset.page);
+                                const pageItem = link.closest('.page-item');
+
+                                if (pageItem?.classList.contains('disabled') || pageItem?.classList.contains('active')) {
+                                    event.preventDefault();
+                                    return;
+                                }
+
+                                event.preventDefault();
+                                loadPage(page);
+                            });
+                        });
+                    }
+
+                    function bindPopularTagSearch() {
+                        popularTagLinks.forEach(link => {
+                            link.addEventListener('click', event => {
+                                event.preventDefault();
+
+                                const keyword = link.dataset.keyword?.trim() ?? '';
+
+                                if (!keyword || !searchInput) {
+                                    return;
+                                }
+
+                                searchInput.value = keyword;
+                                lastSearchTerm = keyword;
+                                loadPage(1);
+                            });
+                        });
+                    }
+
+                    function bindCategoryFilter() {
+                        document.querySelectorAll('.js-blog-category-link').forEach(link => {
+                            link.addEventListener('click', event => {
+                                event.preventDefault();
+
+                                const categoryName = link.dataset.categoryName?.trim() ?? '';
+                                setCurrentCategoryName(categoryName);
+                                lastCategoryName = categoryName;
+                                updateCategorySelection(categoryName);
+                                loadPage(1);
+                            });
+                        });
+                    }
+
+                    if (blogList) {
+                        blogList.addEventListener('click', event => {
+                            const button = event.target.closest('.js-post-useful-btn');
+                            if (!button) {
+                                return;
+                            }
+
+                            event.preventDefault();
+                            handleUsefulButtonClick(button);
+                        });
+                    }
+
+                    bindPaginationAjax();
+                    bindPopularTagSearch();
+                    bindCategoryFilter();
+                    updateCategorySelection(lastCategoryName);
+
+                    if (searchForm) {
+                        searchForm.addEventListener('submit', event => {
+                            event.preventDefault();
+                            loadPage(1);
+                        });
+                    }
+
+                    if (searchInput) {
+                        searchInput.addEventListener('input', () => {
+                            const currentSearchTerm = getCurrentSearchTerm();
+
+                            if (lastSearchTerm && !currentSearchTerm) {
+                                loadPage(1);
+                            }
+
+                            lastSearchTerm = currentSearchTerm;
+                        });
+                    }
+
+                    window.addEventListener('popstate', () => {
+                        const params = new URLSearchParams(window.location.search);
+                        const page = Number(params.get('page') ?? '1');
+
+                        if (searchInput) {
+                            searchInput.value = params.get('searchTerm') ?? '';
+                        }
+
+                        setCurrentCategoryName(params.get('categoryName') ?? '');
+                        lastSearchTerm = getCurrentSearchTerm();
+                        lastCategoryName = getCurrentCategoryName();
+                        updateCategorySelection(lastCategoryName);
+                        loadPage(page);
+                    });
+                })();
+            </script>
+        }

@@ -1,0 +1,56 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<header class="topbar" id="posts-section">
+    <div class="topbar__title-wrap">
+        <button class="sidebar-toggle" type="button" aria-label="Mở menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div>
+            <p class="eyebrow">Admin / Posts</p>
+            <h2>Quản lý bài viết</h2>
+            <div class="overview-hero__chips">
+                <span>Blog</span>
+                <span>Content</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="panel" id="posts-panel">
+    <div class="panel__head">
+        <div>
+            <p class="eyebrow">Scaffold</p>
+            <h3>Danh sách bài viết</h3>
+        </div>
+        <div class="panel__head-actions">
+            <button type="button">Tạo bài viết</button>
+        </div>
+    </div>
+    <div class="table-shell">
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Tiêu đề</th>
+                    <th>Chuyên mục</th>
+                    <th>Ngày đăng</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="product-info"><strong>Scaffold bài viết</strong><span>Khu vực này sẽ nối với blog
+                            admin sau.</span></div>
+                        </td>
+                        <td>Tin tức</td>
+                        <td>--</td>
+                        <td>Ready</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>

@@ -1,0 +1,56 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<header class="topbar" id="price-overview">
+    <div class="topbar__title-wrap">
+        <button class="sidebar-toggle" type="button" aria-label="Mở menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div>
+            <p class="eyebrow">Admin / Prices</p>
+            <h2>Quản lý bảng giá</h2>
+            <div class="overview-hero__chips">
+                <span>Price list</span>
+                <span>Updates</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<section class="panel panel--prices">
+    <div class="panel__head">
+        <div>
+            <p class="eyebrow">Scaffold</p>
+            <h3>Bảng giá thu mua</h3>
+        </div>
+        <div class="panel__head-actions">
+            <button type="button">Cập nhật giá</button>
+        </div>
+    </div>
+    <div class="table-shell">
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Nhóm giá</th>
+                    <th>Mô tả</th>
+                    <th>Hiệu lực</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="product-info"><strong>Bảng giá mẫu</strong><span>Chờ kết nối dữ liệu từ
+                            database.</span></div>
+                        </td>
+                        <td>Trang quản trị bảng giá đã có route riêng.</td>
+                        <td>Hôm nay</td>
+                        <td>Ready</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>

@@ -1,0 +1,699 @@
+@model WebThuMuaPheLieu.ViewModels.PricingIndexViewModel
+
+@{
+    ViewData["Title"] = "Bảng giá phế liệu";
+}
+
+@section Styles {
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet" />
+
+    <style>
+        .pricing-page {
+            --pricing-primary-green: #15803d;
+            --pricing-primary-green-dark: #166534;
+            --pricing-primary-green-light: #dcfce7;
+            --pricing-secondary-yellow: #fdd400;
+            --pricing-surface-bg: #f8fafc;
+            --pricing-text-main: #1e293b;
+            --pricing-text-muted: #64748b;
+            --pricing-card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --pricing-border-radius-lg: 1rem;
+
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--pricing-surface-bg);
+            color: var(--pricing-text-main);
+            padding-bottom: 4rem;
+        }
+
+        .pricing-page .hero-section {
+            position: relative;
+            overflow: hidden;
+            padding: 88px 0 150px 0;
+            color: white;
+            background-color: var(--pricing-primary-green);
+            background-image: linear-gradient(rgba(21, 128, 61, 0.88), rgba(21, 128, 61, 0.9)), url('/assets/default/ảnh%20nền.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .pricing-page .hero-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.02));
+        }
+
+        .pricing-page .hero-section::after {
+            content: '';
+            position: absolute;
+            inset: auto 0 0 0;
+            height: 120px;
+            background: linear-gradient(180deg, rgba(21, 128, 61, 0) 0%, rgba(21, 128, 61, 0.16) 35%, rgba(248, 250, 252, 1) 100%);
+            pointer-events: none;
+        }
+
+        .pricing-page .hero-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .pricing-page .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            margin-bottom: 1rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: #f8fafc;
+            text-transform: uppercase;
+        }
+
+        .pricing-page .hero-kicker .material-symbols-outlined {
+            font-size: 1rem;
+        }
+
+        .pricing-page .btn-primary-green {
+            background-color: var(--pricing-primary-green);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-page .btn-primary-green:hover {
+            background-color: var(--pricing-primary-green-dark);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .pricing-page .btn-secondary-yellow {
+            background-color: var(--pricing-secondary-yellow);
+            color: #451a03;
+            border: none;
+            padding: 0.75rem 1.5rem;
+         
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-page .btn-secondary-yellow:hover {
+            background-color: #eab308;
+            color: #451a03;
+            transform: translateY(-2px);
+        }
+
+        .pricing-page .pricing-card {
+            background: white;
+            border-radius: var(--pricing-border-radius-lg);
+            border: none;
+            box-shadow: var(--pricing-card-shadow);
+            margin-top: -80px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .pricing-page .filter-bar {
+            padding: 2rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .pricing-page .form-control,
+        .pricing-page .form-select {
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            background-color: #f8fafc;
+        }
+
+        .pricing-page .form-control:focus,
+        .pricing-page .form-select:focus {
+            box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.1);
+            border-color: var(--pricing-primary-green);
+        }
+
+        .pricing-page .table-container {
+            padding: 0 2rem 2rem 2rem;
+        }
+
+        .pricing-page .custom-table th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--pricing-text-muted);
+            border-top: none;
+            padding: 1.5rem 1rem;
+            font-weight: 700;
+        }
+
+        .pricing-page .custom-table td {
+            padding: 1.25rem 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .pricing-page .pricing-row {
+            transition: all 0.2s ease;
+        }
+
+        .pricing-page .pricing-row:hover {
+            background-color: #f0fdf4;
+        }
+
+        .pricing-page .price-text {
+            color: var(--pricing-primary-green);
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .pricing-page .badge-status {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            border-radius: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .pricing-page .badge-success-light,
+        .pricing-page .badge-info-light {
+            background-color: #e0f2fe;
+            color: #075985;
+        }
+
+        .pricing-page .badge-warning-light {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .pricing-page .benefit-card {
+            background: white;
+            border-radius: var(--pricing-border-radius-lg);
+            padding: 2rem;
+            height: 100%;
+            transition: transform 0.3s ease;
+            box-shadow: var(--pricing-card-shadow);
+            border: none;
+        }
+
+        .pricing-page .benefit-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pricing-page .icon-box {
+            width: 48px;
+            height: 48px;
+            background-color: var(--pricing-primary-green-light);
+            color: var(--pricing-primary-green);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-page .cta-banner {
+            position: relative;
+            overflow: hidden;
+            margin-top: 5rem;
+            padding: 0;
+            border: 0;
+            border-radius: 2rem;
+            background: linear-gradient(135deg, #0f7a3a 0%, #169b62 55%, #22c55e 100%);
+            box-shadow: 0 24px 60px rgba(21, 128, 61, 0.22);
+        }
+
+        .pricing-page .cta-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top left, rgba(255, 255, 255, 0.24), transparent 32%),
+                radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.16), transparent 28%);
+            pointer-events: none;
+        }
+
+        .pricing-page .cta-banner::after {
+            content: '';
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            right: -80px;
+            top: -80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.09);
+            pointer-events: none;
+        }
+
+        .pricing-page .pricing-cta {
+            position: relative;
+            z-index: 1;
+            padding: 3rem;
+        }
+
+        .pricing-page .pricing-cta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 1.25rem;
+        }
+
+        .pricing-page .hero-badges {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            gap: 0.85rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pricing-page .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1rem;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .pricing-page .hero-badge-primary {
+            background: #ffffff;
+            color: var(--pricing-primary-green);
+        }
+
+        .pricing-page .hero-badge-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.34);
+        }
+
+        .pricing-page .pricing-cta-title {
+            color: #fff;
+            font-size: 2.25rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-page .pricing-cta-description {
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 1rem;
+            line-height: 1.8;
+            max-width: 680px;
+            margin-bottom: 0;
+        }
+
+        .pricing-page .pricing-cta-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .pricing-page .pricing-cta-stat {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.25rem;
+            padding: 1rem 1.1rem;
+            backdrop-filter: blur(8px);
+        }
+
+        .pricing-page .pricing-cta-stat strong {
+            display: block;
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .pricing-page .pricing-cta-stat span {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+
+        .pricing-page .pricing-cta-panel {
+            position: relative;
+            z-index: 1;
+            padding: 3rem 3rem 3rem 0;
+        }
+
+        .pricing-page .pricing-cta-panel-card {
+            background: rgba(255, 255, 255, 0.96);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 1.75rem;
+            padding: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+        }
+
+        .pricing-page .pricing-cta-panel-icon {
+            width: 56px;
+            height: 56px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: var(--pricing-primary-green);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-page .pricing-cta-panel-card h4 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--pricing-text-main);
+        }
+
+        .pricing-page .pricing-cta-panel-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.5rem;
+        }
+
+        .pricing-page .pricing-cta-panel-card li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            color: #334155;
+            margin-bottom: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .pricing-page .pricing-cta-panel-card li i {
+            color: #16a34a;
+            margin-top: 0.15rem;
+        }
+
+        .pricing-page .pricing-cta-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.85rem;
+        }
+
+        .pricing-page .pricing-cta-actions .btn {
+            border-radius: 999px;
+            padding: 0.9rem 1.35rem;
+            font-weight: 800;
+        }
+
+        .pricing-page .pricing-cta-outline {
+            border: 1px solid #d1fae5;
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .pricing-page .pricing-cta-outline:hover {
+            background: #dcfce7;
+            color: #14532d;
+        }
+
+        .pricing-page .material-symbols-outlined {
+            vertical-align: middle;
+        }
+
+        .pricing-page .hero-title {
+            margin-bottom: 1rem;
+            font-size: 2.9rem;
+            line-height: 1.16;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .pricing-page .pricing-hero-heading,
+        .pricing-page .featured-products-section--pricing .section-header {
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .pricing-page .pricing-hero-heading h2,
+        .pricing-page .featured-products-section--pricing .section-header h2 {
+            font-family: "Bungee", sans-serif !important;
+            font-size: 30px !important;
+            font-weight: 400 !important;
+            line-height: 1.2 !important;
+            letter-spacing: 0.03em !important;
+        }
+
+        .pricing-page .pricing-hero-heading h2 {
+            color: #ffffff !important;
+        }
+
+        @@media (max-width: 991.98px) {
+
+            .pricing-page .pricing-cta,
+            .pricing-page .pricing-cta-panel {
+                padding: 2rem;
+            }
+
+            .pricing-page .pricing-cta-panel {
+                padding-top: 0;
+            }
+
+            .pricing-page .pricing-cta-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .pricing-page .hero-section {
+                padding: 60px 0 110px 0;
+            }
+
+            .pricing-page .hero-kicker {
+                margin-bottom: 0.9rem;
+                font-size: 0.72rem;
+            }
+
+            .pricing-page .pricing-card {
+                margin-top: -60px;
+            }
+
+            .pricing-page .price-text {
+                font-size: 1.25rem;
+            }
+
+            .pricing-page .hero-title {
+                font-size: 2rem;
+            }
+
+            .pricing-page .pricing-hero-heading h2,
+            .pricing-page .featured-products-section--pricing .section-header h2 {
+                font-size: 24px !important;
+            }
+
+            .pricing-page .hero-summary {
+                font-size: 0.98rem;
+                line-height: 1.7;
+            }
+
+            .pricing-page .pricing-cta,
+            .pricing-page .pricing-cta-panel {
+                padding: 1.5rem;
+            }
+
+            .pricing-page .pricing-cta-title {
+                font-size: 1.7rem;
+            }
+
+            .form-select {
+                font-size: 0.8rem !important;
+            }
+        }
+    </style>
+}
+
+<div class="pricing-page">
+    <main>
+        <section class="hero-section text-center">
+            <div class="container">
+                <div class="hero-inner">
+                    <span class="hero-kicker">
+                        <span class="material-symbols-outlined">monitoring</span>
+                        BẢNG GIÁ CẬP NHẬT MỚI
+                    </span>
+                    <div class="section-header mb-0 pricing-hero-heading">
+                        <h2 class="materials-title">Bảng Giá Phế Liệu Hôm Nay</h2>
+                    </div>
+                    <p class="hero-summary mb-0">
+                        Theo dõi biến động giá mới nhất, đối chiếu đơn vị thu mua dễ dàng và chủ động hơn trước khi liên
+                        hệ chốt giá.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <div class="container-fluid px-3 px-lg-4 pb-5">
+            <div class="card pricing-card mx-lg-3">
+                <div class="filter-bar">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-6 col-lg-7">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-0">
+                                    <span class="material-symbols-outlined text-muted">search</span>
+                                </span>
+                                <input id="pricingSearchInput" class="form-control border-0 bg-light"
+                                       placeholder="Tìm kiếm tên phế liệu..." type="text" />
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-3">
+                            <select id="pricingCategoryFilter" class="form-select border-0 bg-light"
+                                    style="font-size: 0.8rem;">
+                                <option value="">Tất cả danh mục</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 col-lg-2">
+                            <a class="btn btn-secondary-yellow w-100 d-flex align-items-center justify-content-center px-3 py-2 text-nowrap"
+                                   href="tel:0888.03.7777">
+                                <span class="material-symbols-outlined fs-5">request_quote</span>
+                                Liên hệ báo giá
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-responsive">
+                        <table class="table custom-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên Phế Liệu</th>
+                                    <th>Danh Mục</th>
+                                    <th>Giá Thu Mua</th>
+                                    <th>Đơn Vị</th>
+                                    <th>Tình Trạng</th>
+                                    <th>Cập Nhật</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model?.Prices != null && Model.Prices.Any())
+                                {
+                                    foreach (var item in Model.Prices)
+                                    {
+                                        <tr class="pricing-row" data-product-name="@item.ProductName"
+                                            data-category-name="@item.CategoryName">
+                                            <td class="text-muted fw-bold">@item.OrderNumber.ToString("D2")</td>
+                                            <td class="fw-bold text-dark">@item.ProductName</td>
+                                            <td><span class="badge bg-light text-secondary px-2 py-1">@item.CategoryName</span>
+                                            </td>
+                                            <td class="price-text " style="font-size: 0.8rem;">@item.PriceText</td>
+                                            <td class="text-muted">@item.UnitText</td>
+                                            <td><span class="badge-status @item.StatusCssClass">@item.StatusText</span></td>
+                                            <td class="text-muted fst-italic small">@item.UpdatedText</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td class="text-center text-muted py-4" colspan="7">Chưa có dữ liệu bảng giá.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-0 text-center pb-4">
+                    <p class="text-muted small mb-0 d-flex align-items-center justify-content-center gap-1">
+                        <span class="material-symbols-outlined fs-6">info</span>
+                        Giá thực tế có thể thay đổi tùy theo số lượng và vị trí thu mua.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        @await Component.InvokeAsync("FeaturedProductsSection", new { viewName = "Pricing" })
+ 
+        <script>
+                    (() => {
+                        const searchInput = document.getElementById('pricingSearchInput');
+                        const categoryFilter = document.getElementById('pricingCategoryFilter');
+                        const rows = Array.from(document.querySelectorAll('.pricing-page .pricing-row'));
+
+                        if (!searchInput || !categoryFilter || rows.length === 0) {
+                            return;
+                        }
+
+                        const normalizeText = (value) => (value || '')
+                            .toString()
+                            .trim()
+                            .toLowerCase()
+                            .normalize('NFD')
+                            .replace(/[\u0300-\u036f]/g, '');
+
+                        const categories = [...new Set(rows
+                            .map((row) => row.dataset.categoryName || '')
+                            .filter((value) => value.trim().length > 0))].sort((a, b) => a.localeCompare(b, 'vi'));
+
+                        categories.forEach((category) => {
+                            const option = document.createElement('option');
+                            option.value = category;
+                            option.textContent = category;
+                            categoryFilter.appendChild(option);
+                        });
+
+                        const emptyRow = document.createElement('tr');
+                        emptyRow.id = 'pricingEmptyState';
+                        emptyRow.hidden = true;
+                        emptyRow.innerHTML = '<td class="text-center text-muted py-4" colspan="7">Không tìm thấy dữ liệu phù hợp.</td>';
+
+                        const tbody = rows[0].closest('tbody');
+                        if (tbody) {
+                            tbody.appendChild(emptyRow);
+                        }
+
+                        const applyFilters = () => {
+                            const keyword = normalizeText(searchInput.value);
+                            const selectedCategory = normalizeText(categoryFilter.value);
+                            let visibleCount = 0;
+
+                            rows.forEach((row) => {
+                                const productName = normalizeText(row.dataset.productName);
+                                const categoryName = normalizeText(row.dataset.categoryName);
+                                const matchesKeyword = !keyword || productName.includes(keyword);
+                                const matchesCategory = !selectedCategory || categoryName === selectedCategory;
+                                const isVisible = matchesKeyword && matchesCategory;
+
+                                row.hidden = !isVisible;
+                                if (isVisible) {
+                                    visibleCount += 1;
+                                }
+                            });
+
+                            if (emptyRow) {
+                                emptyRow.hidden = visibleCount !== 0;
+                            }
+                        };
+
+                        searchInput.addEventListener('input', applyFilters);
+                        categoryFilter.addEventListener('change', applyFilters);
+                    })();
+        </script>
+            
