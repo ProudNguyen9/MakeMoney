@@ -3229,29 +3229,30 @@
     "net10.0": [
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 10.0.5",
       "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation >= 10.0.5",
+      "Microsoft.EntityFrameworkCore >= 10.0.5",
       "Microsoft.EntityFrameworkCore.Design >= 10.0.5",
       "Microsoft.EntityFrameworkCore.SqlServer >= 10.0.5",
       "Microsoft.EntityFrameworkCore.Tools >= 10.0.5"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\PC\\.nuget\\packages\\": {},
+    "C:\\Users\\Hoang Dinh Doanh\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\MakeMoney\\WebThuMuaPheLieu.csproj",
+      "projectUniqueName": "C:\\Users\\Hoang Dinh Doanh\\Desktop\\vechai26-3\\MakeMoney\\WebThuMuaPheLieu.csproj",
       "projectName": "WebThuMuaPheLieu",
-      "projectPath": "D:\\MakeMoney\\WebThuMuaPheLieu.csproj",
-      "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
-      "outputPath": "D:\\MakeMoney\\obj\\",
+      "projectPath": "C:\\Users\\Hoang Dinh Doanh\\Desktop\\vechai26-3\\MakeMoney\\WebThuMuaPheLieu.csproj",
+      "packagesPath": "C:\\Users\\Hoang Dinh Doanh\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Hoang Dinh Doanh\\Desktop\\vechai26-3\\MakeMoney\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Hoang Dinh Doanh\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -3279,7 +3280,7 @@
         "auditLevel": "low",
         "auditMode": "all"
       },
-      "SdkAnalysisLevel": "10.0.100"
+      "SdkAnalysisLevel": "10.0.200"
     },
     "frameworks": {
       "net10.0": {
@@ -3290,6 +3291,10 @@
             "version": "[10.0.5, )"
           },
           "Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation": {
+            "target": "Package",
+            "version": "[10.0.5, )"
+          },
+          "Microsoft.EntityFrameworkCore": {
             "target": "Package",
             "version": "[10.0.5, )"
           },
@@ -3329,7 +3334,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.201/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
