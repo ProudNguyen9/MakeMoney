@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\MakeMoney\\WebThuMuaPheLieu.csproj": {}
+    "d:\\MakeMoney\\WebThuMuaPheLieu.csproj": {}
   },
   "projects": {
-    "D:\\MakeMoney\\WebThuMuaPheLieu.csproj": {
+    "d:\\MakeMoney\\WebThuMuaPheLieu.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\MakeMoney\\WebThuMuaPheLieu.csproj",
+        "projectUniqueName": "d:\\MakeMoney\\WebThuMuaPheLieu.csproj",
         "projectName": "WebThuMuaPheLieu",
-        "projectPath": "D:\\MakeMoney\\WebThuMuaPheLieu.csproj",
+        "projectPath": "d:\\MakeMoney\\WebThuMuaPheLieu.csproj",
         "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
-        "outputPath": "D:\\MakeMoney\\obj\\",
+        "outputPath": "d:\\MakeMoney\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
