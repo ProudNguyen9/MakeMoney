@@ -1,0 +1,287 @@
+@model WebThuMuaPheLieu.Models.AdminOverviewViewModel
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var latestPriceUpdateText = Model.LatestPriceUpdateDate?.ToString("dd/MM/yyyy") ?? "Chưa có dữ liệu";
+    var totalAlerts = Model.ProductsWithoutImages + Model.BlogsWithoutImages + Model.NewContactRequests;
+}
+
+<!-- Simple Page Title -->
+<div class="admin-page-title">
+    <div>
+        <h1>Tổng quan hệ thống</h1>
+        <p>Dashboard theo dõi các chỉ số quan trọng của website thu mua phế liệu</p>
+    </div>
+    @if (totalAlerts > 0)
+    {
+        <div class="admin-page-badge admin-page-badge--alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span>@totalAlerts cần xử lý</span>
+        </div>
+    }
+    else
+    {
+        <div class="admin-page-badge admin-page-badge--success">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <span>Tất cả ổn định</span>
+        </div>
+    }
+</div>
+
+<!-- Main Stats Grid - 6 KPI Cards -->
+<div class="admin-stats-grid">
+    <!-- Card 1: Tổng số sản phẩm -->
+    <div class="admin-stat-card admin-stat-card--blue">
+        <div class="admin-stat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+            </svg>
+        </div>
+        <div class="admin-stat-card__content">
+            <p class="admin-stat-card__label">Tổng sản phẩm</p>
+            <h2 class="admin-stat-card__value">@Model.TotalProducts</h2>
+            <p class="admin-stat-card__desc">Sản phẩm trong hệ thống</p>
+        </div>
+    </div>
+
+    <!-- Card 2: Số bài viết đã đăng -->
+    <div class="admin-stat-card admin-stat-card--green">
+        <div class="admin-stat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+            </svg>
+        </div>
+        <div class="admin-stat-card__content">
+            <p class="admin-stat-card__label">Bài viết đã đăng</p>
+            <h2 class="admin-stat-card__value">@Model.TotalPublishedPosts</h2>
+            <p class="admin-stat-card__desc">Tin Tức đã xuất bản</p>
+        </div>
+    </div>
+
+    <!-- Card 3: Yêu cầu liên hệ mới -->
+    <div class="admin-stat-card admin-stat-card--orange">
+        <div class="admin-stat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                <line x1="9" y1="10" x2="15" y2="10" />
+                <line x1="9" y1="14" x2="13" y2="14" />
+            </svg>
+        </div>
+        <div class="admin-stat-card__content">
+            <p class="admin-stat-card__label">Liên hệ mới</p>
+            <h2 class="admin-stat-card__value">@Model.NewContactRequests</h2>
+            <p class="admin-stat-card__desc">Chưa xử lý</p>
+        </div>
+    </div>
+
+    <!-- Card 4: Lần cập nhật giá gần nhất -->
+    <div class="admin-stat-card admin-stat-card--purple">
+        <div class="admin-stat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+        </div>
+        <div class="admin-stat-card__content">
+            <p class="admin-stat-card__label">Cập nhật giá gần nhất</p>
+            <h2 class="admin-stat-card__value admin-stat-card__value--small">@latestPriceUpdateText</h2>
+            <p class="admin-stat-card__desc">Ngày hiệu lực</p>
+        </div>
+    </div>
+
+    <!-- Card 5: Sản phẩm chưa có ảnh -->
+    <div class="admin-stat-card admin-stat-card--red">
+        <div class="admin-stat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <polyline points="21 15 16 10 5 21" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+            </svg>
+        </div>
+        <div class="admin-stat-card__content">
+            <p class="admin-stat-card__label">Sản phẩm thiếu ảnh</p>
+            <h2 class="admin-stat-card__value">@Model.ProductsWithoutImages</h2>
+            <p class="admin-stat-card__desc">Cần bổ sung ảnh</p>
+        </div>
+    </div>
+
+    <!-- Card 6: Blog chưa có ảnh -->
+    <div class="admin-stat-card admin-stat-card--yellow">
+        <div class="admin-stat-card__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <rect x="8" y="12" width="8" height="6" rx="1" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+            </svg>
+        </div>
+        <div class="admin-stat-card__content">
+            <p class="admin-stat-card__label">Tin tức thiếu ảnh</p>
+            <h2 class="admin-stat-card__value">@Model.BlogsWithoutImages</h2>
+            <p class="admin-stat-card__desc">Cần bổ sung ảnh</p>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Grid: Alerts + Quick Info -->
+<div class="admin-bottom-grid">
+    <!-- Left: Cần chú ý -->
+    <div class="admin-panel">
+        <div class="admin-panel__header">
+            <div>
+                <h3>Cần chú ý</h3>
+                <p>Các vấn đề cần xử lý ưu tiên</p>
+            </div>
+            @if (totalAlerts > 0)
+            {
+                <span class="admin-panel__badge">@totalAlerts</span>
+            }
+        </div>
+        <div class="admin-alert-list">
+            @if (Model.ProductsWithoutImages > 0)
+            {
+                <div class="admin-alert-item admin-alert-item--warning">
+                    <div class="admin-alert-item__icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                    </div>
+                    <div class="admin-alert-item__content">
+                        <h4>Sản phẩm thiếu ảnh</h4>
+                        <p>@Model.ProductsWithoutImages sản phẩm chưa có ảnh đại diện</p>
+                    </div>
+                    <span class="admin-alert-item__count">@Model.ProductsWithoutImages</span>
+                </div>
+            }
+            @if (Model.BlogsWithoutImages > 0)
+            {
+                <div class="admin-alert-item admin-alert-item--warning">
+                    <div class="admin-alert-item__icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                            <line x1="12" y1="9" x2="12" y2="13" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                    </div>
+                    <div class="admin-alert-item__content">
+                        <h4>Tin tức thiếu ảnh</h4>
+                        <p>@Model.BlogsWithoutImages bài viết chưa có ảnh bìa</p>
+                    </div>
+                    <span class="admin-alert-item__count">@Model.BlogsWithoutImages</span>
+                </div>
+            }
+            @if (Model.NewContactRequests > 0)
+            {
+                <div class="admin-alert-item admin-alert-item--info">
+                    <div class="admin-alert-item__icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="16" x2="12" y2="12" />
+                            <line x1="12" y1="8" x2="12.01" y2="8" />
+                        </svg>
+                    </div>
+                    <div class="admin-alert-item__content">
+                        <h4>Yêu cầu liên hệ mới</h4>
+                        <p>@Model.NewContactRequests yêu cầu đang chờ xử lý</p>
+                    </div>
+                    <span class="admin-alert-item__count">@Model.NewContactRequests</span>
+                </div>
+            }
+            @if (totalAlerts == 0)
+            {
+                <div class="admin-alert-item admin-alert-item--success">
+                    <div class="admin-alert-item__icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                    </div>
+                    <div class="admin-alert-item__content">
+                        <h4>Tất cả đều ổn</h4>
+                        <p>Không có vấn đề nào cần xử lý ngay</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Right: Hướng dẫn -->
+    <div class="admin-panel">
+        <div class="admin-panel__header">
+            <div>
+                <h3>Hướng dẫn theo dõi</h3>
+                <p>Ý nghĩa các chỉ số dashboard</p>
+            </div>
+        </div>
+        <div class="admin-guide-list">
+            <div class="admin-guide-item">
+                <div class="admin-guide-item__icon admin-guide-item__icon--blue">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                </div>
+                <div>
+                    <h4>Sản phẩm</h4>
+                    <p>Kiểm tra tổng số và rà soát các mục thiếu ảnh</p>
+                </div>
+            </div>
+            <div class="admin-guide-item">
+                <div class="admin-guide-item__icon admin-guide-item__icon--green">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                </div>
+                <div>
+                    <h4>Bài viết</h4>
+                    <p>Theo dõi số bài đã đăng và tối ưu SEO</p>
+                </div>
+            </div>
+            <div class="admin-guide-item">
+                <div class="admin-guide-item__icon admin-guide-item__icon--orange">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h4>Liên hệ</h4>
+                    <p>Ưu tiên xử lý để không bỏ sót khách hàng</p>
+                </div>
+            </div>
+            <div class="admin-guide-item">
+                <div class="admin-guide-item__icon admin-guide-item__icon--purple">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                </div>
+                <div>
+                    <h4>Giá thu mua</h4>
+                    <p>Đảm bảo dữ liệu giá luôn cập nhật</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
