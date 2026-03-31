@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebThuMuaPheLieu")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f1d9cd699d7f1045359ffaed85b277c30bfa3f2f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+259644b3a070be11bd440b246fda1d9ff58cd1fd")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebThuMuaPheLieu")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebThuMuaPheLieu")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

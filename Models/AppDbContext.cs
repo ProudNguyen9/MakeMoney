@@ -184,6 +184,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.Excerpt).HasColumnName("excerpt");
+            entity.Property(e => e.LikeCount).HasColumnName("like_count");
             entity.Property(e => e.PublishedAt)
                 .HasColumnType("datetime")
                 .HasColumnName("published_at");
