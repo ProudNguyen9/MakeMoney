@@ -468,7 +468,6 @@ D:\MakeMoney\obj\Debug\net10.0\compressed\v5fpvvpvx7-{0}-6e44tuvcnd-6e44tuvcnd.g
 D:\MakeMoney\obj\Debug\net10.0\compressed\1wbvafv82k-{0}-g272ozm3rj-g272ozm3rj.gz
 D:\MakeMoney\obj\Debug\net10.0\compressed\9xgm6wuqmg-{0}-n88yo0lx7b-n88yo0lx7b.gz
 D:\MakeMoney\obj\Debug\net10.0\compressed\tunwvi3s5l-{0}-zz3h6nwp7c-zz3h6nwp7c.gz
-D:\MakeMoney\obj\Debug\net10.0\compressed\tjeehusozn-{0}-sja0two5tx-sja0two5tx.gz
 D:\MakeMoney\obj\Debug\net10.0\compressed\cucd699t34-{0}-pdhg2w2hb7-pdhg2w2hb7.gz
 D:\MakeMoney\obj\Debug\net10.0\compressed\innoxqfv7r-{0}-rj4ba1tr2p-rj4ba1tr2p.gz
 D:\MakeMoney\obj\Debug\net10.0\compressed\y1e23xz68h-{0}-euiikl6nsc-euiikl6nsc.gz
@@ -635,3 +634,4 @@ D:\MakeMoney\obj\Debug\net10.0\refint\WebThuMuaPheLieu.dll
 D:\MakeMoney\obj\Debug\net10.0\WebThuMuaPheLieu.pdb
 D:\MakeMoney\obj\Debug\net10.0\WebThuMuaPheLieu.genruntimeconfig.cache
 D:\MakeMoney\obj\Debug\net10.0\ref\WebThuMuaPheLieu.dll
+D:\MakeMoney\obj\Debug\net10.0\compressed\tjeehusozn-{0}-lru3cthydl-lru3cthydl.gz

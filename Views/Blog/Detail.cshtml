@@ -69,11 +69,17 @@
     var daysSincePublish = publishDate.HasValue ? Math.Max(0, (DateTime.Now.Date - publishDate.Value.Date).Days) : 45;
     var freshnessPercent = publishDate.HasValue ? Math.Max(45, 100 - Math.Min(55, daysSincePublish)) : 55;
     var coverBadgeText = plainSummary.Length > 72 ? $"{plainSummary[..69]}..." : plainSummary;
+    var galleryImages = (Model.GalleryImages ?? [])
+        .Where(image => !string.IsNullOrWhiteSpace(image))
+        .Distinct()
+        .ToList();
+    var hasCoverCarousel = galleryImages.Count > 1;
 }
 
 @section Styles {
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-          rel="stylesheet" />
+    <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
     <style>
         body.blog-detail-page {
             background: #f6f8f2;
@@ -123,117 +129,211 @@
         }
 
         .blog-detail-head {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
-        .blog-detail-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .blog-detail-badge {
+        .blog-detail-eyebrow {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 9px 14px;
-            border-radius: 999px;
-            background: rgba(21, 128, 61, 0.1);
-            color: #166534;
+            gap: 10px;
+            margin-bottom: 14px;
+            color: #15803d;
             font-size: 0.78rem;
             font-weight: 800;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
         }
 
+        .blog-detail-eyebrow::before {
+            content: "";
+            width: 38px;
+            height: 1px;
+            background: rgba(21, 128, 61, 0.35);
+        }
+
         .blog-detail-title {
-            max-width: none;
+            max-width: 100%;
             width: 100%;
-            margin: 0 0 14px;
+            margin: 0;
             color: #0f172a;
-            font-size: clamp(2rem, 3vw, 3.2rem);
-            line-height: 1.08;
+
+            font-size: clamp(2.2rem, 3.2vw, 3.9rem);
+            line-height: 1.15;
             letter-spacing: -0.03em;
+
+            /* QUAN TRỌNG */
+            white-space: normal;
+            /* cho phép xuống dòng */
+            overflow-wrap: break-word;
+            /* tránh chữ dài bị tràn */
+            word-break: break-word;
+            /* backup */
         }
 
         .blog-detail-top-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 14px 18px;
             align-items: center;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(148, 163, 184, 0.22);
         }
 
         .blog-detail-top-meta-item {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 12px 14px;
-            border-radius: 16px;
-            background: #ffffff;
-            color: #475569;
+            color: #64748b;
+            font-size: 0.96rem;
             font-weight: 600;
-            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+            letter-spacing: -0.01em;
+        }
+
+        .blog-detail-top-meta-item i {
+            color: #15803d;
+            font-size: 0.98rem;
+        }
+
+        .blog-detail-top-meta-separator {
+            width: 5px;
+            height: 5px;
+            border-radius: 999px;
+            background: #cbd5e1;
         }
 
         .blog-detail-cover {
             position: relative;
             overflow: hidden;
             border-radius: 24px;
-            margin-bottom: 30px;
+            margin-bottom: 0;
             padding: 0 !important;
             line-height: 0;
-            background: transparent !important;
-            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+            background: #edf2ec !important;
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.10);
+        }
+
+        .blog-detail-cover::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.00) 0%, rgba(15, 23, 42, 0.08) 55%, rgba(15, 23, 42, 0.24) 100%);
         }
 
         .blog-detail-cover img {
             display: block;
             width: 100%;
-            height: clamp(300px, 42vw, 520px);
+            height: clamp(300px, 42vw, 720px);
             object-fit: cover;
             border-radius: inherit;
         }
 
+        .blog-detail-cover-swiper,
+        .blog-detail-cover-swiper .swiper-wrapper,
+        .blog-detail-cover-swiper .swiper-slide {
+            height: clamp(300px, 42vw, 720px);
+        }
+
+        .blog-detail-cover-swiper .swiper-slide {
+            overflow: hidden;
+        }
+
+        .blog-detail-cover-swiper .swiper-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .blog-detail-cover-pagination {
+            position: absolute;
+            left: 50% !important;
+            bottom: 18px !important;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: auto !important;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.24);
+            backdrop-filter: blur(8px);
+            transform: translateX(-50%);
+        }
+
+        .blog-detail-cover-pagination .swiper-pagination-bullet {
+            width: 8px;
+            height: 8px;
+            margin: 0 !important;
+            background: rgba(255, 255, 255, 0.72);
+            opacity: 1;
+        }
+
+        .blog-detail-cover-pagination .swiper-pagination-bullet-active {
+            width: 24px;
+            border-radius: 999px;
+            background: #ffffff;
+        }
+
         .blog-detail-cover-note {
             position: absolute;
-            left: 22px;
-            bottom: 20px;
-            max-width: min(360px, calc(100% - 44px));
-            padding: 12px 16px;
+            left: 18px;
+            bottom: 18px;
+            z-index: 2;
+            max-width: min(320px, calc(100% - 36px));
+            padding: 10px 12px;
             border-radius: 16px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 14px 26px rgba(15, 23, 42, 0.12);
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10);
+        }
+
+        .blog-detail-cover-note-copy {
+            min-width: 0;
         }
 
         .blog-detail-cover-note small {
-            display: block;
-            margin-bottom: 4px;
-            color: #16a34a;
-            font-size: 0.72rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 5px;
+            color: #0f766e;
+            font-size: 0.64rem;
             font-weight: 800;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.16em;
             text-transform: uppercase;
+        }
+
+        .blog-detail-cover-note small i {
+            font-size: 0.72rem;
         }
 
         .blog-detail-cover-note strong {
             display: block;
-            color: #1f2937;
-            font-size: 0.95rem;
-            line-height: 1.4;
+            color: #0f172a;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            letter-spacing: -0.01em;
+            font-weight: 700;
+        }
+
+        .blog-detail-cover-chip {
+            display: none;
         }
 
         .blog-detail-layout {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) 500px;
+            grid-template-columns: minmax(0, 1fr) 420px;
             gap: 28px;
             align-items: start;
         }
 
         .blog-detail-primary {
             display: grid;
-            gap: 24px;
+            gap: 28px;
+            min-width: 0;
         }
 
         .blog-detail-card,
@@ -309,7 +409,7 @@
             padding: 0 12px;
         }
 
-        .blog-detail-overview-stat + .blog-detail-overview-stat {
+        .blog-detail-overview-stat+.blog-detail-overview-stat {
             border-left: 1px solid rgba(148, 163, 184, 0.28);
         }
 
@@ -382,66 +482,265 @@
         }
 
         .blog-detail-content-card {
-            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            padding: 0;
+            border: 1px solid rgba(221, 231, 225, 0.9);
+            background:
+                radial-gradient(circle at top right, rgba(22, 163, 74, 0.07), transparent 28%),
+                linear-gradient(180deg, #ffffff 0%, #fcfdfb 100%);
+            box-shadow: 0 22px 48px rgba(15, 23, 42, 0.08);
+        }
+
+        .blog-detail-content-card::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(21, 128, 61, 0), rgba(21, 128, 61, 0.3), rgba(21, 128, 61, 0));
+        }
+
+        .blog-detail-content-header {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 22px;
+            padding: 24px 28px 20px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.82);
+            background: linear-gradient(180deg, rgba(246, 248, 242, 0.92) 0%, rgba(255, 255, 255, 0.92) 100%);
+        }
+
+        .blog-detail-content-header>div {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .blog-detail-content-header::after {
+            content: "";
+            position: absolute;
+            left: 28px;
+            right: 28px;
+            bottom: -1px;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.04));
+        }
+
+        .blog-detail-content-kicker {
+            display: block;
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(1.31rem, 2.06vw, 1.87rem);
+            font-weight: 500;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+            text-transform: none;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            max-width: 100%;
+        }
+
+        .blog-detail-content-kicker::before {
+            content: none;
+        }
+
+        .blog-detail-content-header h3 {
+            max-width: 720px;
+            margin: 0;
+            color: #0f172a;
+            font-size: clamp(1.2rem, 1.65vw, 1.55rem);
+            line-height: 1.45;
+            letter-spacing: -0.02em;
+        }
+
+        .blog-detail-content-summary {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            max-width: 280px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(244, 247, 241, 0.92);
+            border: 1px solid rgba(214, 226, 218, 0.88);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+        }
+
+        .blog-detail-content-summary i {
+            color: #15803d;
+            font-size: 1rem;
+            margin-top: 2px;
+        }
+
+        .blog-detail-content-summary strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #0f172a;
+            font-size: 0.86rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .blog-detail-content-summary span {
+            display: block;
+            color: #64748b;
+            font-size: 0.84rem;
+            line-height: 1.65;
         }
 
         .blog-detail-body {
+            padding: 32px 32px 36px;
             color: #334155;
-            font-size: 1rem;
-            line-height: 1.9;
+            font-size: 1.04rem;
+            line-height: 1.95;
         }
 
-        .blog-detail-body > *:first-child {
+        .blog-detail-body>*:first-child {
             margin-top: 0;
         }
 
-        .blog-detail-body > *:last-child {
+        .blog-detail-body>*:last-child {
             margin-bottom: 0;
+        }
+
+        .blog-detail-body p {
+            margin-bottom: 1.22rem;
+            color: #334155;
+        }
+
+        .blog-detail-body>p:first-of-type {
+            color: #1e293b;
+            font-size: 1.1rem;
+            line-height: 1.92;
         }
 
         .blog-detail-body h2,
         .blog-detail-body h3,
         .blog-detail-body h4 {
-            margin-top: 2rem;
-            margin-bottom: 0.95rem;
+            margin-top: 2.4rem;
+            margin-bottom: 1rem;
             color: #0f172a;
             font-weight: 800;
-            line-height: 1.3;
+            line-height: 1.28;
+            letter-spacing: -0.025em;
         }
 
-        .blog-detail-body p,
-        .blog-detail-body ul,
-        .blog-detail-body ol,
-        .blog-detail-body blockquote {
-            margin-bottom: 1.1rem;
+        .blog-detail-body h2 {
+            font-size: clamp(1.55rem, 2vw, 2.1rem);
+        }
+
+        .blog-detail-body h3 {
+            font-size: clamp(1.3rem, 1.5vw, 1.65rem);
+        }
+
+        .blog-detail-body h4 {
+            font-size: 1.12rem;
+        }
+
+        .blog-detail-body h2+h3,
+        .blog-detail-body h3+h4 {
+            margin-top: 1.2rem;
         }
 
         .blog-detail-body ul,
         .blog-detail-body ol {
-            padding-left: 1.2rem;
+            margin-bottom: 1.3rem;
+            padding-left: 1.3rem;
+        }
+
+        .blog-detail-body li {
+            margin-bottom: 0.55rem;
+            padding-left: 0.18rem;
+        }
+
+        .blog-detail-body strong {
+            color: #0f172a;
+            font-weight: 800;
+        }
+
+        .blog-detail-body hr {
+            margin: 2rem 0;
+            border: 0;
+            border-top: 1px solid rgba(203, 213, 225, 0.8);
         }
 
         .blog-detail-body img {
             display: block;
             max-width: 100%;
+            width: 100%;
             height: auto;
-            margin: 1.5rem auto;
-            border-radius: 20px;
-            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+            margin: 1.85rem auto;
+            border-radius: 24px;
+            border: 1px solid rgba(226, 232, 240, 0.92);
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.11);
+        }
+
+        .blog-detail-body figure {
+            margin: 1.9rem 0;
+        }
+
+        .blog-detail-body figure img {
+            margin: 0;
+        }
+
+        .blog-detail-body figcaption {
+            margin-top: 12px;
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            text-align: center;
         }
 
         .blog-detail-body blockquote {
-            padding: 20px 22px;
+            margin: 1.7rem 0;
+            padding: 22px 24px;
             border-left: 4px solid #16a34a;
-            border-radius: 18px;
-            background: linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(236, 253, 245, 0.92));
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(22, 163, 74, 0.08), rgba(240, 253, 244, 0.94));
             color: #14532d;
             font-weight: 700;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+        }
+
+        .blog-detail-body blockquote p:last-child {
+            margin-bottom: 0;
         }
 
         .blog-detail-body a {
             color: #15803d;
             font-weight: 700;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 3px;
+        }
+
+        .blog-detail-body table {
+            width: 100%;
+            margin: 1.6rem 0;
+            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0;
+            border: 1px solid rgba(226, 232, 240, 0.92);
+            border-radius: 18px;
+            background: #ffffff;
+        }
+
+        .blog-detail-body th,
+        .blog-detail-body td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .blog-detail-body th {
+            color: #0f172a;
+            font-size: 0.9rem;
+            font-weight: 800;
+            background: #f8fafc;
+        }
+
+        .blog-detail-body tr:last-child td {
+            border-bottom: 0;
         }
 
         .blog-detail-share-card {
@@ -512,7 +811,7 @@
             transition: transform 0.25s ease, opacity 0.25s ease;
         }
 
-        .blog-detail-sidebar .mini-post + .mini-post {
+        .blog-detail-sidebar .mini-post+.mini-post {
             margin-top: 18px;
             padding-top: 18px;
             
@@ -587,7 +886,7 @@
             font-size: 1.15rem;
         }
 
-        .blog-detail-sidebar-card > small {
+        .blog-detail-sidebar-card>small {
             display: block;
             margin-bottom: 18px;
             color: #94a3b8;
@@ -747,7 +1046,8 @@
 
         @@media (max-width: 1199.98px) {
             .blog-detail-layout {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr) 360px;
+                gap: 22px;
             }
 
             .blog-detail-sidebar {
@@ -764,11 +1064,55 @@
                 height: 250px;
             }
 
+            .blog-detail-cover-swiper,
+            .blog-detail-cover-swiper .swiper-wrapper,
+            .blog-detail-cover-swiper .swiper-slide {
+                height: 250px;
+            }
+
+            .blog-detail-cover-note {
+                left: 14px;
+                bottom: 14px;
+                max-width: calc(100% - 28px);
+                padding: 10px 11px;
+                border-radius: 14px;
+                display: block;
+            }
+
             .blog-detail-overview,
-            .blog-detail-content-card,
             .blog-detail-sidebar-card,
             .blog-detail-feature-card {
                 padding: 18px;
+            }
+
+            .blog-detail-content-header {
+                flex-direction: column;
+                padding: 18px 18px 16px;
+                gap: 16px;
+            }
+
+            .blog-detail-content-header::after {
+                left: 18px;
+                right: 18px;
+            }
+
+            .blog-detail-content-summary {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .blog-detail-body {
+                padding: 22px 18px 24px;
+                font-size: 1rem;
+                line-height: 1.85;
+            }
+
+            .blog-detail-body>p:first-of-type {
+                font-size: 1.03rem;
+            }
+
+            .blog-detail-body img {
+                border-radius: 18px;
             }
 
             .blog-detail-sidebar .sidebar-card {
@@ -800,7 +1144,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .blog-detail-overview-stat + .blog-detail-overview-stat {
+            .blog-detail-overview-stat+.blog-detail-overview-stat {
                 border-left: 0;
                 border-top: 1px solid rgba(148, 163, 184, 0.28);
                 margin-top: 16px;
@@ -816,9 +1160,20 @@
                 justify-content: center;
             }
 
+            .blog-detail-top-meta {
+                gap: 10px;
+                margin-top: 16px;
+                padding-top: 16px;
+                align-items: flex-start;
+            }
+
             .blog-detail-top-meta-item {
-                width: 100%;
-                justify-content: flex-start;
+                width: auto;
+                font-size: 0.92rem;
+            }
+
+            .blog-detail-top-meta-separator {
+                display: none;
             }
         }
     </style>
@@ -827,35 +1182,59 @@
 <main class="blog-detail-main">
     <div class="blog-detail-shell container-fluid home-section-shell">
         <div class="blog-detail-head">
-            <h1 class="blog-detail-title">@Model.Post.Title</h1>
-
             <div class="blog-detail-top-meta">
                 <div class="blog-detail-top-meta-item">
-                    <i class="bi bi-calendar-event"></i>
+                    <i class="bi bi-calendar4-week"></i>
                     <span>@(publishDate?.ToString("dd/MM/yyyy") ?? "Đang cập nhật")</span>
                 </div>
+                <span class="blog-detail-top-meta-separator"></span>
                 <div class="blog-detail-top-meta-item">
                     <i class="bi bi-clock-history"></i>
                     <span>@readingTime</span>
                 </div>
+                <span class="blog-detail-top-meta-separator"></span>
                 <div class="blog-detail-top-meta-item">
-                    <i class="bi bi-person-circle"></i>
+                    <i class="bi bi-pencil-square"></i>
                     <span>@authorName</span>
                 </div>
             </div>
         </div>
 
-        <section class="blog-detail-cover">
-            <img src="@Model.CoverImage" alt="@Model.Post.Title" />
-            <div class="blog-detail-cover-note">
-                <small>Nội dung nổi bật</small>
-                <strong>@coverBadgeText</strong>
-            </div>
-        </section>
-
         <div class="blog-detail-layout">
             <div class="blog-detail-primary">
+                <section class="blog-detail-cover">
+                    @if (galleryImages.Any())
+                    {
+                        <div class="swiper blog-detail-cover-swiper">
+                            <div class="swiper-wrapper">
+                                @foreach (var imageUrl in galleryImages)
+                                {
+                                    <div class="swiper-slide">
+                                        <img src="@imageUrl" alt="@Model.Post.Title" loading="lazy" />
+                                    </div>
+                                }
+                            </div>
+
+                            @if (hasCoverCarousel)
+                            {
+                                <div class="swiper-pagination blog-detail-cover-pagination"></div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <img src="@Model.CoverImage" alt="@Model.Post.Title" />
+                    }
+                </section>
+
                 <article class="blog-detail-card blog-detail-content-card">
+                    <div class="blog-detail-content-header">
+                        <div>
+                            <h2 class="blog-detail-content-kicker">@Model.Post.Title
+                            </h2>
+                        </div>
+                        
+                    </div>
                     <div class="blog-detail-body">
                         @if (string.IsNullOrWhiteSpace(Model.Post.Content))
                         {
@@ -868,47 +1247,7 @@
                     </div>
                 </article>
 
-                <section class="blog-detail-card blog-detail-overview">
-                    <h2>Tổng quan bài viết</h2>
-
-                    <div class="blog-detail-progress-block">
-                        <div class="blog-detail-progress-head">
-                            <span>Độ sâu nội dung</span>
-                            <small>@wordCount từ</small>
-                        </div>
-                        <div class="blog-detail-progress is-muted">
-                            <span style="width:@($"{detailDepthPercent}%")"></span>
-                        </div>
-                    </div>
-
-                    <div class="blog-detail-progress-block mb-0">
-                        <div class="blog-detail-progress-head">
-                            <span>Mức độ cập nhật</span>
-                            <small>@(publishDate?.ToString("dd/MM/yyyy") ?? "Đang cập nhật")</small>
-                        </div>
-                        <div class="blog-detail-progress">
-                            <span style="width:@($"{freshnessPercent}%")"></span>
-                        </div>
-                    </div>
-
-                    <hr class="blog-detail-overview-divider" />
-
-                    <div class="blog-detail-overview-stats">
-                        <div class="blog-detail-overview-stat">
-                            <strong>@readingTime.Replace(" phút đọc", string.Empty)</strong>
-                            <span>Thời lượng đọc</span>
-                        </div>
-                        <div class="blog-detail-overview-stat">
-                            <strong>@Model.RelatedPosts.Count</strong>
-                            <span>Bài liên quan</span>
-                        </div>
-                        <div class="blog-detail-overview-stat">
-                            <strong>@authorInitial</strong>
-                            <span>Tác giả</span>
-                        </div>
-                    </div>
-                </section>
-
+                
                 
             </div>
 
@@ -918,20 +1257,18 @@
 
                     @if (Model.RelatedPosts.Any())
                     {
-                        @foreach (var relatedPost in Model.RelatedPosts.Take(3))
+                        @foreach (var relatedPost in Model.RelatedPosts.Take(4))
                         {
                             var relatedReadingMinutes = Math.Max(
                                 3,
-                                (int)Math.Ceiling(((relatedPost.Summary?.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length ?? 0) + 35) / 35d));
+                                (int)Math.Ceiling(((relatedPost.Summary?.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length ??
+                    0) + 35) / 35d));
                             var relatedSlug = !string.IsNullOrWhiteSpace(relatedPost.Slug)
                                 ? relatedPost.Slug
                                 : relatedPost.Id.ToString();
                             var relatedPreview = TruncateText(relatedPost.Summary, 58);
 
-                            <a class="mini-post"
-                               asp-controller="Blog"
-                               asp-action="Detail"
-                               asp-route-slug="@relatedSlug">
+                            <a class="mini-post" asp-controller="Blog" asp-action="Detail" asp-route-slug="@relatedSlug">
                                 <div class="mini-thumb">
                                     <img src="@relatedPost.CoverImage" alt="@relatedPost.Title" />
                                 </div>
@@ -962,6 +1299,8 @@
                         </div>
                     }
                 </div>
+
+                @await Component.InvokeAsync("FeaturedProductsSection", new { count = 4, viewName = "Default" })
             </aside>
         </div>
     </div>
@@ -970,5 +1309,35 @@
 @section Scripts {
     <script>
         document.body.classList.add('blog-detail-page');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const coverSwiperElement = document.querySelector('.blog-detail-cover-swiper');
+
+            if (coverSwiperElement && typeof Swiper !== 'undefined') {
+                const totalSlides = coverSwiperElement.querySelectorAll('.swiper-slide').length;
+
+                new Swiper(coverSwiperElement, {
+                    speed: 850,
+                    loop: totalSlides > 1,
+                    effect: 'slide',
+                    slidesPerView: 1,
+                    spaceBetween: 0,
+                    autoplay: totalSlides > 1
+                        ? {
+                            delay: 3500,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true
+                        }
+                        : false,
+                    pagination: totalSlides > 1
+                        ? {
+                            el: '.blog-detail-cover-pagination',
+                            clickable: true
+                        }
+                        : false,
+                    navigation: false
+                });
+            }
+        });
     </script>
 }

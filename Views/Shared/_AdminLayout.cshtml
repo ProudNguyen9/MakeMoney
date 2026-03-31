@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin | WebThuMuaPheLieu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet" />
+    <link rel="stylesheet" href="~/adminwebsite/css/admin-dashboard.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body>
+    <div class="admin-shell">
+        <aside class="sidebar">
+            <div class="sidebar__brand">
+                <div class="sidebar__logo">PL</div>
+                <div>
+                    <p class="eyebrow">Admin</p>
+                    <h1>Phế Liệu Pro</h1>
+                </div>
+            </div>
+
+            <nav class="sidebar__nav">
+                <a class="sidebar__item" href="/admin/overview">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M4 11.5 12 4l8 7.5v7A1.5 1.5 0 0 1 18.5 20H14v-4h-4v4H5.5A1.5 1.5 0 0 1 4 18.5v-7Z"
+                                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                  stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                    <span>Tổng quan</span>
+                </a>
+
+                <a class="sidebar__item" href="/admin/products">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                            d="M6 7h12M6 12h12M6 17h8M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                    <span>Sản phẩm</span>
+                </a>
+
+                <a class="sidebar__item" href="/admin/prices">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 3v18M16.5 7.5h-6a2.5 2.5 0 0 0 0 5h3a2.5 2.5 0 0 1 0 5h-6"
+                                  stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                  stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                    <span>Bảng giá</span>
+                </a>
+
+                <a class="sidebar__item" href="/admin/posts">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                            d="M7 5.5h10A1.5 1.5 0 0 1 18.5 7v10A1.5 1.5 0 0 1 17 18.5H7A1.5 1.5 0 0 1 5.5 17V7A1.5 1.5 0 0 1 7 5.5Z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                            <path d="M8.5 9.5h7M8.5 12h7M8.5 14.5h4.5" stroke="currentColor" stroke-width="1.8"
+                                  stroke-linecap="round" />
+                        </svg>
+                    </span>
+                    <span>Bài viết</span>
+                </a>
+
+                <a class="sidebar__item" href="/admin/marketing">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                            d="M4 18.5V9.8a1.3 1.3 0 0 1 .82-1.2l8-3.2a1.3 1.3 0 0 1 1.76 1.2v10.8a1.3 1.3 0 0 1-.82 1.2l-8 3.2A1.3 1.3 0 0 1 4 20.6Z"
+                            stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                            <path d="M14.5 8.5c2.6.5 4.5 2.8 4.5 5.5s-1.9 5-4.5 5.5" stroke="currentColor"
+                                  stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                    </span>
+                    <span>Banner & SEO</span>
+                </a>
+            </nav>
+
+            <div class="sidebar__footer">
+                <strong>Đồng bộ ổn định</strong>
+                <span>Last sync 3 phút trước</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

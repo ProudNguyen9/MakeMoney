@@ -23,6 +23,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<BlogCategory> BlogCategories { get; set; }
 
+    public virtual DbSet<BlogImage> BlogImages { get; set; }
+
     public virtual DbSet<BlogPost> BlogPosts { get; set; }
 
     public virtual DbSet<BlogPostCategory> BlogPostCategories { get; set; }
@@ -142,6 +144,28 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.Banner).WithMany(p => p.BannerImages)
                 .HasForeignKey(d => d.BannerId)
                 .HasConstraintName("FK_banner_images_banners");
+        });
+
+        modelBuilder.Entity<BlogImage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__blog_ima__3213E83F2F0F4A57");
+
+            entity.ToTable("blog_images");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BlogId).HasColumnName("blog_id");
+            entity.Property(e => e.Caption)
+                .HasMaxLength(255)
+                .HasColumnName("caption");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("image_url");
+            entity.Property(e => e.OrderIndex).HasColumnName("order_index");
+
+            entity.HasOne(d => d.Blog).WithMany(p => p.BlogImages)
+                .HasForeignKey(d => d.BlogId)
+                .HasConstraintName("FK_blog_images_blog_posts");
         });
 
         modelBuilder.Entity<BlogCategory>(entity =>

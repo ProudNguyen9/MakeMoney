@@ -30,4 +30,6 @@ public partial class BlogPost
     public DateTime? UpdatedAt { get; set; }
 
     public virtual Admin? Author { get; set; }
+
+    public virtual ICollection<BlogImage> BlogImages { get; set; } = new List<BlogImage>();
 }
