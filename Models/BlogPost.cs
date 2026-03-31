@@ -23,6 +23,8 @@ public partial class BlogPost
 
     public string? Status { get; set; }
 
+    public int? LikeCount { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
