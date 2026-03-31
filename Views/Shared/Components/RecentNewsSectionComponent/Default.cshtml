@@ -75,7 +75,7 @@
                                     </div>
                                     <h3 class="news-card-title">@(post.Title ?? "Tin tức đang cập nhật")</h3>
                                     <p>@BuildBlogSummary(post)</p>
-                                    <a href="~/blog.html" class="readmore">Xem bài viết <i class="bi bi-arrow-right"></i></a>
+                                    <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(post.Slug) ? post.Slug : post.Id.ToString())" class="readmore">Xem bài viết <i class="bi bi-arrow-right"></i></a>
                                 </div>
                             </article>
                         </div>
