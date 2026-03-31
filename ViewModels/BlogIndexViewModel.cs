@@ -55,6 +55,8 @@ public class BlogDetailViewModel
 
     public string CoverImage { get; set; } = string.Empty;
 
+    public List<string> GalleryImages { get; set; } = [];
+
     public string PrimaryCategoryName { get; set; } = "Tin tức";
 
     public string AuthorName { get; set; } = string.Empty;

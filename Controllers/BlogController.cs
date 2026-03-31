@@ -38,6 +38,7 @@ public class BlogController : Controller
         var post = await _context.BlogPosts
             .AsNoTracking()
             .Include(item => item.Author)
+            .Include(item => item.BlogImages)
             .FirstOrDefaultAsync(item => item.Status == "published"
                 && (((item.Slug ?? string.Empty) == normalizedSlug)
                     || (parsedPostId.HasValue && item.Id == parsedPostId.Value)));
@@ -108,11 +109,30 @@ public class BlogController : Controller
 
         var relatedBlogCards = await BuildBlogCardsAsync(relatedPosts);
         var currentUrl = Url.Action(nameof(Detail), "Blog", new { slug = normalizedSlug }, Request.Scheme) ?? string.Empty;
+        var galleryImages = post.BlogImages
+            .OrderBy(image => image.OrderIndex ?? int.MaxValue)
+            .ThenBy(image => image.Id)
+            .Select(image => NormalizeBlogImagePath(image.ImageUrl))
+            .Where(imageUrl => !string.IsNullOrWhiteSpace(imageUrl))
+            .Distinct()
+            .ToList();
+
+        var normalizedCoverImage = NormalizeBlogImagePath(post.CoverImage);
+
+        if (!galleryImages.Any())
+        {
+            galleryImages.Add(normalizedCoverImage);
+        }
+        else if (!galleryImages.Any(imageUrl => string.Equals(imageUrl, normalizedCoverImage, StringComparison.OrdinalIgnoreCase)))
+        {
+            galleryImages.Insert(0, normalizedCoverImage);
+        }
 
         var viewModel = new BlogDetailViewModel
         {
             Post = post,
-            CoverImage = NormalizeBlogImagePath(post.CoverImage),
+            CoverImage = normalizedCoverImage,
+            GalleryImages = galleryImages,
             PrimaryCategoryName = primaryCategoryName,
             AuthorName = post.Author?.FullName ?? string.Empty,
             CurrentUrl = currentUrl,
@@ -200,7 +220,7 @@ public class BlogController : Controller
             message = "Đã ghi nhận đánh giá hữu ích."
         });
     }
- 
+
     private async Task<BlogIndexViewModel> BuildBlogIndexViewModelAsync(int page, string? searchTerm, string? categoryName)
     {
         const int pageSize = 6;
