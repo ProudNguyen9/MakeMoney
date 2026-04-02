@@ -1,0 +1,214 @@
+@model WebThuMuaPheLieu.ViewModels.AdminLoginViewModel
+@{
+    Layout = null;
+    var heroImage = Url.Content("~/assets/img/dongnhom.jpg");
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập quản trị | WebThuMuaPheLieu</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: Inter, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background:
+                linear-gradient(135deg, rgba(2, 6, 23, 0.78), rgba(15, 23, 42, 0.68)),
+                url('@heroImage') center/cover no-repeat fixed;
+            color: #0f172a;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at top left, rgba(45, 212, 191, 0.16), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.12), transparent 30%);
+            pointer-events: none;
+        }
+
+        .admin-login-shell {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 460px);
+            padding: 32px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.93);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 28px 80px rgba(15, 23, 42, 0.28);
+            backdrop-filter: blur(18px);
+        }
+
+        .admin-login-header {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .admin-login-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 9px 14px;
+            margin: 0 auto;
+            border-radius: 999px;
+            background: rgba(20, 184, 166, 0.12);
+            color: #0f766e;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .admin-login-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            line-height: 1.1;
+        }
+
+        .admin-login-header p {
+            margin: 0;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        form {
+            display: grid;
+            gap: 18px;
+        }
+
+        .validation-summary-errors,
+        .validation-summary-valid {
+            margin: 0;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(239, 68, 68, 0.08);
+            color: #b91c1c;
+        }
+
+        .validation-summary-valid:empty {
+            display: none;
+        }
+
+        .admin-login-field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .admin-login-field label {
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .admin-login-field input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.32);
+            background: rgba(255, 255, 255, 0.96);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .admin-login-field input:focus {
+            border-color: rgba(20, 184, 166, 0.5);
+            box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.15);
+        }
+
+        .field-validation-error {
+            color: #dc2626;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .admin-login-button {
+            border: 0;
+            border-radius: 18px;
+            padding: 15px 18px;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fff;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 55%, #5eead4 100%);
+            box-shadow: 0 18px 34px rgba(15, 118, 110, 0.22);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+
+        .admin-login-button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.03);
+            box-shadow: 0 22px 40px rgba(15, 118, 110, 0.28);
+        }
+
+        .admin-login-note {
+            margin-top: 16px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        @@media (max-width: 640px) {
+            body {
+                padding: 16px;
+            }
+
+            .admin-login-shell {
+                padding: 24px;
+                border-radius: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="admin-login-shell">
+        <div class="admin-login-header">
+            <span class="admin-login-badge">Admin / Login</span>
+            <h1>Đăng nhập quản trị</h1>
+            <p>Đăng nhập nhanh để vào khu vực quản lý bảng giá, sản phẩm và nội dung website.</p>
+        </div>
+
+        <form asp-controller="AdminAuth" asp-action="Index" method="post">
+            @Html.AntiForgeryToken()
+            <input asp-for="ReturnUrl" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly"></div>
+
+            <div class="admin-login-field">
+                <label asp-for="Username"></label>
+                <input asp-for="Username" autocomplete="username" placeholder="Nhập tài khoản quản trị" />
+                <span asp-validation-for="Username"></span>
+            </div>
+
+            <div class="admin-login-field">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" autocomplete="current-password" placeholder="Nhập mật khẩu" />
+                <span asp-validation-for="Password"></span>
+            </div>
+
+            <button class="admin-login-button" type="submit">Đăng nhập vào trang quản trị</button>
+        </form>
+
+       
+    </section>
+
+    <partial name="_ValidationScriptsPartial" />
+</body>
+</html>
