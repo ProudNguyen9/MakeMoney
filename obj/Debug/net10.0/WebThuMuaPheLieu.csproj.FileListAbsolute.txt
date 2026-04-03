@@ -2,7 +2,6 @@ D:\MakeMoney\bin\Debug\net10.0\appsettings.Development.json
 D:\MakeMoney\bin\Debug\net10.0\appsettings.json
 D:\MakeMoney\bin\Debug\net10.0\WebThuMuaPheLieu.staticwebassets.runtime.json
 D:\MakeMoney\bin\Debug\net10.0\WebThuMuaPheLieu.staticwebassets.endpoints.json
-D:\MakeMoney\bin\Debug\net10.0\WebThuMuaPheLieu.exe
 D:\MakeMoney\bin\Debug\net10.0\WebThuMuaPheLieu.deps.json
 D:\MakeMoney\bin\Debug\net10.0\WebThuMuaPheLieu.runtimeconfig.json
 D:\MakeMoney\bin\Debug\net10.0\WebThuMuaPheLieu.dll
@@ -462,7 +461,6 @@ D:\MakeMoney\obj\Debug\net10.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 D:\MakeMoney\obj\Debug\net10.0\scopedcss\bundle\WebThuMuaPheLieu.styles.css
 D:\MakeMoney\obj\Debug\net10.0\scopedcss\projectbundle\WebThuMuaPheLieu.bundle.scp.css
 D:\MakeMoney\obj\Debug\net10.0\compressed\gz2vksyt3v-{0}-pgkzanvwed-pgkzanvwed.gz
-D:\MakeMoney\obj\Debug\net10.0\compressed\5ad5zf1cy6-{0}-jxmtpym3zh-jxmtpym3zh.gz
 D:\MakeMoney\obj\Debug\net10.0\compressed\l96qrgmnra-{0}-93gfcxtlxt-93gfcxtlxt.gz
 D:\MakeMoney\obj\Debug\net10.0\compressed\v5fpvvpvx7-{0}-6e44tuvcnd-6e44tuvcnd.gz
 D:\MakeMoney\obj\Debug\net10.0\compressed\1wbvafv82k-{0}-g272ozm3rj-g272ozm3rj.gz
@@ -635,3 +633,5 @@ D:\MakeMoney\obj\Debug\net10.0\WebThuMuaPheLieu.pdb
 D:\MakeMoney\obj\Debug\net10.0\WebThuMuaPheLieu.genruntimeconfig.cache
 D:\MakeMoney\obj\Debug\net10.0\ref\WebThuMuaPheLieu.dll
 D:\MakeMoney\obj\Debug\net10.0\compressed\tjeehusozn-{0}-lru3cthydl-lru3cthydl.gz
+D:\MakeMoney\obj\Debug\net10.0\compressed\5ad5zf1cy6-{0}-tprgd803r2-tprgd803r2.gz
+D:\MakeMoney\bin\Debug\net10.0\WebThuMuaPheLieu.exe
