@@ -1,56 +1,1220 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var bannerImage1Url = Url.Content(Model.BannerImage1 ?? "~/assets/img/satthep.png");
+    var bannerImage2Url = Url.Content(Model.BannerImage2 ?? "~/assets/img/dongnhom.jpg");
+    var bannerImage3Url = Url.Content(Model.BannerImage3 ?? "~/assets/img/maymoc.jpg");
+    var seoOgImageUrl = Url.Content(Model.OgImage ?? "~/assets/img/satthep.png");
 }
 
-<header class="topbar" id="marketing-seo-section">
-    <div class="topbar__title-wrap">
-        <button class="sidebar-toggle" type="button" aria-label="Mở menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div>
-            <p class="eyebrow">Admin / Marketing</p>
-            <h2>Banner & SEO</h2>
-            <div class="overview-hero__chips">
-                <span>Banner</span>
-                <span>SEO</span>
-            </div>
-        </div>
-    </div>
-</header>
+@model WebThuMuaPheLieu.ViewModels.AdminMarketingViewModel
 
-<section class="panel" id="marketing-panel">
-    <div class="panel__head">
-        <div>
-            <p class="eyebrow">Scaffold</p>
-            <h3>Quản lý nội dung marketing</h3>
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <link href="~/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/assets/css/main.css" asp-append-version="true" />
+    <style>
+        .marketing-section-group--banner .marketing-panel {
+            overflow: hidden;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell {
+            border-radius: 28px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .marketing-panel__actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(226, 232, 240, 0.9);
+            flex-wrap: wrap;
+        }
+
+        .marketing-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .marketing-field label {
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: 0.01em;
+        }
+
+        .marketing-field input,
+        .marketing-field textarea {
+            width: 100%;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 14px 16px;
+            font-size: 0.96rem;
+            color: #0f172a;
+            outline: none;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease, background 0.18s ease;
+        }
+
+        .marketing-field textarea {
+            min-height: 112px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .marketing-field input::placeholder,
+        .marketing-field textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .marketing-field input:hover,
+        .marketing-field textarea:hover {
+            border-color: rgba(96, 165, 250, 0.4);
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.06);
+        }
+
+        .marketing-field input:focus,
+        .marketing-field textarea:focus {
+            border-color: rgba(37, 99, 235, 0.45);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12), 0 12px 24px rgba(37, 99, 235, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .marketing-action-btn {
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+        }
+
+        .marketing-action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .marketing-action-btn--primary {
+            color: #2563eb;
+            border-color: rgba(37, 99, 235, 0.4);
+            background: #eff6ff;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.08);
+        }
+
+        .marketing-action-btn--primary:hover {
+            color: #1d4ed8;
+            border-color: rgba(29, 78, 216, 0.5);
+            background: #dbeafe;
+            box-shadow: 0 8px 14px rgba(37, 99, 235, 0.12);
+        }
+
+        .marketing-action-btn--secondary {
+            color: #334155;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+        }
+
+        .marketing-action-btn--secondary:hover {
+            color: #0f172a;
+            border-color: rgba(100, 116, 139, 0.34);
+            background: #f8fafc;
+            box-shadow: 0 8px 14px rgba(15, 23, 42, 0.08);
+        }
+
+        .marketing-section-group--banner .marketing-banner-config {
+            padding: 0 24px 24px;
+        }
+
+        .marketing-section-group--banner .marketing-banner-card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+            align-items: stretch;
+            justify-content: stretch;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card {
+            border: 1px solid rgba(59, 130, 246, 0.16);
+            border-radius: 14px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.08);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            height: 100%;
+            position: relative;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+            border-color: rgba(59, 130, 246, 0.28);
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__preview {
+            aspect-ratio: 1.45 / 1;
+            overflow: hidden;
+            background: #dbeafe;
+            position: relative;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__preview::after {
+            content: '';
+            position: absolute;
+            inset: auto 0 0 0;
+            height: 42%;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.38) 100%);
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__body {
+            padding: 8px 10px 10px;
+            min-height: 56px;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__body label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2px;
+            text-align: center;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__meta {
+            font-size: 0.68rem;
+            color: #64748b;
+            line-height: 1.35;
+            text-align: center;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__body input {
+            display: none;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__status {
+            margin-top: 8px;
+            font-size: 0.72rem;
+            color: #64748b;
+            text-align: center;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__button {
+            margin-top: 10px;
+            width: 100%;
+            border: 1px dashed rgba(37, 99, 235, 0.28);
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 12px;
+            padding: 9px 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+        }
+
+        .marketing-section-group--banner .marketing-banner-upload-card__button:hover {
+            background: #dbeafe;
+            border-color: rgba(29, 78, 216, 0.38);
+            transform: translateY(-1px);
+        }
+
+        .marketing-seo-image-picker {
+            margin-top: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 16px;
+            background: #fff;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+        }
+
+        .marketing-seo-image-picker__top {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .marketing-seo-image-picker__preview {
+            width: 96px;
+            height: 96px;
+            flex: 0 0 96px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .marketing-seo-image-picker__preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .marketing-seo-image-picker__details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .marketing-seo-image-picker__content strong {
+            display: block;
+            font-size: 0.9rem;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+
+        .marketing-seo-image-picker__content span {
+            font-size: 0.78rem;
+            color: #64748b;
+            line-height: 1.45;
+        }
+
+        .marketing-seo-image-picker__path {
+            font-size: 0.75rem;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 10px;
+            padding: 8px 10px;
+            word-break: break-all;
+        }
+
+        .marketing-seo-image-picker__actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding-top: 10px;
+            border-top: 1px solid rgba(226, 232, 240, 0.9);
+        }
+
+        .marketing-seo-image-picker__button {
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            color: #fff;
+            padding: 8px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            white-space: nowrap;
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.18);
+        }
+
+        .marketing-seo-image-picker__hint {
+            font-size: 0.72rem;
+            color: #64748b;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero.scrap-hero {
+            margin: 0;
+            min-height: auto;
+            padding: 32px 28px;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .container-fluid.home-wide-shell {
+            max-width: 100%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .row {
+            --bs-gutter-x: 1.25rem;
+            --bs-gutter-y: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero-title {
+            font-size: clamp(28px, 2.5vw, 42px);
+            margin-bottom: 0;
+            max-width: 380px;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero-content {
+            width: 38%;
+            flex: 0 0 38%;
+            max-width: 38%;
+            padding-right: 8px;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .col-lg-7 {
+            width: 62%;
+            flex: 0 0 62%;
+            max-width: 62%;
+            margin-left: auto;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero-actions {
+            display: none;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero-visual-wrap,
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero-illustration {
+            min-height: 300px;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero-illustration-mask {
+            inset: 12px 14px;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero-banner-slider .swiper-slide,
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero-banner-slider img {
+            min-height: 240px;
+        }
+
+        .marketing-section-group--banner .marketing-banner-preview-shell .hero-illustration img {
+            object-fit: cover;
+        }
+
+        @@media (max-width: 991px) {
+            .marketing-section-group--banner .marketing-banner-preview-shell .row {
+                flex-wrap: wrap;
+            }
+
+            .marketing-section-group--banner .marketing-banner-preview-shell .hero-content,
+            .marketing-section-group--banner .marketing-banner-preview-shell .col-lg-7 {
+                width: 100%;
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="~/assets/js/main.js" asp-append-version="true"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toast = typeof Swal !== 'undefined'
+                ? Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2600,
+                    timerProgressBar: true
+                })
+                : null;
+
+            const showToast = function (icon, title) {
+                if (toast) {
+                    toast.fire({ icon, title });
+                }
+            };
+
+            const toClientUrl = function (url) {
+                if (!url) {
+                    return url;
+                }
+
+                return url.startsWith('~/') ? url.substring(1) : url;
+            };
+
+            const marketingRoot = document.querySelector('.marketing-section-group--banner');
+            if (marketingRoot) {
+                marketingRoot.addEventListener('submit', function (event) {
+                    event.preventDefault();
+                });
+            }
+
+            if (typeof Swiper === 'undefined') {
+                return;
+            }
+
+            const adminBanner = document.querySelector('.marketing-banner-preview-shell .hero-banner-slider');
+            if (!adminBanner) {
+                return;
+            }
+
+            if (adminBanner.swiper) {
+                adminBanner.swiper.destroy(true, true);
+            }
+
+            const adminBannerSwiper = new Swiper(adminBanner, {
+                speed: 600,
+                loop: true,
+                autoplay: {
+                    delay: 3500,
+                    disableOnInteraction: false
+                },
+                slidesPerView: 1,
+                pagination: {
+                    el: adminBanner.querySelector('.swiper-pagination'),
+                    type: 'bullets',
+                    clickable: true
+                }
+            });
+
+            const titleInputs = [
+                document.querySelector('#banner-line-1'),
+                document.querySelector('#banner-line-2'),
+                document.querySelector('#banner-line-3'),
+                document.querySelector('#banner-line-4')
+            ];
+
+            const titlePreviewTargets = [
+                document.querySelector('[data-banner-line="1"]'),
+                document.querySelector('[data-banner-line="2"]'),
+                document.querySelector('[data-banner-line="3"]'),
+                document.querySelector('[data-banner-line="4"]')
+            ];
+
+            titleInputs.forEach(function (input, index) {
+                if (!input || !titlePreviewTargets[index]) {
+                    return;
+                }
+
+                input.addEventListener('input', function () {
+                    titlePreviewTargets[index].textContent = input.value || ' ';
+                });
+            });
+
+            const uploadForms = document.querySelectorAll('[data-temp-upload-form]');
+            const getBannerPayload = function () {
+                const imageInputs = Array.from(document.querySelectorAll('[data-image-path-input]'));
+
+                return {
+                    bannerId: Number.parseInt(document.querySelector('#banner-id')?.value || '', 10) || null,
+                    bannerLine1: document.querySelector('#banner-line-1')?.value || '',
+                    bannerLine2: document.querySelector('#banner-line-2')?.value || '',
+                    bannerLine3: document.querySelector('#banner-line-3')?.value || '',
+                    bannerLine4: document.querySelector('#banner-line-4')?.value || '',
+                    bannerImage1: imageInputs[0]?.value || '',
+                    bannerImage2: imageInputs[1]?.value || '',
+                    bannerImage3: imageInputs[2]?.value || ''
+                };
+            };
+
+            const getContactPayload = function () {
+                return {
+                    phone: document.querySelector('#contact-phone')?.value || '',
+                    zalo: document.querySelector('#contact-zalo')?.value || '',
+                    messenger: document.querySelector('#contact-messenger')?.value || '',
+                    facebook: document.querySelector('#contact-facebook')?.value || '',
+                    email: document.querySelector('#contact-email')?.value || '',
+                    address: document.querySelector('#contact-address')?.value || '',
+                    purchaseAreas: document.querySelector('#contact-purchase-areas')?.value || ''
+                };
+            };
+
+            const applyContactState = function (state) {
+                const map = {
+                    '#contact-phone': state.phone,
+                    '#contact-zalo': state.zalo,
+                    '#contact-messenger': state.messenger,
+                    '#contact-facebook': state.facebook,
+                    '#contact-email': state.email,
+                    '#contact-address': state.address,
+                    '#contact-purchase-areas': state.purchaseAreas
+                };
+
+                Object.entries(map).forEach(function ([selector, value]) {
+                    const element = document.querySelector(selector);
+                    if (element) {
+                        element.value = value || '';
+                    }
+                });
+            };
+
+            const getSeoPayload = function () {
+                return {
+                    metaTitle: document.querySelector('#seo-meta-title')?.value || '',
+                    metaDescription: document.querySelector('#seo-meta-description')?.value || '',
+                    seoKeywords: document.querySelector('#seo-keywords')?.value || '',
+                    ogTitle: document.querySelector('#seo-og-title')?.value || '',
+                    ogImage: document.querySelector('#seo-og-image')?.value || ''
+                };
+            };
+
+            const applySeoState = function (state) {
+                const map = {
+                    '#seo-meta-title': state.metaTitle,
+                    '#seo-meta-description': state.metaDescription,
+                    '#seo-keywords': state.seoKeywords,
+                    '#seo-og-title': state.ogTitle,
+                    '#seo-og-image': state.ogImage
+                };
+
+                Object.entries(map).forEach(function ([selector, value]) {
+                    const element = document.querySelector(selector);
+                    if (element) {
+                        element.value = value || '';
+                    }
+                });
+
+                const seoPreviewPath = document.querySelector('[data-seo-og-path]');
+                const seoPreviewImage = document.querySelector('[data-seo-og-preview]');
+                if (seoPreviewPath) {
+                    seoPreviewPath.textContent = state.ogImage || '';
+                }
+                if (seoPreviewImage && state.ogImage) {
+                    seoPreviewImage.src = toClientUrl(state.ogImage);
+                }
+            };
+
+            const seoOgFileInput = document.querySelector('#seo-og-file');
+            const seoOgTrigger = document.querySelector('[data-trigger-seo-og-upload]');
+            if (seoOgFileInput && seoOgTrigger) {
+                seoOgTrigger.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    seoOgFileInput.click();
+                });
+
+                seoOgFileInput.addEventListener('change', async function () {
+                    const file = seoOgFileInput.files && seoOgFileInput.files[0];
+                    if (!file) {
+                        return;
+                    }
+
+                    const localPreviewUrl = URL.createObjectURL(file);
+                    const seoPreviewImage = document.querySelector('[data-seo-og-preview]');
+                    const seoPreviewPath = document.querySelector('[data-seo-og-path]');
+                    const seoOgImageInput = document.querySelector('#seo-og-image');
+
+                    if (seoPreviewImage) {
+                        seoPreviewImage.src = localPreviewUrl;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    try {
+                        const response = await fetch('/admin/marketing/upload-active-image', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+                        if (!response.ok || !result.success || !result.url) {
+                            throw new Error('Upload ảnh SEO thất bại');
+                        }
+
+                        if (seoPreviewImage) {
+                            seoPreviewImage.src = toClientUrl(result.url);
+                        }
+
+                        if (seoPreviewPath) {
+                            seoPreviewPath.textContent = result.url;
+                        }
+
+                        if (seoOgImageInput) {
+                            seoOgImageInput.value = result.url;
+                        }
+
+                        URL.revokeObjectURL(localPreviewUrl);
+                    } catch (error) {
+                        URL.revokeObjectURL(localPreviewUrl);
+                    } finally {
+                        seoOgFileInput.value = '';
+                    }
+                });
+            }
+
+            const applyBannerState = function (state) {
+                const line1Input = document.querySelector('#banner-line-1');
+                const line2Input = document.querySelector('#banner-line-2');
+                const line3Input = document.querySelector('#banner-line-3');
+                const line4Input = document.querySelector('#banner-line-4');
+                const bannerIdInput = document.querySelector('#banner-id');
+
+                if (bannerIdInput) bannerIdInput.value = state.bannerId ?? '';
+                if (line1Input) line1Input.value = state.bannerLine1 || '';
+                if (line2Input) line2Input.value = state.bannerLine2 || '';
+                if (line3Input) line3Input.value = state.bannerLine3 || '';
+                if (line4Input) line4Input.value = state.bannerLine4 || '';
+
+                const titleTargets = [
+                    document.querySelector('[data-banner-line="1"]'),
+                    document.querySelector('[data-banner-line="2"]'),
+                    document.querySelector('[data-banner-line="3"]'),
+                    document.querySelector('[data-banner-line="4"]')
+                ];
+
+                [state.bannerLine1, state.bannerLine2, state.bannerLine3, state.bannerLine4].forEach(function (value, index) {
+                    if (titleTargets[index]) {
+                        titleTargets[index].textContent = value || ' ';
+                    }
+                });
+
+                const imageValues = [state.bannerImage1, state.bannerImage2, state.bannerImage3];
+                const previewImages = Array.from(document.querySelectorAll('[data-preview-image]'));
+                const imageInputs = Array.from(document.querySelectorAll('[data-image-path-input]'));
+
+                previewImages.forEach(function (image, index) {
+                    if (imageValues[index]) {
+                        image.src = imageValues[index];
+                    }
+                });
+
+                imageInputs.forEach(function (input, index) {
+                    if (imageValues[index]) {
+                        input.value = imageValues[index];
+                    }
+                });
+
+                if (adminBannerSwiper) {
+                    adminBannerSwiper.removeAllSlides();
+                    adminBannerSwiper.appendSlide([
+                        `<div class="swiper-slide"><img src="${imageValues[0]}" data-banner-slider-image="1" alt="Banner 1" class="img-fluid w-100"></div>`,
+                        `<div class="swiper-slide"><img src="${imageValues[1]}" data-banner-slider-image="2" alt="Banner 2" class="img-fluid w-100"></div>`,
+                        `<div class="swiper-slide"><img src="${imageValues[2]}" data-banner-slider-image="3" alt="Banner 3" class="img-fluid w-100"></div>`
+                    ]);
+                    adminBannerSwiper.update();
+                    adminBannerSwiper.slideToLoop(0, 0, false);
+                    adminBannerSwiper.autoplay?.stop();
+                    adminBannerSwiper.autoplay?.start();
+                }
+            };
+            uploadForms.forEach(function (form) {
+                const fileInput = form.querySelector('input[type="file"]');
+                const triggerButton = form.querySelector('[data-trigger-upload]');
+                const previewImage = form.querySelector('[data-preview-image]');
+                const sliderImage = document.querySelector(form.getAttribute('data-slider-target'));
+                const pathInput = form.querySelector('[data-image-path-input]');
+                const statusText = form.querySelector('[data-upload-status]');
+
+                if (!fileInput || !previewImage || !sliderImage || !pathInput) {
+                    return;
+                }
+
+                if (triggerButton) {
+                    triggerButton.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        fileInput.click();
+                    });
+                }
+
+                form.addEventListener('click', function (event) {
+                    const clickedAction = event.target.closest('button, input, textarea, a');
+                    if (clickedAction) {
+                        return;
+                    }
+
+                    fileInput.click();
+                });
+
+                fileInput.addEventListener('change', async function () {
+                    const file = fileInput.files && fileInput.files[0];
+                    if (!file) {
+                        return;
+                    }
+
+                    const localPreviewUrl = URL.createObjectURL(file);
+                    previewImage.src = localPreviewUrl;
+
+                    const bannerIndex = Number.parseInt(form.getAttribute('data-banner-index') || '0', 10) || 0;
+
+                    if (adminBannerSwiper) {
+                        adminBannerSwiper.removeAllSlides();
+                        adminBannerSwiper.appendSlide([
+                            `<div class="swiper-slide"><img src="${bannerIndex === 0 ? localPreviewUrl : document.querySelectorAll('[data-image-path-input]')[0]?.value || '@Model.BannerImage1'}" data-banner-slider-image="1" alt="Banner 1" class="img-fluid w-100"></div>`,
+                            `<div class="swiper-slide"><img src="${bannerIndex === 1 ? localPreviewUrl : document.querySelectorAll('[data-image-path-input]')[1]?.value || '@Model.BannerImage2'}" data-banner-slider-image="2" alt="Banner 2" class="img-fluid w-100"></div>`,
+                            `<div class="swiper-slide"><img src="${bannerIndex === 2 ? localPreviewUrl : document.querySelectorAll('[data-image-path-input]')[2]?.value || '@Model.BannerImage3'}" data-banner-slider-image="3" alt="Banner 3" class="img-fluid w-100"></div>`
+                        ]);
+                        adminBannerSwiper.update();
+                        adminBannerSwiper.slideToLoop(bannerIndex, 0, false);
+                        adminBannerSwiper.autoplay?.stop();
+                        adminBannerSwiper.autoplay?.start();
+                    }
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    if (statusText) {
+                            statusText.textContent = 'Đang tải ảnh...';
+                    }
+
+                    try {
+                        const response = await fetch('/admin/marketing/upload-active-image', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Upload ảnh banner thất bại');
+                        }
+
+                        const result = await response.json();
+                        if (!result.success || !result.url) {
+                            throw new Error('Không nhận được đường dẫn ảnh banner');
+                        }
+
+                        previewImage.src = toClientUrl(result.url);
+                        pathInput.value = result.url;
+
+                        if (adminBannerSwiper) {
+                            const currentBannerValues = Array.from(document.querySelectorAll('[data-image-path-input]')).map(function (input, index) {
+                                return index === bannerIndex ? result.url : input.value;
+                            });
+
+                            adminBannerSwiper.removeAllSlides();
+                            adminBannerSwiper.appendSlide([
+                                `<div class="swiper-slide"><img src="${toClientUrl(currentBannerValues[0] || '@Model.BannerImage1')}" data-banner-slider-image="1" alt="Banner 1" class="img-fluid w-100"></div>`,
+                                `<div class="swiper-slide"><img src="${toClientUrl(currentBannerValues[1] || '@Model.BannerImage2')}" data-banner-slider-image="2" alt="Banner 2" class="img-fluid w-100"></div>`,
+                                `<div class="swiper-slide"><img src="${toClientUrl(currentBannerValues[2] || '@Model.BannerImage3')}" data-banner-slider-image="3" alt="Banner 3" class="img-fluid w-100"></div>`
+                            ]);
+                            adminBannerSwiper.update();
+                            adminBannerSwiper.slideToLoop(bannerIndex, 0, false);
+                            adminBannerSwiper.autoplay?.stop();
+                            adminBannerSwiper.autoplay?.start();
+                        }
+                        URL.revokeObjectURL(localPreviewUrl);
+
+                        if (statusText) {
+                            statusText.textContent = 'Đã cập nhật ảnh banner';
+                        }
+                    } catch (error) {
+                        URL.revokeObjectURL(localPreviewUrl);
+                        if (statusText) {
+                            statusText.textContent = 'Tải ảnh banner thất bại';
+                        }
+                    } finally {
+                        fileInput.value = '';
+                    }
+                });
+            });
+
+            const saveBannerButton = document.querySelector('[data-save-banner]');
+            if (saveBannerButton) {
+                saveBannerButton.addEventListener('click', async function () {
+                    saveBannerButton.disabled = true;
+
+                    try {
+                        const response = await fetch('/admin/marketing/save-banner', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(getBannerPayload())
+                        });
+
+                        const result = await response.json();
+                        if (!response.ok || !result.success) {
+                            throw new Error('Lưu banner thất bại');
+                        }
+
+                        applyBannerState(result);
+                        showToast('success', 'Đã lưu banner thành công');
+                    } catch (error) {
+                        showToast('error', 'Lưu banner thất bại');
+                    } finally {
+                        saveBannerButton.disabled = false;
+                    }
+                });
+            }
+
+            const reloadBannerButton = document.querySelector('[data-reload-banner]');
+            if (reloadBannerButton) {
+                reloadBannerButton.addEventListener('click', async function () {
+                    reloadBannerButton.disabled = true;
+
+                    try {
+                        const response = await fetch('/admin/marketing/banner-state');
+                        const result = await response.json();
+                        if (!response.ok || !result.success) {
+                            throw new Error('Tải lại banner thất bại');
+                        }
+
+                        applyBannerState(result);
+                        showToast('success', 'Đã tải lại banner');
+                    } catch (error) {
+                        showToast('error', 'Tải lại banner thất bại');
+                    } finally {
+                        reloadBannerButton.disabled = false;
+                    }
+                });
+            }
+
+            const saveContactButton = document.querySelector('[data-save-contact]');
+            if (saveContactButton) {
+                saveContactButton.addEventListener('click', async function () {
+                    saveContactButton.disabled = true;
+                    try {
+                        const response = await fetch('/admin/marketing/save-contact', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(getContactPayload())
+                        });
+                        const result = await response.json();
+                        if (!response.ok || !result.success) {
+                            throw new Error('Lưu liên hệ thất bại');
+                        }
+
+                        applyContactState(result);
+                        showToast('success', 'Đã lưu thông tin liên hệ');
+                    } catch (error) {
+                        showToast('error', 'Lưu thông tin liên hệ thất bại');
+                    } finally {
+                        saveContactButton.disabled = false;
+                    }
+                });
+            }
+
+            const reloadContactButton = document.querySelector('[data-reload-contact]');
+            if (reloadContactButton) {
+                reloadContactButton.addEventListener('click', async function () {
+                    reloadContactButton.disabled = true;
+                    try {
+                        const response = await fetch('/admin/marketing/contact-state');
+                        const result = await response.json();
+                        if (!response.ok || !result.success) {
+                            throw new Error('Tải lại liên hệ thất bại');
+                        }
+
+                        applyContactState(result);
+                        showToast('success', 'Đã tải lại thông tin liên hệ');
+                    } catch (error) {
+                        showToast('error', 'Tải lại thông tin liên hệ thất bại');
+                    } finally {
+                        reloadContactButton.disabled = false;
+                    }
+                });
+            }
+
+            const saveSeoButton = document.querySelector('[data-save-seo]');
+            if (saveSeoButton) {
+                saveSeoButton.addEventListener('click', async function () {
+                    saveSeoButton.disabled = true;
+                    try {
+                        const response = await fetch('/admin/marketing/save-seo', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(getSeoPayload())
+                        });
+                        const result = await response.json();
+                        if (!response.ok || !result.success) {
+                            throw new Error('Lưu SEO thất bại');
+                        }
+
+                        applySeoState(result);
+                        showToast('success', 'Đã lưu cấu hình SEO');
+                    } catch (error) {
+                        showToast('error', 'Lưu cấu hình SEO thất bại');
+                    } finally {
+                        saveSeoButton.disabled = false;
+                    }
+                });
+            }
+
+            const reloadSeoButton = document.querySelector('[data-reload-seo]');
+            if (reloadSeoButton) {
+                reloadSeoButton.addEventListener('click', async function () {
+                    reloadSeoButton.disabled = true;
+                    try {
+                        const response = await fetch('/admin/marketing/seo-state');
+                        const result = await response.json();
+                        if (!response.ok || !result.success) {
+                            throw new Error('Tải lại SEO thất bại');
+                        }
+
+                        applySeoState(result);
+                        showToast('success', 'Đã tải lại cấu hình SEO');
+                    } catch (error) {
+                        showToast('error', 'Tải lại cấu hình SEO thất bại');
+                    } finally {
+                        reloadSeoButton.disabled = false;
+                    }
+                });
+            }
+        });
+    </script>
+}
+
+<div class="admin-page-title">
+    <div>
+        <h1>Banner & cấu hình hiển thị</h1>
+        <p style="font-size: 1rem; line-height: 1.65;">Quản lý nhanh thông tin liên hệ, khu vực thu mua, banner trang
+            chủ và nội dung SEO cơ bản</p>
         </div>
-        <div class="panel__head-actions">
-            <button type="button">Thêm banner</button>
+        <div class="admin-page-badge admin-page-badge--success">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <span>Giao diện sẵn sàng cấu hình</span>
         </div>
     </div>
-    <div class="table-shell">
-        <table class="product-table">
-            <thead>
-                <tr>
-                    <th>Hạng mục</th>
-                    <th>Mô tả</th>
-                    <th>Kênh</th>
-                    <th>Trạng thái</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <div class="product-info"><strong>Banner trang chủ</strong><span>Khung quản trị marketing đã sẵn
-                            sàng.</span></div>
-                        </td>
-                        <td>Chờ bind dữ liệu banner và SEO.</td>
-                        <td>Website</td>
-                        <td>Ready</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
+
+    <input type="hidden" id="banner-id" value="@Model.BannerId" />
+
+    <section class="marketing-section-group marketing-section-group--banner">
+        <section class="admin-panel marketing-panel" style="margin-bottom: 20px;">
+            <div class="admin-panel__header">
+                <div>
+                    <h3>Banner trang chủ</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.65;">Bố cục nội dung chính cho khu vực hero và hình ảnh
+                        truyền thông</p>
+                    </div>
+                    <span class="admin-panel__badge">Banner</span>
+                </div>
+                <section class="marketing-banner-preview-shell">
+                    <section id="hero" class="hero scrap-hero d-flex align-items-center">
+                        <div class="container-fluid home-wide-shell position-relative">
+                            <div class="row align-items-center gy-5">
+                                <div class="col-lg-5 hero-content" data-aos="fade-right" data-aos-delay="100">
+                                    <h2 class="hero-title"><span class="hero-title-line" data-banner-line="1">@Model.BannerLine1</span><span data-banner-line="2">@Model.BannerLine2</span><span class="hero-title-line" data-banner-line="3">@Model.BannerLine3</span><span
+                                        class="hero-title-tail" data-banner-line="4">@Model.BannerLine4</span></h2>
+                                    </div>
+                                    <div class="col-lg-7" data-aos="fade-left" data-aos-delay="180">
+                                        <div class="hero-visual-wrap">
+                                            <div class="hero-illustration">
+                                                <div class="hero-illustration-mask">
+                                                    <div class="slides-1 swiper hero-banner-slider">
+                                                        <div class="swiper-wrapper">
+                                                            <div class="swiper-slide">
+                                                                <img src="@bannerImage1Url" data-banner-slider-image="1"
+                                                                     alt="Thu mua sắt thép phế liệu tại kho bãi"
+                                                                     class="img-fluid w-100">
+                                                            </div>
+                                                            <div class="swiper-slide">
+                                                                <img src="@bannerImage2Url" data-banner-slider-image="2"
+                                                                     alt="Thu mua đồng nhôm và kim loại màu" class="img-fluid w-100">
+                                                            </div>
+                                                            <div class="swiper-slide" data-banner-slide="3">
+                                                                <img src="@bannerImage3Url" data-banner-slider-image="3"
+                                                                     alt="Thu mua đồng nhôm và kim loại màu"
+                                                                     class="img-fluid w-100">
+                                                            </div>
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                </section>
+                            </section>
+
+                            <section class="admin-panel marketing-panel">
+                                <div class="admin-panel__header">
+                                    <div>
+                                        <h3>Cấu hình banner trang chủ</h3>
+                                        <p style="font-size: 0.95rem; line-height: 1.65;">Thiết lập 4 dòng tiêu đề và 3 ảnh hiển thị cho banner
+                                        </p>
+                                    </div>
+                                    <span class="admin-panel__badge">Thiết lập</span>
+                                </div>
+
+                                <div class="marketing-banner-config">
+                                    <div class="marketing-form-grid">
+                                        <div class="marketing-field">
+                                            <label>Tiêu đề dòng 1</label>
+                                            <input id="banner-line-1" type="text" value="@Model.BannerLine1" placeholder="Nhập dòng 1" />
+                                        </div>
+                                        <div class="marketing-field">
+                                            <label>Tiêu đề dòng 2</label>
+                                            <input id="banner-line-2" type="text" value="@Model.BannerLine2" placeholder="Nhập dòng 2" />
+                                        </div>
+                                        <div class="marketing-field">
+                                            <label>Tiêu đề dòng 3</label>
+                                            <input id="banner-line-3" type="text" value="@Model.BannerLine3" placeholder="Nhập dòng 3" />
+                                        </div>
+                                        <div class="marketing-field">
+                                            <label>Tiêu đề dòng 4</label>
+                                            <input id="banner-line-4" type="text" value="@Model.BannerLine4" placeholder="Nhập dòng 4" />
+                                        </div>
+                                    </div>
+
+                                    <div class="marketing-banner-card-grid">
+                                        <div class="marketing-banner-upload-card" data-temp-upload-form data-banner-index="0" data-slider-target='[data-banner-slider-image="1"]'>
+                                            <div class="marketing-banner-upload-card__preview">
+                                                <img src="@bannerImage1Url" data-preview-image alt="Ảnh banner 1" />
+                                            </div>
+                                            <div class="marketing-banner-upload-card__body">
+                                                <label>Ảnh banner chính</label>
+                                                <div class="marketing-banner-upload-card__meta">Banner hiển thị mặc định · 1920 × 900</div>
+                                                <input type="hidden" data-image-path-input value="@Model.BannerImage1" />
+                                                <input type="file" accept="image/*" />
+                                                <button type="button" class="marketing-banner-upload-card__button" data-trigger-upload>Chọn ảnh banner</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="marketing-banner-upload-card" data-temp-upload-form data-banner-index="1" data-slider-target='[data-banner-slider-image="2"]'>
+                                            <div class="marketing-banner-upload-card__preview">
+                                                <img src="@bannerImage2Url" data-preview-image alt="Ảnh banner 2" />
+                                            </div>
+                                            <div class="marketing-banner-upload-card__body">
+                                                <label>Ảnh banner 2</label>
+                                                <div class="marketing-banner-upload-card__meta">Banner hiển thị luân phiên · 1200 × 800</div>
+                                                <input type="hidden" data-image-path-input value="@Model.BannerImage2" />
+                                                <input type="file" accept="image/*" />
+                                                <button type="button" class="marketing-banner-upload-card__button" data-trigger-upload>Chọn ảnh banner</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="marketing-banner-upload-card" data-temp-upload-form data-banner-index="2" data-slider-target='[data-banner-slider-image="3"]'>
+                                            <div class="marketing-banner-upload-card__preview">
+                                                <img src="@bannerImage3Url" data-preview-image alt="Ảnh banner 3" />
+                                            </div>
+                                            <div class="marketing-banner-upload-card__body">
+                                                <label>Ảnh banner 3</label>
+                                                <div class="marketing-banner-upload-card__meta">Banner hiển thị luân phiên · 900 ×
+                                                    1200</div>
+                                                <input type="hidden" data-image-path-input value="@Model.BannerImage3" />
+                                                <input type="file" accept="image/*" />
+                                                <button type="button" class="marketing-banner-upload-card__button" data-trigger-upload>Chọn ảnh banner</button>
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        <div class="marketing-panel__actions">
+                                            <button type="button" class="marketing-action-btn marketing-action-btn--primary" data-save-banner>Lưu banner</button>
+                                            <button type="button" class="marketing-action-btn marketing-action-btn--secondary" data-reload-banner>Tải lại
+                                                banner</button>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </section>
+
+                                <section class="marketing-section-group">
+                                    <div class="admin-bottom-grid admin-bottom-grid--marketing">
+                                        <section class="admin-panel marketing-panel">
+                                            <div class="admin-panel__header">
+                                                <div>
+                                                    <h3>Thông tin liên hệ hiển thị</h3>
+                                                    <p style="font-size: 0.95rem; line-height: 1.65;">Các nội dung xuất hiện ở header, footer và khu
+                                                        vực
+                                                        liên hệ nhanh</p>
+                                                    </div>
+                                                    <span class="admin-panel__badge">Ưu tiên</span>
+                                                </div>
+
+                                                <div class="marketing-form-grid">
+                                                    <div class="marketing-field">
+                                                        <label>Số điện thoại liên hệ</label>
+                                                        <input id="contact-phone" type="text" value="@Model.Phone" placeholder="Nhập số điện thoại" />
+                                                    </div>
+                                                    <div class="marketing-field">
+                                                        <label>Zalo</label>
+                                                        <input id="contact-zalo" type="text" value="@Model.Zalo" placeholder="Nhập link Zalo" />
+                                                    </div>
+                                                    <div class="marketing-field marketing-field--full">
+                                                        <label>Messenger</label>
+                                                        <input id="contact-messenger" type="text" value="@Model.Messenger" placeholder="Nhập link Messenger" />
+                                                    </div>
+                                                    <div class="marketing-field marketing-field--full">
+                                                        <label>Facebook</label>
+                                                        <input id="contact-facebook" type="text" value="@Model.Facebook" placeholder="Nhập link Facebook" />
+                                                    </div>
+                                                    <div class="marketing-field marketing-field--full">
+                                                        <label>Gmail</label>
+                                                        <input id="contact-email" type="text" value="@Model.Email" placeholder="Nhập Gmail" />
+                                                    </div>
+                                                    <div class="marketing-field marketing-field--full">
+                                                        <label>Địa chỉ</label>
+                                                        <input id="contact-address" type="text" value="@Model.Address" placeholder="Nhập địa chỉ" />
+                                                    </div>
+                                                    <div class="marketing-field marketing-field--full">
+                                                        <label>Khu vực thu mua</label>
+                                                        <textarea id="contact-purchase-areas" rows="3"
+                                                                  placeholder="Nhập khu vực thu mua">@Model.PurchaseAreas</textarea>
+                                                    </div>
+                                                </div>
+
+                                                <div class="marketing-panel__actions">
+                                                    <button type="button" class="marketing-action-btn marketing-action-btn--primary" data-save-contact>Lưu liên hệ</button>
+                                                    <button type="button" class="marketing-action-btn marketing-action-btn--secondary" data-reload-contact>Tải lại liên
+                                                        hệ</button>
+                                                    </div>
+                                                </section>
+
+                                                <section class="admin-panel marketing-panel">
+                                                    <div class="admin-panel__header">
+                                                        <div>
+                                                            <h3>SEO trang chủ</h3>
+                                                            <p style="font-size: 0.95rem; line-height: 1.65;">Nhóm trường cơ bản để admin thay đổi nội dung
+                                                                tối ưu
+                                                                hiển
+                                                                thị tìm kiếm</p>
+                                                            </div>
+                                                            <span class="admin-panel__badge">SEO</span>
+                                                        </div>
+
+                                                        <div class="marketing-form-grid">
+                                                            <div class="marketing-field marketing-field--full">
+                                                                <label>Meta title</label>
+                                                                <input id="seo-meta-title" type="text" value="@Model.MetaTitle"
+                                                                       placeholder="Nhập meta title" />
+                                                            </div>
+                                                            <div class="marketing-field marketing-field--full">
+                                                                <label>Meta description</label>
+                                                                <textarea id="seo-meta-description" rows="3"
+                                                                          placeholder="Nhập meta description">@Model.MetaDescription</textarea>
+                                                            </div>
+                                                            <div class="marketing-field marketing-field--full">
+                                                                <label>Từ khóa SEO</label>
+                                                                <textarea id="seo-keywords" rows="1"
+                                                                          placeholder="Nhập từ khóa">@Model.SeoKeywords</textarea>
+                                                            </div>
+                                                            <div class="marketing-field marketing-field--full">
+                                                                <label>Tiêu đề khi chia sẻ link (OG title)</label>
+                                                                <input id="seo-og-title" type="text" value="@Model.OgTitle"
+                                                                       placeholder="Nhập tiêu đề khi chia sẻ link" />
+                                                            </div>
+                                                            <div class="marketing-field marketing-field--full">
+                                                                <label>Ảnh khi chia sẻ link (OG image)</label>
+                                                                <div class="marketing-seo-image-picker">
+                                                                    <div class="marketing-seo-image-picker__top">
+                                                                        <div class="marketing-seo-image-picker__preview">
+                                                                            <img src="@seoOgImageUrl" data-seo-og-preview alt="Ảnh chia sẻ link trang chủ" />
+                                                                        </div>
+                                                                        <div class="marketing-seo-image-picker__details">
+                                                                            <div class="marketing-seo-image-picker__content">
+                                                                                <strong>Ảnh preview khi share link</strong>
+                                                                                <span>Ảnh hiển thị khi dán link trang chủ lên Facebook, Zalo hoặc nền tảng chat
+                                                                                    khác.</span>
+                                                                            </div>
+                                                                           
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="marketing-seo-image-picker__actions">
+                                                                            <button type="button" class="marketing-seo-image-picker__button" data-trigger-seo-og-upload>Chọn ảnh chia sẻ</button>
+                                                                            <span class="marketing-seo-image-picker__hint">Khuyến nghị ảnh vuông hoặc tỷ lệ 1200 ×
+                                                                                630</span>
+                                                                            </div>
+                                                                        </div>
+                                                                        </div>
+                                                                    <input id="seo-og-file" type="file" accept="image/*" style="display: none;" />
+                                                                    <input id="seo-og-image" type="hidden" value="@Model.OgImage" />
+                                                                </div>
+
+                                                                <div class="marketing-panel__actions">
+                                                                    <button type="button" class="marketing-action-btn marketing-action-btn--primary" data-save-seo>Lưu SEO</button>
+                                                                    <button type="button" class="marketing-action-btn marketing-action-btn--secondary" data-reload-seo>Tải lại SEO</button>
+                                                                </div>
+                                                            </section>
+                                                        </div>
+                                                    </section>
