@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using WebThuMuaPheLieu.Models;
 using WebThuMuaPheLieu.ViewModels;
 
@@ -20,10 +21,12 @@ public class AdminController : Controller
     private const string SuccessTempDataKey = "AdminPostsSuccess";
     private const string ErrorTempDataKey = "AdminPostsError";
     private const int PostsPageSize = 8;
+    private const int AdminProductsPageSize = 8;
     private static readonly string[] CategoryTonePalette = ["blue", "green", "violet", "orange", "rose", "slate"];
     private static readonly HashSet<string> ValidBlogStatuses = ["draft", "review", "published", "hidden"];
     private readonly AppDbContext _context;
     private readonly IWebHostEnvironment _environment;
+    private readonly ILogger<AdminController> _logger;
 
     private const string BannerActiveFolderRelative = "assets/images/bannersandseos";
     private const string BannerTitleSeparator = "|||";
@@ -31,10 +34,11 @@ public class AdminController : Controller
     private static readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
     private const string ProductImageFolder = "assets/images/products";
 
-    public AdminController(AppDbContext context, IWebHostEnvironment environment)
+    public AdminController(AppDbContext context, IWebHostEnvironment environment, ILogger<AdminController> logger)
     {
         _context = context;
         _environment = environment;
+        _logger = logger;
     }
 
     [HttpGet("")]
@@ -68,9 +72,11 @@ public class AdminController : Controller
         int? categoryId = null,
         int? categoryEditId = null,
         bool create = false,
-        bool manageCategories = false)
+        bool manageCategories = false,
+        int page = 1,
+        string? search = null)
     {
-        var model = await BuildAdminProductsViewModelAsync(id, categoryId, categoryEditId, create, manageCategories);
+        var model = await BuildAdminProductsViewModelAsync(id, categoryId, categoryEditId, create, manageCategories, page, search);
         ViewData["Title"] = "Sản phẩm";
         ViewData["AdminSection"] = "Products";
         return View(model);
@@ -145,6 +151,11 @@ public class AdminController : Controller
         product.Status = normalizedStatus;
         product.IsFeatured = editor.IsFeatured;
         product.UpdatedAt = now;
+
+        if (!isCreate)
+        {
+            await ApplyProductImageChangesAsync(product, editor);
+        }
 
         await _context.SaveChangesAsync();
 
@@ -301,9 +312,9 @@ public class AdminController : Controller
     }
 
     [HttpGet("prices")]
-    public async Task<IActionResult> Prices(int? productId = null, int? historyId = null, bool createHistory = false, bool editCurrent = false)
+    public async Task<IActionResult> Prices(int? productId = null, int? historyId = null, bool createHistory = false, bool editCurrent = false, string? search = null)
     {
-        var model = await BuildAdminPricesViewModelAsync(productId, historyId, createHistory, editCurrent);
+        var model = await BuildAdminPricesViewModelAsync(productId, historyId, createHistory, editCurrent, search);
         ViewData["Title"] = "Bảng giá";
         ViewData["AdminSection"] = "Prices";
         return View(model);
@@ -344,18 +355,44 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SavePriceHistory(AdminPriceHistoryEditorViewModel editor)
     {
+        _logger.LogInformation("SavePriceHistory called. Id={Id}, ProductId={ProductId}, PriceValue={PriceValue}, PriceUnit={PriceUnit}, PriceType={PriceType}, EffectiveDate={EffectiveDate}, RecordedAt={RecordedAt}",
+            editor.Id,
+            editor.ProductId,
+            editor.PriceValue,
+            editor.PriceUnit,
+            editor.PriceType,
+            editor.EffectiveDate,
+            editor.RecordedAt);
+
+        if (!ModelState.IsValid)
+        {
+            var validationErrors = string.Join(" | ", ModelState
+                .Where(entry => entry.Value?.Errors.Count > 0)
+                .Select(entry => $"{entry.Key}: {string.Join(", ", entry.Value!.Errors.Select(error => error.ErrorMessage))}"));
+
+            _logger.LogWarning("SavePriceHistory ModelState invalid: {ValidationErrors}", validationErrors);
+
+            TempData["AdminPricesError"] = string.IsNullOrWhiteSpace(validationErrors)
+                ? "Dữ liệu lịch sử giá không hợp lệ."
+                : $"Dữ liệu lịch sử giá không hợp lệ: {validationErrors}";
+
+            return RedirectToAction(nameof(Prices), new { productId = editor.ProductId, historyId = editor.Id, createHistory = !editor.Id.HasValue });
+        }
+
         var product = await _context.Products
             .AsNoTracking()
             .FirstOrDefaultAsync(p => p.Id == editor.ProductId);
 
         if (product is null)
         {
+            _logger.LogWarning("SavePriceHistory failed: product not found for ProductId={ProductId}", editor.ProductId);
             TempData["AdminPricesError"] = "Sản phẩm áp dụng lịch sử giá không tồn tại.";
             return RedirectToAction(nameof(Prices));
         }
 
         if (!editor.PriceValue.HasValue)
         {
+            _logger.LogWarning("SavePriceHistory failed: PriceValue missing for ProductId={ProductId}", editor.ProductId);
             TempData["AdminPricesError"] = "Giá lịch sử không được để trống.";
             return RedirectToAction(nameof(Prices), new { productId = editor.ProductId, historyId = editor.Id, createHistory = !editor.Id.HasValue });
         }
@@ -385,7 +422,16 @@ public class AdminController : Controller
         history.EffectiveDate = editor.EffectiveDate;
         history.RecordedAt = editor.RecordedAt ?? history.RecordedAt ?? DateTime.Now;
 
+        if (history.RecordedAt is null)
+        {
+            _logger.LogWarning("SavePriceHistory failed: RecordedAt null after binding for ProductId={ProductId}", editor.ProductId);
+            TempData["AdminPricesError"] = "Ngày ghi nhận không hợp lệ hoặc chưa được truyền lên form.";
+            return RedirectToAction(nameof(Prices), new { productId = editor.ProductId, historyId = editor.Id, createHistory = !editor.Id.HasValue });
+        }
+
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("SavePriceHistory success. HistoryId={HistoryId}, ProductId={ProductId}", history.Id, editor.ProductId);
 
         TempData["AdminPricesSuccess"] = isCreate
             ? "Đã thêm lịch sử giá mới."
@@ -2722,14 +2768,47 @@ public class AdminController : Controller
         int? preselectedCategoryId,
         int? categoryEditId,
         bool createMode,
-        bool manageCategories)
+        bool manageCategories,
+        int page,
+        string? search)
     {
-        var products = await _context.Products
+        var normalizedPage = page < 1 ? 1 : page;
+        var normalizedSearch = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
+
+        IQueryable<Product> productsQuery = _context.Products
             .AsNoTracking()
             .Include(p => p.Category)
             .Include(p => p.ProductImages)
             .OrderByDescending(p => p.UpdatedAt ?? p.CreatedAt)
-            .ThenBy(p => p.Name)
+            .ThenBy(p => p.Name);
+
+        if (normalizedSearch is not null)
+        {
+            var searchPattern = $"%{normalizedSearch}%";
+            productsQuery = productsQuery.Where(p =>
+                EF.Functions.Like(p.Name ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.Slug ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.ShortDescription ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.Description ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.PriceLabel ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.Unit ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.Status ?? string.Empty, searchPattern) ||
+                EF.Functions.Like((p.Category != null ? p.Category.Name : string.Empty) ?? string.Empty, searchPattern));
+        }
+
+        var totalProducts = await productsQuery.CountAsync();
+        var totalPages = totalProducts == 0
+            ? 1
+            : (int)Math.Ceiling(totalProducts / (double)AdminProductsPageSize);
+
+        if (normalizedPage > totalPages)
+        {
+            normalizedPage = totalPages;
+        }
+
+        var products = await productsQuery
+            .Skip((normalizedPage - 1) * AdminProductsPageSize)
+            .Take(AdminProductsPageSize)
             .ToListAsync();
 
         Product? selectedProduct = null;
@@ -2815,6 +2894,11 @@ public class AdminController : Controller
                 UpdatedAt = product.UpdatedAt,
                 ImageCount = CountImages(product)
             }).ToList(),
+            SearchTerm = normalizedSearch,
+            CurrentPage = normalizedPage,
+            PageSize = AdminProductsPageSize,
+            TotalProducts = totalProducts,
+            TotalPages = totalPages,
             Categories = categories.Select(category => new AdminCategoryListItemViewModel
             {
                 Id = category.Id,
@@ -2832,17 +2916,44 @@ public class AdminController : Controller
         };
     }
 
-    private async Task<AdminPricesViewModel> BuildAdminPricesViewModelAsync(int? selectedProductId, int? historyId, bool createHistory, bool editCurrent)
+    private async Task<AdminPricesViewModel> BuildAdminPricesViewModelAsync(int? selectedProductId, int? historyId, bool createHistory, bool editCurrent, string? search)
     {
-        var products = await _context.Products
+        var normalizedSearch = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
+
+        var productsQuery = _context.Products
             .AsNoTracking()
             .Include(p => p.Category)
+            .AsQueryable();
+
+        if (normalizedSearch is not null)
+        {
+            var searchPattern = $"%{normalizedSearch}%";
+            productsQuery = productsQuery.Where(p =>
+                EF.Functions.Like(p.Name ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.Slug ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.ShortDescription ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.Description ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.PriceLabel ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.Unit ?? string.Empty, searchPattern) ||
+                EF.Functions.Like(p.Status ?? string.Empty, searchPattern) ||
+                EF.Functions.Like((p.Category != null ? p.Category.Name : string.Empty) ?? string.Empty, searchPattern));
+        }
+
+        var products = await productsQuery
             .OrderBy(p => p.Name)
             .ToListAsync();
 
-        var selectedProduct = selectedProductId.HasValue
-            ? products.FirstOrDefault(p => p.Id == selectedProductId.Value)
-            : products.FirstOrDefault();
+        Product? selectedProduct = null;
+
+        if (selectedProductId.HasValue)
+        {
+            selectedProduct = await _context.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == selectedProductId.Value);
+        }
+
+        selectedProduct ??= products.FirstOrDefault();
 
         var historiesQuery = _context.PriceHistories
             .AsNoTracking()
@@ -2911,6 +3022,7 @@ public class AdminController : Controller
                 IsSelected = selectedProduct?.Id == product.Id,
                 UpdatedAt = product.UpdatedAt
             }).ToList(),
+            SearchTerm = normalizedSearch,
             ProductOptions = products.Select(product => new SelectListItem
             {
                 Value = product.Id.ToString(CultureInfo.InvariantCulture),
@@ -3051,6 +3163,38 @@ public class AdminController : Controller
         }
 
         product.UpdatedAt = DateTime.Now;
+    }
+
+    private async Task ApplyProductImageChangesAsync(Product product, AdminProductEditorViewModel editor)
+    {
+        if (editor.RemovePrimaryImage && !string.IsNullOrWhiteSpace(product.PrimaryImage))
+        {
+            DeletePhysicalFile(product.PrimaryImage);
+            product.PrimaryImage = null;
+        }
+
+        var removedImageIds = editor.RemovedImageIds
+            .Distinct()
+            .ToHashSet();
+
+        if (removedImageIds.Count == 0)
+        {
+            return;
+        }
+
+        var imagesToRemove = await _context.ProductImages
+            .Where(image => image.ProductId == product.Id && removedImageIds.Contains(image.Id))
+            .ToListAsync();
+
+        foreach (var image in imagesToRemove)
+        {
+            DeletePhysicalFile(image.ImageUrl);
+        }
+
+        if (imagesToRemove.Count > 0)
+        {
+            _context.ProductImages.RemoveRange(imagesToRemove);
+        }
     }
 
     private Task CreateInitialPriceHistoryAsync(Product product)
