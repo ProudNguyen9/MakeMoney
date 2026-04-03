@@ -1,56 +1,3517 @@
+@model WebThuMuaPheLieu.Models.AdminPostsPageViewModel
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var publishedAtValue = Model.Editor.Input.PublishedAt?.ToString("yyyy-MM-ddTHH:mm");
+    var currentStatusRoute = string.IsNullOrWhiteSpace(Model.SelectedStatus) ? null : Model.SelectedStatus;
+    var currentCategoryRoute = Model.SelectedCategoryId;
+    var currentPostsPage = Model.CurrentPage > 0 ? Model.CurrentPage : 1;
+    var postsPageUrl = Url.Action("Posts", "Admin", new
+    {
+        searchTerm = Model.SearchTerm,
+        status = currentStatusRoute,
+        categoryId = currentCategoryRoute,
+        page = currentPostsPage > 1 ? (int?)currentPostsPage : null
+    }) ?? "/Admin/Posts";
+    var createPostUrl = $"{postsPageUrl}#editor-panel";
+    var postsListUrl = $"{postsPageUrl}#posts-panel";
+    var paginationStartPage = Math.Max(1, currentPostsPage - 2);
+    var paginationEndPage = Math.Min(Model.TotalPages, paginationStartPage + 4);
+    paginationStartPage = Math.Max(1, paginationEndPage - 4);
+    var shouldOpenEditor = Model.Editor.IsEditing || (!ViewData.ModelState.IsValid && string.IsNullOrWhiteSpace(Model.ActiveSection));
+    var initialSection = !string.IsNullOrWhiteSpace(Model.ActiveSection)
+        ? Model.ActiveSection
+        : shouldOpenEditor ? "editor" : "posts";
 }
 
-<header class="topbar" id="posts-section">
-    <div class="topbar__title-wrap">
-        <button class="sidebar-toggle" type="button" aria-label="Mở menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div>
-            <p class="eyebrow">Admin / Posts</p>
-            <h2>Quản lý bài viết</h2>
-            <div class="overview-hero__chips">
-                <span>Blog</span>
-                <span>Content</span>
+
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <div class="posts-flash posts-flash--success">@Model.SuccessMessage</div>
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div class="posts-flash posts-flash--error">@Model.ErrorMessage</div>
+}
+
+<nav class="posts-section-nav" aria-label="Điều hướng quản trị blog" data-posts-nav>
+    <a href="#posts-panel"
+       class="posts-section-nav__item js-posts-section-trigger @(initialSection == "posts" ? "is-active" : null)"
+       data-section-target="posts"
+       aria-controls="posts-panel">
+        <span class="posts-section-nav__eyebrow">Chính</span>
+        <strong>Danh sách bài viết</strong>
+        <small>Tìm kiếm, lọc và thao tác bài viết</small>
+    </a>
+
+    <a href="#overview-panel"
+       class="posts-section-nav__item js-posts-section-trigger @(initialSection == "overview" ? "is-active" : null)"
+       data-section-target="overview"
+       aria-controls="overview-panel">
+        <span class="posts-section-nav__eyebrow">Tổng quan</span>
+        <strong>Tổng quan</strong>
+        <small>Chỉ số, quy trình và thao tác nhanh</small>
+    </a>
+
+    <a href="#editor-panel"
+       class="posts-section-nav__item js-posts-section-trigger @(initialSection == "editor" ? "is-active" : null)"
+       data-section-target="editor"
+       aria-controls="editor-panel">
+        <span class="posts-section-nav__eyebrow">Biên tập</span>
+        <strong>Trình soạn thảo</strong>
+        <small>Mở khi tạo mới hoặc chỉnh sửa</small>
+    </a>
+
+    <a href="#categories-panel"
+       class="posts-section-nav__item js-posts-section-trigger @(initialSection == "categories" ? "is-active" : null)"
+       data-section-target="categories"
+       aria-controls="categories-panel">
+        <span class="posts-section-nav__eyebrow">Phân loại</span>
+        <strong>Chuyên mục</strong>
+        <small>Quản lý chuyên mục và điều hướng lọc</small>
+    </a>
+</nav>
+
+<div class="posts-section-shell" data-posts-sections data-initial-section="@initialSection">
+    <section class="posts-section-panel @(initialSection == "posts" ? "is-active" : null)" id="posts-panel" data-section-panel="posts">
+        <div class="panel posts-panel posts-panel--table">
+            <div class="panel__head posts-panel__head posts-panel__head--stacked">
+                <div>
+                    <p class="eyebrow">Posts registry</p>
+                    <h3>Danh sách bài viết</h3>
+                    <p class="posts-panel__summary">Phần chính của trang. Giữ nguyên luồng tìm kiếm, lọc, chuyển trạng thái, chỉnh sửa và xoá bài viết nhưng được tách khỏi dashboard để tránh quá tải thông tin.</p>
+                </div>
+
+                <div class="posts-panel__actions">
+                    <a href="#categories-panel" class="btn-ghost-posts js-posts-section-trigger" data-section-target="categories">Xem chuyên mục</a>
+                    <a href="@createPostUrl" class="btn-primary-posts">Tạo bài viết</a>
+                </div>
+            </div>
+
+            <form method="get" asp-action="Posts" asp-controller="Admin" class="posts-toolbar">
+                <label class="search-box posts-search-box" aria-label="Tìm bài viết">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" name="searchTerm" value="@Model.SearchTerm" placeholder="Tìm theo tiêu đề, slug, category, author..." />
+                </label>
+
+                <select name="status" class="posts-select">
+                    @foreach (var filter in Model.StatusFilters)
+                    {
+                        <option value="@filter.Value" selected="@(filter.Selected ? "selected" : null)">@filter.Label</option>
+                    }
+                </select>
+
+                <select name="categoryId" class="posts-select">
+                    @foreach (var option in Model.CategoryFilters)
+                    {
+                        <option value="@option.Value" selected="@(option.Selected ? "selected" : null)">@option.Label</option>
+                    }
+                </select>
+
+                <div class="posts-topbar__buttons">
+                    <button type="submit" class="btn-secondary-posts">Lọc dữ liệu</button>
+                    <a asp-action="Posts" asp-controller="Admin" class="btn-ghost-posts">Làm mới</a>
+                </div>
+            </form>
+
+            <div class="posts-filter-row">
+                @foreach (var filter in Model.StatusFilters)
+                {
+                    <a asp-action="Posts"
+                       asp-controller="Admin"
+                       asp-route-searchTerm="@Model.SearchTerm"
+                       asp-route-status="@(string.IsNullOrWhiteSpace(filter.Value) ? null : filter.Value)"
+                       asp-route-categoryId="@Model.SelectedCategoryId"
+                       class="@(filter.Selected ? "is-active" : null)">
+                        @filter.Label
+                    </a>
+                }
+            </div>
+
+            <div class="table-shell posts-table-shell">
+                <table class="product-table posts-table">
+                    <thead>
+                        <tr>
+                            <th>Bài viết</th>
+                            <th>Chuyên mục</th>
+                            <th>Lịch xuất bản</th>
+                            <th>Tài nguyên</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Posts.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="6">
+                                    <div class="posts-empty-state">
+                                        <strong>Không có bài viết phù hợp bộ lọc hiện tại.</strong>
+                                        <span>Hãy thay đổi từ khoá tìm kiếm, trạng thái hoặc chuyên mục để xem dữ liệu khác.</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var post in Model.Posts)
+                            {
+                                var editPostUrl = $"{Url.Action("Posts", "Admin", new { searchTerm = Model.SearchTerm, status = currentStatusRoute, categoryId = currentCategoryRoute, editId = post.Id, page = currentPostsPage > 1 ? (int?)currentPostsPage : null })}#editor-panel";
+
+                                <tr>
+                                    <td>
+                                        <div class="posts-table__main">
+                                            <div class="posts-table__title-row">
+                                                <strong>@post.Title</strong>
+                                                <span class="posts-table__id">#@post.Id</span>
+                                            </div>
+                                            <span class="posts-table__slug">/@post.Slug</span>
+                                            <p>@post.Excerpt</p>
+                                            <div class="posts-inline-meta">
+                                                <span>Tác giả: @post.Author</span>
+                                                <span>Tạo: @post.CreatedText</span>
+                                                <span>Cập nhật: @post.UpdatedText</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="posts-table__category">
+                                            <strong>@post.Category</strong>
+                                            <span>@post.CategorySlug</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="posts-table__schedule">
+                                            <strong>@post.PublishText</strong>
+                                            <span>@post.PublishHint</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="posts-resource-stack">
+                                            <span class="posts-pill posts-pill--@post.CoverClass">@post.CoverText</span>
+                                            <span class="posts-pill">@post.GalleryImages ảnh gallery</span>
+                                            <span class="posts-pill">@post.RelatedProducts sản phẩm liên quan</span>
+                                            <span class="posts-pill">@post.Likes lượt thích</span>
+                                        </div>
+                                        <small class="posts-resource-note">@post.RelatedProductSummary</small>
+                                    </td>
+                                    <td>
+                                        <span class="posts-status-badge posts-status-badge--@post.StatusClass">@post.StatusLabel</span>
+                                    </td>
+                                    <td>
+                                        <div class="posts-table__actions">
+                                            <a href="@editPostUrl">Chỉnh sửa</a>
+
+                                            @if (!string.IsNullOrWhiteSpace(post.PublicUrl))
+                                            {
+                                                <a href="@post.PublicUrl" target="_blank" rel="noreferrer" class="is-muted">Xem ngoài site</a>
+                                            }
+
+                                            <form asp-action="ChangePostStatus" asp-controller="Admin" method="post" class="posts-action-inline-form">
+                                                <input type="hidden" name="id" value="@post.Id" />
+                                                <input type="hidden" name="status" value="@post.PrimaryActionValue" />
+                                                <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
+                                                <input type="hidden" name="returnStatus" value="@Model.SelectedStatus" />
+                                                <input type="hidden" name="returnCategoryId" value="@Model.SelectedCategoryId" />
+                                                <input type="hidden" name="editId" value="@Model.Editor.Input.Id" />
+                                                <input type="hidden" name="returnPage" value="@Model.CurrentPage" />
+                                                <button type="submit">@post.PrimaryAction</button>
+                                            </form>
+
+                                            <form asp-action="ChangePostStatus" asp-controller="Admin" method="post" class="posts-action-inline-form">
+                                                <input type="hidden" name="id" value="@post.Id" />
+                                                <input type="hidden" name="status" value="@post.SecondaryActionValue" />
+                                                <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
+                                                <input type="hidden" name="returnStatus" value="@Model.SelectedStatus" />
+                                                <input type="hidden" name="returnCategoryId" value="@Model.SelectedCategoryId" />
+                                                <input type="hidden" name="editId" value="@Model.Editor.Input.Id" />
+                                                <input type="hidden" name="returnPage" value="@Model.CurrentPage" />
+                                                <button type="submit" class="is-muted">@post.SecondaryAction</button>
+                                            </form>
+
+                                            <form asp-action="DeletePost" asp-controller="Admin" method="post" class="posts-action-inline-form" onsubmit="return confirm('Xóa bài viết này và toàn bộ liên kết liên quan?');">
+                                                <input type="hidden" name="id" value="@post.Id" />
+                                                <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
+                                                <input type="hidden" name="returnStatus" value="@Model.SelectedStatus" />
+                                                <input type="hidden" name="returnCategoryId" value="@Model.SelectedCategoryId" />
+                                                <input type="hidden" name="editId" value="@Model.Editor.Input.Id" />
+                                                <input type="hidden" name="returnPage" value="@Model.CurrentPage" />
+                                                <button type="submit" class="is-danger">Xóa</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="posts-pagination">
+                <div class="posts-pagination__summary">
+                    @if (Model.TotalFilteredPosts > 0)
+                    {
+                        <span>Hiển thị @Model.StartItemIndex-@Model.EndItemIndex trên @Model.TotalFilteredPosts bài viết</span>
+                    }
+                    else
+                    {
+                        <span>Không có bài viết nào trong bộ lọc hiện tại</span>
+                    }
+
+                    <strong>Trang @Model.CurrentPage/@Model.TotalPages</strong>
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="posts-pagination__nav" aria-label="Phân trang danh sách bài viết">
+                        <a href="@(Model.CurrentPage > 1 ? $"{Url.Action("Posts", "Admin", new { searchTerm = Model.SearchTerm, status = currentStatusRoute, categoryId = currentCategoryRoute, page = Model.CurrentPage - 1 })}#posts-panel" : "#")"
+                           class="posts-pagination__link @(Model.CurrentPage == 1 ? "is-disabled" : null)"
+                           aria-disabled="@(Model.CurrentPage == 1 ? "true" : "false")">Trước</a>
+
+                        @for (var pageNumber = paginationStartPage; pageNumber <= paginationEndPage; pageNumber++)
+                        {
+                            <a href="@($"{Url.Action("Posts", "Admin", new { searchTerm = Model.SearchTerm, status = currentStatusRoute, categoryId = currentCategoryRoute, page = pageNumber })}#posts-panel")"
+                               class="posts-pagination__link @(pageNumber == Model.CurrentPage ? "is-current" : null)"
+                               aria-current="@(pageNumber == Model.CurrentPage ? "page" : null)">@pageNumber</a>
+                        }
+
+                        <a href="@(Model.CurrentPage < Model.TotalPages ? $"{Url.Action("Posts", "Admin", new { searchTerm = Model.SearchTerm, status = currentStatusRoute, categoryId = currentCategoryRoute, page = Model.CurrentPage + 1 })}#posts-panel" : "#")"
+                           class="posts-pagination__link @(Model.CurrentPage == Model.TotalPages ? "is-disabled" : null)"
+                           aria-disabled="@(Model.CurrentPage == Model.TotalPages ? "true" : "false")">Sau</a>
+                    </nav>
+                }
             </div>
         </div>
-    </div>
-</header>
+    </section>
 
-<section class="panel" id="posts-panel">
-    <div class="panel__head">
-        <div>
-            <p class="eyebrow">Scaffold</p>
-            <h3>Danh sách bài viết</h3>
-        </div>
-        <div class="panel__head-actions">
-            <button type="button">Tạo bài viết</button>
-        </div>
-    </div>
-    <div class="table-shell">
-        <table class="product-table">
-            <thead>
-                <tr>
-                    <th>Tiêu đề</th>
-                    <th>Chuyên mục</th>
-                    <th>Ngày đăng</th>
-                    <th>Trạng thái</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <div class="product-info"><strong>Scaffold bài viết</strong><span>Khu vực này sẽ nối với blog
-                            admin sau.</span></div>
-                        </td>
-                        <td>Tin tức</td>
-                        <td>--</td>
-                        <td>Ready</td>
-                    </tr>
-                </tbody>
-            </table>
+    <section class="posts-section-panel @(initialSection == "overview" ? "is-active" : null)" id="overview-panel" data-section-panel="overview">
+        <div class="posts-dashboard-grid">
+            <div class="posts-dashboard-main">
+                <section class="panel posts-panel">
+                    <div class="panel__head posts-panel__head posts-panel__head--stacked">
+                        <div>
+                            <p class="eyebrow">Overview</p>
+                            <h3>Tổng quan vận hành nội dung</h3>
+                            <p class="posts-panel__summary">Gom toàn bộ chỉ số và workflow vào một khu vực riêng để người quản trị xem nhanh health của hệ thống blog mà không bị lẫn với bảng dữ liệu.</p>
+                        </div>
+                        <a href="#posts-panel" class="btn-ghost-posts js-posts-section-trigger" data-section-target="posts">Đến danh sách bài viết</a>
+                    </div>
+
+                    <section class="posts-metrics-grid" aria-label="Chỉ số bài viết blog">
+                        @foreach (var metric in Model.MetricCards)
+                        {
+                            <article class="posts-metric-card posts-metric-card--@metric.Tone">
+                                <span class="posts-metric-card__label">@metric.Label</span>
+                                <strong class="posts-metric-card__value">
+                                    @metric.Value@if (metric.Label == "SEO trung bình")
+                                    {
+                                        <span>/100</span>
+                                    }
+                                </strong>
+                                <span class="posts-metric-card__meta">@metric.Meta</span>
+                            </article>
+                        }
+                    </section>
+                </section>
+
+                <section class="panel posts-panel">
+                    <div class="panel__head posts-panel__head">
+                        <div>
+                            <p class="eyebrow">Editorial workflow</p>
+                            <h3>Trạng thái vận hành nội dung</h3>
+                        </div>
+                        <span class="posts-panel__tag">Workflow · publication · media</span>
+                    </div>
+
+                    <div class="posts-workflow-grid">
+                        @foreach (var item in Model.WorkflowItems)
+                        {
+                            <article class="posts-workflow-card posts-workflow-card--@item.Tone">
+                                <div class="posts-workflow-card__top">
+                                    <span>@item.Label</span>
+                                    <strong>@item.Count</strong>
+                                </div>
+                                <p>@item.Hint</p>
+                            </article>
+                        }
+                    </div>
+
+                    <div class="posts-action-grid">
+                        @foreach (var action in Model.QuickActions)
+                        {
+                            <article class="posts-action-card">
+                                <h4>@action.Title</h4>
+                                <p>@action.Description</p>
+                                <a href="@action.ActionUrl" class="btn-secondary-posts">@action.Cta</a>
+                            </article>
+                        }
+                    </div>
+                </section>
+
+                <section class="panel posts-panel">
+                    <div class="panel__head posts-panel__head">
+                        <div>
+                            <p class="eyebrow">Media & relation</p>
+                            <h3>Ma trận quản lý tài nguyên blog</h3>
+                        </div>
+                    </div>
+
+                    <div class="posts-resource-board">
+                        @foreach (var item in Model.ResourceCards)
+                        {
+                            <article class="posts-resource-board__card">
+                                <strong>@item.Title</strong>
+                                <p>@item.Description</p>
+                                <span>@item.Summary</span>
+                            </article>
+                        }
+                    </div>
+                </section>
+            </div>
+
+            <aside class="posts-dashboard-side">
+                <section class="panel posts-panel posts-panel--side">
+                    <div class="panel__head posts-panel__head">
+                        <div>
+                            <p class="eyebrow">Checklist</p>
+                            <h3>Chuẩn xuất bản blog</h3>
+                        </div>
+                    </div>
+
+                    <ul class="posts-checklist">
+                        @foreach (var item in Model.EditorialChecklist)
+                        {
+                            <li>
+                                <span class="posts-checklist__icon">✓</span>
+                                <span>@item</span>
+                            </li>
+                        }
+                    </ul>
+
+                    <div class="posts-side-note">
+                        <strong>Gợi ý triển khai</strong>
+                        <p>@Model.ImplementationNote</p>
+                    </div>
+                </section>
+
+                <section class="panel posts-panel posts-panel--side">
+                    <div class="panel__head posts-panel__head">
+                        <div>
+                            <p class="eyebrow">Publishing note</p>
+                            <h3>Nguyên tắc tránh conflict</h3>
+                        </div>
+                    </div>
+
+                    <div class="posts-side-note posts-side-note--compact">
+                        <p>@Model.ConflictNote</p>
+                    </div>
+                </section>
+            </aside>
         </div>
     </section>
+
+    <section class="posts-section-panel @(initialSection == "editor" ? "is-active" : null)" id="editor-panel" data-section-panel="editor">
+        <section class="panel posts-panel posts-editor-panel">
+            <div class="panel__head posts-panel__head posts-panel__head--stacked">
+                <div>
+                    <p class="eyebrow">Editor</p>
+                    <h3>@Model.Editor.FormTitle</h3>
+                    <p class="posts-panel__summary">Editor được tách riêng như một workspace độc lập để thao tác tạo mới hoặc chỉnh sửa bài viết mà không bị phân tâm bởi dashboard và danh sách dài.</p>
+                </div>
+
+                <div class="posts-panel__actions">
+                    @if (Model.Editor.IsEditing)
+                    {
+                        <span class="posts-panel__tag">Đang chỉnh sửa bài viết #@Model.Editor.Input.Id</span>
+                    }
+                    <a href="@postsListUrl" class="btn-ghost-posts">Quay lại danh sách</a>
+                </div>
+            </div>
+
+            <form asp-action="SavePost" asp-controller="Admin" method="post" enctype="multipart/form-data" class="posts-editor-form" id="posts-editor-form">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="posts-validation-summary"></div>
+
+                <input asp-for="Editor.Input.Id" type="hidden" />
+                <input asp-for="Editor.Input.SearchTerm" type="hidden" value="@Model.SearchTerm" />
+                <input asp-for="Editor.Input.ReturnStatus" type="hidden" value="@Model.SelectedStatus" />
+                <input asp-for="Editor.Input.ReturnCategoryId" type="hidden" value="@Model.SelectedCategoryId" />
+                <input asp-for="Editor.Input.ReturnPage" type="hidden" value="@Model.CurrentPage" />
+
+                <div class="posts-editor-grid">
+                    <div class="posts-editor-card posts-editor-card--span-2">
+                        <h4>Thông tin cơ bản</h4>
+                        <div class="posts-form-grid posts-form-grid--2">
+                            <div class="posts-field posts-field--span-2">
+                                <label asp-for="Editor.Input.Title">Tiêu đề bài viết</label>
+                                <input asp-for="Editor.Input.Title" class="posts-input" placeholder="Ví dụ: Thu mua phế liệu công trình giá cao tại TP.HCM" data-title-input />
+                                <small class="posts-editor-hint">Nhập tiêu đề rõ ràng để hệ thống tự gợi ý slug bên dưới.</small>
+                                <span asp-validation-for="Editor.Input.Title" class="field-validation-error"></span>
+                            </div>
+                            <div class="posts-field posts-field--span-2">
+                                <label asp-for="Editor.Input.Slug">Đường dẫn bài viết (Slug)</label>
+                                <input asp-for="Editor.Input.Slug" class="posts-input" placeholder="tu-dong-tao-tu-tieu-de" autocomplete="off" data-slug-input />
+                                <small class="posts-editor-hint">Slug sẽ tự tạo từ tiêu đề. Nếu muốn, bạn vẫn có thể sửa thủ công.</small>
+                                <span asp-validation-for="Editor.Input.Slug" class="field-validation-error"></span>
+                            </div>
+                            <div class="posts-field posts-field--span-2">
+                                <label for="ImageFiles">Ảnh bài viết</label>
+                                <div class="posts-cover-upload posts-cover-upload--unified" data-cover-upload>
+                                    <div class="posts-cover-upload__controls">
+                                        <div class="posts-gallery-dropzone posts-gallery-dropzone--media" data-media-dropzone tabindex="0" role="button" aria-controls="ImageFiles">
+                                            <div class="posts-gallery-dropzone__content">
+                                                <strong>Kéo thả hoặc chọn ảnh bài viết</strong>
+                                                <span>Ảnh đầu tiên sẽ làm ảnh đại diện. Các ảnh còn lại sẽ tự chuyển vào gallery để bạn thêm mô tả nếu cần.</span>
+                                                <div class="posts-gallery-dropzone__chips">
+                                                    <span>1 luồng upload duy nhất</span>
+                                                    <span>Ảnh đầu = Cover</span>
+                                                    <span>Ảnh còn lại = Gallery</span>
+                                                </div>
+                                            </div>
+                                            <input id="ImageFiles" name="imageFiles" type="file" multiple class="posts-input posts-input--file js-cover-file-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" data-cover-file-input data-media-file-input />
+                                        </div>
+                                        <small class="posts-editor-hint">Chỉ cần chọn ảnh, hệ thống sẽ tự lưu đúng thư mục con có sẵn trong <code>wwwroot/assets/images/blogs</code> theo chuyên mục bạn chọn.</small>
+                                        @Html.ValidationMessage("ImageFiles", null, new { @class = "field-validation-error" })
+
+                                    
+                                    </div>
+                                    <div class="posts-cover-preview @(string.IsNullOrWhiteSpace(Model.Editor.Input.CoverImage) ? "is-empty" : null)" data-cover-preview>
+                                        <img src="@(string.IsNullOrWhiteSpace(Model.Editor.Input.CoverImage) ? "" : Model.Editor.Input.CoverImage)"
+                                             alt="Xem trước cover image"
+                                             class="posts-cover-preview__image"
+                                             data-cover-preview-image
+                                             @(string.IsNullOrWhiteSpace(Model.Editor.Input.CoverImage) ? "hidden" : null) />
+                                        <div class="posts-cover-preview__placeholder" data-cover-preview-placeholder>
+                                            <strong>Xem trước ảnh đại diện</strong>
+                                            <span>Ảnh đại diện sẽ hiện ở đây sau khi bạn chọn file. Các ảnh còn lại sẽ xuất hiện trong gallery bên dưới.</span>
+                                        </div>
+                                        <div class="posts-cover-preview__meta">
+                                            <span data-cover-preview-label>@(string.IsNullOrWhiteSpace(Model.Editor.Input.CoverImage) ? "Chưa có ảnh được chọn" : Model.Editor.Input.CoverImage)</span>
+                                            <button type="button" class="btn-ghost-posts posts-cover-preview__clear" data-clear-upload hidden>Xoá file đã chọn</button>
+                                        </div>
+                                        <div class="posts-cover-files-list" data-cover-files-list hidden></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="posts-field posts-field--span-2">
+                                <label asp-for="Editor.Input.Excerpt">Mô tả ngắn</label>
+                                <textarea asp-for="Editor.Input.Excerpt" class="posts-textarea posts-textarea--sm" placeholder="Tóm tắt ngắn gọn 1-2 câu để hiển thị ở danh sách bài viết và khi chia sẻ liên kết"></textarea>
+                            </div>
+                            <div class="posts-field posts-field--span-2">
+                                <label asp-for="Editor.Input.Content">Nội dung bài viết</label>
+                                <div class="posts-rich-editor-shell is-loading" data-rich-editor-shell>
+                                    <div class="posts-rich-editor-toolbar">
+                                        <strong>Soạn nội dung như Word</strong>
+                                        <span data-rich-editor-status>Đang tải trình soạn thảo trực quan...</span>
+                                    </div>
+                                    <div class="posts-editor-capabilities" aria-label="Tính năng trình soạn thảo">
+                                        <span>H1 · H2 · H3</span>
+                                        <span>In đậm / in nghiêng</span>
+                                        <span>Danh sách</span>
+                                        <span>Chèn link</span>
+                                        <span>Chèn ảnh trực tiếp</span>
+                                    </div>
+                                    <textarea asp-for="Editor.Input.Content"
+                                              class="posts-textarea posts-textarea--editor"
+                                              placeholder="Bắt đầu viết nội dung bài blog tại đây. Hãy chia bài viết thành từng đoạn rõ ràng để người đọc dễ theo dõi."
+                                              data-rich-editor></textarea>
+                                </div>
+                                <small class="posts-editor-hint">Bạn chỉ cần gõ nội dung, chọn định dạng trên thanh công cụ và chèn ảnh trực tiếp. Hệ thống sẽ tự sinh HTML ở phía sau.</small>
+                                <span asp-validation-for="Editor.Input.Content" class="field-validation-error"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="posts-editor-card">
+                        <h4>Xuất bản & tác giả</h4>
+                        <div class="posts-form-grid">
+                            <div class="posts-field">
+                                <label asp-for="Editor.Input.AuthorId">Tác giả</label>
+                                <select asp-for="Editor.Input.AuthorId" class="posts-select">
+                                    <option value="">Chưa gán tác giả</option>
+                                    @foreach (var author in Model.Editor.AuthorOptions)
+                                    {
+                                        <option value="@author.Id" selected="@(author.Selected ? "selected" : null)">@author.Label</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Editor.Input.AuthorId" class="field-validation-error"></span>
+                            </div>
+                            <div class="posts-field">
+                                <label asp-for="Editor.Input.Status">Trạng thái</label>
+                                <select asp-for="Editor.Input.Status" class="posts-select">
+                                    <option value="draft">Bản nháp</option>
+                                    <option value="review">Chờ duyệt</option>
+                                    <option value="published">Đã xuất bản</option>
+                                    <option value="hidden">Đang ẩn</option>
+                                </select>
+                                <span asp-validation-for="Editor.Input.Status" class="field-validation-error"></span>
+                            </div>
+                            <div class="posts-field">
+                                <label asp-for="Editor.Input.PublishedAt">Lịch xuất bản</label>
+                                <input asp-for="Editor.Input.PublishedAt" class="posts-input" type="datetime-local" value="@publishedAtValue" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="posts-editor-card">
+                        <h4>Chuyên mục</h4>
+                        <p class="posts-editor-hint">Mỗi bài nên có ít nhất một chuyên mục. Ảnh upload mới sẽ được lưu vào đúng thư mục con đã tồn tại sẵn trong <code>images/blogs</code> theo chuyên mục lưu ảnh được chọn.</p>
+                        <div class="posts-field">
+                            <label asp-for="Editor.Input.PrimaryCategoryId">Chuyên mục lưu ảnh</label>
+                            <select asp-for="Editor.Input.PrimaryCategoryId" class="posts-select" data-primary-category-select>
+                                <option value="">Tự động dùng chuyên mục đầu tiên đã chọn</option>
+                                @foreach (var category in Model.Editor.CategoryOptions)
+                                {
+                                    <option value="@category.Id">@category.Label (@category.MetaValue)</option>
+                                }
+                            </select>
+                            <small class="posts-editor-hint">Thư mục lưu thực tế: <code>wwwroot/assets/images/blogs/<folder-chuyen-muc></code>. Đường dẫn này cũng sẽ được lưu xuống DB cho cover và gallery.</small>
+                            <span asp-validation-for="Editor.Input.PrimaryCategoryId" class="field-validation-error"></span>
+                        </div>
+                        <div class="posts-checkbox-grid">
+                            @foreach (var category in Model.Editor.CategoryOptions)
+                            {
+                                <label class="posts-checkbox-card">
+                                    <input type="checkbox" name="Editor.Input.SelectedCategoryIds" value="@category.Id" checked="@(category.Selected ? "checked" : null)" />
+                                    <span>
+                                        <strong>@category.Label</strong>
+                                        <small>@category.Description</small>
+                                        <small>@category.MetaValue</small>
+                                    </span>
+                                </label>
+                            }
+                        </div>
+                        @Html.ValidationMessage("Editor.Input.SelectedCategoryIds", null, new { @class = "field-validation-error" })
+                    </div>
+
+                    <div class="posts-editor-card" id="editor-products">
+                        <div class="posts-related-products-head posts-related-products-head--compact">
+                            <div class="posts-related-products-label">
+                                <h4>Sản phẩm liên quan</h4>
+                                <span class="posts-editor-hint posts-related-products-description" data-related-products-description>Chưa chọn sản phẩm</span>
+                            </div>
+                            <button type="button"
+                                    class="btn-primary-posts posts-related-products-trigger"
+                                    data-related-products-open
+                                    aria-haspopup="dialog"
+                                    aria-expanded="false"
+                                    aria-controls="editor-products-modal">
+                                + Thêm sản phẩm liên quan
+                            </button>
+                        </div>
+
+                        <div class="posts-related-products-summary" data-related-products-summary>
+                            <strong class="posts-related-products-count" data-related-products-count hidden>0 sản phẩm đã chọn</strong>
+                            <div class="posts-related-products-summary__chips" data-related-products-chips>
+                                <span class="posts-related-products-chip posts-related-products-chip--empty">Chưa chọn sản phẩm</span>
+                            </div>
+                        </div>
+
+                        @Html.ValidationMessage("Editor.Input.SelectedProductIds", null, new { @class = "field-validation-error" })
+
+                    </div>
+
+                    <div class="posts-editor-card posts-editor-card--span-2" id="editor-media">
+                        <h4>Gallery ảnh</h4>
+                        <p class="posts-editor-hint">Sau khi chọn ảnh, hệ thống sẽ tự tách ảnh đầu làm cover và hiển thị các ảnh còn lại ở đây để bạn nhập caption. Tất cả ảnh upload mới sẽ được lưu vào thư mục con có sẵn tương ứng trong <code>wwwroot/assets/images/blogs</code>.</p>
+                        <textarea asp-for="Editor.Input.GalleryInput" class="posts-textarea posts-textarea--md posts-gallery-legacy-input" hidden data-gallery-input></textarea>
+                        <span asp-validation-for="Editor.Input.GalleryInput" class="field-validation-error"></span>
+                        @Html.ValidationMessage("GalleryFiles", null, new { @class = "field-validation-error" })
+
+                        <div class="posts-gallery-builder" data-gallery-builder>
+                            <div class="posts-gallery-toolbar">
+                                <strong>Gallery preview</strong>
+                                <span data-gallery-toolbar-note>Chưa upload file. Bạn có thể dùng URL cover và GalleryInput thủ công ở phần fallback bên trên.</span>
+                            </div>
+                            <div class="posts-gallery-canvas" data-gallery-list>
+                                @if (Model.Editor.GalleryItems.Count == 0)
+                                {
+                                    <div class="posts-gallery-empty">
+                                        <strong>Chưa có ảnh gallery</strong>
+                                        <span>Chọn nhiều ảnh để tạo gallery tự động, hoặc nhập dữ liệu thủ công nếu bạn không upload file.</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @foreach (var item in Model.Editor.GalleryItems)
+                                    {
+                                        <article class="posts-gallery-card">
+                                            <div class="posts-gallery-card__preview">
+                                                <span class="posts-gallery-card__order">@item.OrderIndex.ToString("00")</span>
+                                                <img src="@item.ImageUrl" alt="Ảnh gallery @item.OrderIndex" class="posts-gallery-card__image" />
+                                            </div>
+                                            <div class="posts-gallery-card__body">
+                                                <div class="posts-gallery-card__meta">
+                                                    <strong>@item.ImageUrl</strong>
+                                                    <span class="posts-gallery-card__badge">Đang có sẵn</span>
+                                                    <span>@(string.IsNullOrWhiteSpace(item.Caption) ? "Chưa có caption" : item.Caption)</span>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="posts-editor-actions">
+                    <button type="submit" class="btn-primary-posts">@Model.Editor.SubmitLabel</button>
+                    @if (Model.Editor.IsEditing)
+                    {
+                        <a href="@($"{Model.Editor.CancelUrl}#posts-panel")" class="btn-ghost-posts">Huỷ chỉnh sửa</a>
+                    }
+                    else
+                    {
+                        <a href="@postsListUrl" class="btn-ghost-posts">Quay lại danh sách</a>
+                    }
+                </div>
+            </form>
+
+            <div class="posts-modal" id="editor-products-modal" data-related-products-modal hidden aria-hidden="true" tabindex="-1">
+                <div class="posts-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="editor-products-modal-title">
+                    <div class="posts-modal__header">
+                        <div class="posts-modal__header-copy">
+                            <span class="posts-modal__eyebrow">Liên kết sản phẩm</span>
+                            <h5 id="editor-products-modal-title">Chọn sản phẩm liên quan</h5>
+                            <p>Chọn nhanh các sản phẩm cần điều hướng từ bài viết sang trang bán hàng. Bạn có thể nhấp trực tiếp vào toàn bộ card để chọn hoặc bỏ chọn.</p>
+                        </div>
+                        <div class="posts-modal__header-actions">
+                            <span class="posts-modal__selection-badge" data-related-products-modal-count>Chưa chọn sản phẩm</span>
+                            <button type="button" class="btn-ghost-posts" data-related-products-close>Đóng</button>
+                        </div>
+                    </div>
+                    <div class="posts-modal__body">
+                        <div class="posts-modal__toolbar">
+                            <strong>Danh sách sản phẩm</strong>
+                            <span>Nhấp vào card để chọn nhanh. Hệ thống vẫn giữ nguyên binding dữ liệu hiện tại khi lưu bài viết.</span>
+                        </div>
+                        <div class="posts-checkbox-grid posts-checkbox-grid--products">
+                            @foreach (var product in Model.Editor.ProductOptions)
+                            {
+                                var hasProductMeta = !string.IsNullOrWhiteSpace(product.Description);
+                                <label class="posts-checkbox-card posts-checkbox-card--product @(product.Selected ? "is-selected" : null)">
+                                    <input type="checkbox"
+                                           name="Editor.Input.SelectedProductIds"
+                                           value="@product.Id"
+                                           form="posts-editor-form"
+                                           checked="@(product.Selected ? "checked" : null)"
+                                           data-related-product-checkbox
+                                           data-product-label="@product.Label" />
+                                    <span class="posts-checkbox-card__content">
+                                        <strong>@product.Label</strong>
+                                        <small class="posts-checkbox-card__meta-label">@(hasProductMeta ? "Giá / thông tin" : "Trạng thái")</small>
+                                        <small class="posts-checkbox-card__meta-value">@(hasProductMeta ? product.Description : "Chưa có thông tin bổ sung")</small>
+                                    </span>
+                                    <span class="posts-checkbox-card__state" data-related-product-state>@(product.Selected ? "Đã chọn" : "Nhấn để chọn")</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                    <div class="posts-modal__footer">
+                        <span class="posts-editor-hint">Có thể chọn nhiều sản phẩm cùng lúc, sau đó bấm <strong>Xong</strong> để quay lại form.</span>
+                        <div class="posts-modal__actions">
+                            <button type="button" class="btn-ghost-posts" data-related-products-close>Huỷ</button>
+                            <button type="button" class="btn-primary-posts" data-related-products-apply>Xong</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <section class="posts-section-panel @(initialSection == "categories" ? "is-active" : null)" id="categories-panel" data-section-panel="categories">
+        <div class="posts-dashboard-grid">
+            <div class="posts-dashboard-main">
+                <section class="panel posts-panel" id="taxonomy-panel">
+                    <div class="panel__head posts-panel__head posts-panel__head--stacked">
+                        <div>
+                            <p class="eyebrow">Taxonomy</p>
+                            <h3>Chuyên mục blog</h3>
+                            <p class="posts-panel__summary">Chuyên mục được tách riêng thành một workspace riêng. Người quản trị có thể xem cấu trúc nội dung mà không bị trộn với workflow và editor.</p>
+                        </div>
+                        <a href="#posts-panel" class="btn-ghost-posts js-posts-section-trigger" data-section-target="posts">Quay lại bài viết</a>
+                    </div>
+
+                    <section class="panel posts-panel posts-panel--side posts-category-create-panel">
+                        <div class="panel__head posts-panel__head">
+                            <div>
+                                <p class="eyebrow">Tạo mới</p>
+                                <h3>Thêm chuyên mục</h3>
+                            </div>
+                        </div>
+
+                        <form asp-action="SaveCategory" asp-controller="Admin" method="post" class="posts-category-form">
+                            @Html.AntiForgeryToken()
+                            <input asp-for="CategoryEditor.Input.SearchTerm" type="hidden" value="@Model.SearchTerm" />
+                            <input asp-for="CategoryEditor.Input.ReturnStatus" type="hidden" value="@Model.SelectedStatus" />
+                            <input asp-for="CategoryEditor.Input.ReturnCategoryId" type="hidden" value="@Model.SelectedCategoryId" />
+                            <input asp-for="CategoryEditor.Input.ReturnPage" type="hidden" value="@Model.CurrentPage" />
+
+                            <div class="posts-form-grid">
+                                <div class="posts-field">
+                                    <label asp-for="CategoryEditor.Input.Name">Tên chuyên mục</label>
+                                    <input asp-for="CategoryEditor.Input.Name" class="posts-input" placeholder="Ví dụ: Thu mua nhà xưởng" />
+                                    <span asp-validation-for="CategoryEditor.Input.Name" class="field-validation-error"></span>
+                                </div>
+                                <div class="posts-field">
+                                    <label asp-for="CategoryEditor.Input.Slug">Slug</label>
+                                    <input asp-for="CategoryEditor.Input.Slug" class="posts-input" placeholder="de-trong-se-tu-sinh-tu-ten" />
+                                    <span asp-validation-for="CategoryEditor.Input.Slug" class="field-validation-error"></span>
+                                </div>
+                                <div class="posts-field">
+                                    <label asp-for="CategoryEditor.Input.Description">Mô tả</label>
+                                    <textarea asp-for="CategoryEditor.Input.Description" class="posts-textarea posts-textarea--sm" placeholder="Mô tả ngắn giúp phân loại nội dung dễ hơn"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="posts-editor-actions posts-editor-actions--compact">
+                                <button type="submit" class="btn-primary-posts">@Model.CategoryEditor.SubmitLabel</button>
+                                <span class="posts-editor-hint">Nếu để trống slug, hệ thống sẽ tự sinh từ tên chuyên mục.</span>
+                            </div>
+                        </form>
+                    </section>
+
+                    <div class="posts-category-grid">
+                        @foreach (var category in Model.Categories)
+                        {
+                            var categoryFilterUrl = string.IsNullOrWhiteSpace(category.FilterUrl)
+                                ? postsListUrl
+                                : $"{category.FilterUrl}#posts-panel";
+
+                            <article class="posts-category-card posts-category-card--@category.Tone">
+                                <div class="posts-category-card__head">
+                                    <div>
+                                        <h4>@category.Name</h4>
+                                        <span>/@category.Slug</span>
+                                    </div>
+                                    <strong>@category.TotalPosts bài</strong>
+                                </div>
+                                <p>@category.Description</p>
+                                <div class="posts-category-card__footer">
+                                    <span>Taxonomy động</span>
+                                    <a href="@categoryFilterUrl" class="btn-ghost-posts">Lọc bài</a>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </section>
+            </div>
+
+            <aside class="posts-dashboard-side">
+                <section class="panel posts-panel posts-panel--side">
+                    <div class="panel__head posts-panel__head">
+                        <div>
+                            <p class="eyebrow">Coverage</p>
+                            <h3>Nhóm chức năng blog</h3>
+                        </div>
+                    </div>
+
+                    <div class="posts-feature-list">
+                        @foreach (var item in Model.FeatureItems)
+                        {
+                            <div class="posts-feature-list__item">
+                                <strong>@item.Title</strong>
+                                <span>@item.Description</span>
+                            </div>
+                        }
+                    </div>
+                </section>
+
+                <section class="panel posts-panel posts-panel--side">
+                    <div class="panel__head posts-panel__head">
+                        <div>
+                            <p class="eyebrow">Taxonomy note</p>
+                            <h3>Liên kết quản trị</h3>
+                        </div>
+                    </div>
+
+                    <div class="posts-side-note posts-side-note--compact">
+                        <p>Sử dụng nút lọc trên từng card để quay về danh sách bài viết với bộ lọc chuyên mục tương ứng, giúp điều hướng giữa taxonomy và content list nhanh hơn.</p>
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </section>
+</div>
+
+@section Styles {
+    <style>
+        .topbar--posts {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .posts-hero {
+            align-items: flex-start;
+        }
+
+        .posts-hero__content {
+            width: 100%;
+            display: grid;
+            gap: 14px;
+        }
+
+        .posts-hero__headline {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .posts-hero__chips {
+            flex-wrap: wrap;
+        }
+
+        .posts-hero__actions,
+        .posts-panel__actions,
+        .posts-topbar__buttons,
+        .posts-editor-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .posts-section-nav {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .posts-section-nav__item {
+            display: grid;
+            gap: 6px;
+            padding: 18px 20px;
+            text-decoration: none;
+            border-radius: 22px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+            color: #0f172a;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .posts-section-nav__item:hover {
+            transform: translateY(-1px);
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+
+        .posts-section-nav__item strong {
+            font-size: 1rem;
+        }
+
+        .posts-section-nav__item small,
+        .posts-section-nav__eyebrow,
+        .posts-panel__summary,
+        .posts-side-note p,
+        .posts-feature-list__item span,
+        .posts-resource-board__card p,
+        .posts-editor-hint,
+        .posts-resource-note,
+        .posts-empty-state {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .posts-section-nav__eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            font-size: 0.72rem;
+        }
+
+        .posts-section-nav__item.is-active {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(79, 70, 229, 0.1));
+            border-color: rgba(79, 70, 229, 0.22);
+            box-shadow: 0 18px 38px rgba(37, 99, 235, 0.12);
+        }
+
+        .posts-section-panel {
+            display: none;
+        }
+
+        .posts-section-panel.is-active {
+            display: block;
+        }
+
+        .posts-dashboard-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.85fr);
+            gap: 18px;
+        }
+
+        .posts-dashboard-main,
+        .posts-dashboard-side {
+            display: grid;
+            gap: 18px;
+        }
+
+        .posts-toolbar {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(180px, 0.55fr)) auto;
+            gap: 12px;
+            align-items: center;
+            margin-top: 18px;
+        }
+
+        .posts-search-box,
+        .posts-select,
+        .posts-input,
+        .posts-textarea {
+            width: 100%;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 16px;
+            background: #fff;
+            color: #0f172a;
+        }
+
+        .posts-select,
+        .posts-input {
+            min-height: 48px;
+            padding: 0.8rem 1rem;
+        }
+
+        .posts-textarea {
+            padding: 0.9rem 1rem;
+            resize: vertical;
+        }
+
+        .posts-textarea--sm {
+            min-height: 110px;
+        }
+
+        .posts-textarea--md {
+            min-height: 150px;
+        }
+
+        .posts-textarea--lg {
+            min-height: 260px;
+        }
+
+        .posts-textarea--editor {
+            min-height: 560px;
+            padding: 1.15rem 1.25rem;
+            font-size: 1rem;
+            line-height: 1.85;
+            font-family: inherit;
+            border-radius: 20px;
+            background: linear-gradient(180deg, #ffffff, #f8fafc);
+        }
+
+        .posts-rich-editor-shell {
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+            overflow: hidden;
+        }
+
+        .posts-rich-editor-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px 12px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.88);
+            background: rgba(248, 250, 252, 0.94);
+        }
+
+        .posts-rich-editor-toolbar strong {
+            color: #0f172a;
+            font-size: 0.98rem;
+        }
+
+        .posts-rich-editor-toolbar span {
+            color: #64748b;
+            font-size: 0.86rem;
+            font-weight: 600;
+        }
+
+        .posts-rich-editor-shell.is-ready [data-rich-editor-status] {
+            color: #15803d;
+        }
+
+        .posts-rich-editor-shell.has-error [data-rich-editor-status] {
+            color: #be123c;
+        }
+
+        .posts-editor-capabilities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 12px 18px 0;
+        }
+
+        .posts-editor-capabilities span {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            padding: 0.45rem 0.8rem;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.08);
+            color: #1d4ed8;
+            font-size: 0.83rem;
+            font-weight: 700;
+        }
+
+        .posts-rich-editor-shell .posts-textarea--editor {
+            min-height: 320px;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+        }
+
+        .posts-rich-editor-shell .tox-tinymce {
+            border: 0;
+            border-top: 1px solid rgba(226, 232, 240, 0.88);
+            border-radius: 0 0 22px 22px;
+        }
+
+        .posts-rich-editor-shell .tox .tox-editor-header {
+            box-shadow: none;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.88);
+        }
+
+        .posts-rich-editor-shell .tox .tox-toolbar,
+        .posts-rich-editor-shell .tox .tox-toolbar__primary,
+        .posts-rich-editor-shell .tox .tox-toolbar__overflow {
+            background: #ffffff;
+        }
+
+        .posts-rich-editor-shell .tox .tox-edit-area__iframe {
+            background: #ffffff;
+        }
+
+        .btn-primary-posts,
+        .btn-secondary-posts,
+        .btn-ghost-posts,
+        .posts-action-card a,
+        .posts-category-card a,
+        .posts-table__actions a,
+        .posts-table__actions button,
+        .posts-filter-row a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.82rem 1.1rem;
+            border: 0;
+            border-radius: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary-posts {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: #fff;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+        }
+
+        .btn-secondary-posts,
+        .posts-action-card a,
+        .posts-table__actions button,
+        .posts-table__actions a {
+            background: rgba(37, 99, 235, 0.08);
+            color: #1d4ed8;
+        }
+
+        .btn-ghost-posts,
+        .posts-category-card a,
+        .posts-table__actions .is-muted,
+        .posts-filter-row a {
+            background: rgba(148, 163, 184, 0.14);
+            color: #475569;
+        }
+
+        .posts-table__actions .is-danger {
+            background: rgba(244, 63, 94, 0.12);
+            color: #be123c;
+        }
+
+        .btn-primary-posts:hover,
+        .btn-secondary-posts:hover,
+        .btn-ghost-posts:hover,
+        .posts-action-card a:hover,
+        .posts-category-card a:hover,
+        .posts-table__actions a:hover,
+        .posts-table__actions button:hover,
+        .posts-filter-row a:hover {
+            transform: translateY(-1px);
+        }
+
+        .posts-flash {
+            margin-bottom: 18px;
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-weight: 600;
+        }
+
+        .posts-flash--success {
+            background: rgba(16, 185, 129, 0.12);
+            color: #047857;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .posts-flash--error {
+            background: rgba(244, 63, 94, 0.1);
+            color: #be123c;
+            border: 1px solid rgba(244, 63, 94, 0.18);
+        }
+
+        .posts-panel,
+        .posts-metric-card,
+        .posts-workflow-card,
+        .posts-action-card,
+        .posts-category-card,
+        .posts-resource-board__card,
+        .posts-feature-list__item,
+        .posts-side-note,
+        .posts-editor-card {
+            border-radius: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+        }
+
+        .posts-panel {
+            padding: 22px;
+        }
+
+        .posts-panel--table {
+            overflow: hidden;
+        }
+
+        .posts-panel__head {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .posts-panel__head--stacked {
+            flex-wrap: wrap;
+        }
+
+        .posts-panel__tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.08);
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+
+        .posts-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .posts-metric-card {
+            padding: 20px 18px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .posts-metric-card__label {
+            color: #64748b;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .posts-metric-card__value {
+            font-size: 2rem;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: #0f172a;
+        }
+
+        .posts-metric-card__value span {
+            font-size: 1rem;
+            color: #64748b;
+            margin-left: 4px;
+        }
+
+        .posts-metric-card__meta {
+            color: #64748b;
+        }
+
+        .posts-metric-card--blue {
+            border-color: rgba(37, 99, 235, 0.16);
+            background: linear-gradient(180deg, rgba(239, 246, 255, 0.92), #ffffff);
+        }
+
+        .posts-metric-card--green {
+            border-color: rgba(16, 185, 129, 0.18);
+            background: linear-gradient(180deg, rgba(236, 253, 245, 0.92), #ffffff);
+        }
+
+        .posts-metric-card--amber {
+            border-color: rgba(245, 158, 11, 0.18);
+            background: linear-gradient(180deg, rgba(255, 251, 235, 0.95), #ffffff);
+        }
+
+        .posts-metric-card--rose {
+            border-color: rgba(244, 63, 94, 0.18);
+            background: linear-gradient(180deg, rgba(255, 241, 242, 0.96), #ffffff);
+        }
+
+        .posts-metric-card--violet {
+            border-color: rgba(139, 92, 246, 0.18);
+            background: linear-gradient(180deg, rgba(245, 243, 255, 0.96), #ffffff);
+        }
+
+        .posts-metric-card--slate {
+            border-color: rgba(71, 85, 105, 0.16);
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), #ffffff);
+        }
+
+        .posts-workflow-grid,
+        .posts-action-grid,
+        .posts-category-grid,
+        .posts-resource-board,
+        .posts-editor-grid,
+        .posts-checkbox-grid,
+        .posts-feature-list,
+        .posts-editor-form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .posts-workflow-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            margin-top: 18px;
+        }
+
+        .posts-action-grid,
+        .posts-category-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            margin-top: 18px;
+        }
+
+        .posts-resource-board {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            margin-top: 18px;
+        }
+
+        .posts-workflow-card,
+        .posts-action-card,
+        .posts-category-card,
+        .posts-resource-board__card,
+        .posts-feature-list__item,
+        .posts-side-note,
+        .posts-editor-card {
+            padding: 18px;
+        }
+
+        .posts-workflow-card__top,
+        .posts-category-card__head,
+        .posts-category-card__footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .posts-workflow-card__top strong {
+            font-size: 1.6rem;
+        }
+
+        .posts-workflow-card--draft {
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), #ffffff);
+        }
+
+        .posts-workflow-card--review {
+            background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), #ffffff);
+        }
+
+        .posts-workflow-card--published {
+            background: linear-gradient(180deg, rgba(236, 253, 245, 0.98), #ffffff);
+        }
+
+        .posts-workflow-card--warning {
+            background: linear-gradient(180deg, rgba(254, 242, 242, 0.98), #ffffff);
+        }
+
+        .posts-category-card--blue {
+            background: linear-gradient(180deg, rgba(239, 246, 255, 0.98), #ffffff);
+        }
+
+        .posts-category-card--green {
+            background: linear-gradient(180deg, rgba(236, 253, 245, 0.98), #ffffff);
+        }
+
+        .posts-category-card--violet {
+            background: linear-gradient(180deg, rgba(245, 243, 255, 0.98), #ffffff);
+        }
+
+        .posts-category-card--orange {
+            background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), #ffffff);
+        }
+
+        .posts-category-card--rose {
+            background: linear-gradient(180deg, rgba(255, 241, 242, 0.98), #ffffff);
+        }
+
+        .posts-checklist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 12px;
+        }
+
+        .posts-checklist li {
+            display: grid;
+            grid-template-columns: 28px minmax(0, 1fr);
+            gap: 12px;
+            align-items: start;
+            padding: 14px 0;
+            border-bottom: 1px dashed rgba(148, 163, 184, 0.24);
+        }
+
+        .posts-checklist li:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .posts-checklist__icon {
+            width: 28px;
+            height: 28px;
+            display: inline-grid;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.12);
+            color: #059669;
+            font-weight: 800;
+        }
+
+        .posts-side-note {
+            margin-top: 18px;
+            background: linear-gradient(180deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.98));
+        }
+
+        .posts-side-note strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .posts-editor-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .posts-editor-card--span-2 {
+            grid-column: 1 / -1;
+        }
+
+        .posts-form-grid {
+            display: grid;
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .posts-form-grid--2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .posts-category-create-panel {
+            margin-bottom: 24px;
+        }
+
+        .posts-category-form {
+            margin-top: 14px;
+        }
+
+        .posts-editor-actions--compact {
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .posts-field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .posts-field label {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .posts-field--span-2 {
+            grid-column: 1 / -1;
+        }
+
+        .posts-checkbox-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            margin-top: 12px;
+        }
+
+        .posts-checkbox-grid--products {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            max-height: min(58vh, 540px);
+            margin-top: 0;
+            overflow: auto;
+            padding: 6px;
+            align-content: start;
+            overscroll-behavior: contain;
+            scroll-behavior: smooth;
+            scrollbar-gutter: stable;
+        }
+
+        .posts-checkbox-grid--products::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .posts-checkbox-grid--products::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.55);
+            border: 2px solid rgba(255, 255, 255, 0.92);
+        }
+
+        .posts-related-products-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .posts-related-products-head--compact {
+            align-items: center;
+        }
+
+        .posts-related-products-label {
+            display: grid;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .posts-related-products-label h4 {
+            margin: 0;
+        }
+
+        .posts-related-products-description {
+            margin: 0;
+        }
+
+        .posts-related-products-trigger {
+            white-space: nowrap;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.16);
+        }
+
+        .posts-related-products-summary {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            padding: 0;
+            border: 0;
+            background: none;
+        }
+
+        .posts-related-products-count {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            padding: 0.4rem 0.75rem;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.05);
+            color: #0f172a;
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        .posts-related-products-summary__chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .posts-related-products-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 34px;
+            max-width: 100%;
+            padding: 0.45rem 0.75rem;
+            border-radius: 999px;
+            border: 1px solid rgba(37, 99, 235, 0.16);
+            background: rgba(37, 99, 235, 0.08);
+            color: #1d4ed8;
+            font-size: 0.86rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        button.posts-related-products-chip {
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button.posts-related-products-chip:hover {
+            border-color: rgba(37, 99, 235, 0.28);
+            background: rgba(37, 99, 235, 0.12);
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .posts-related-products-chip__label {
+            max-width: 220px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .posts-related-products-chip__remove {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: rgba(29, 78, 216, 0.14);
+            color: inherit;
+            font-size: 0.82rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .posts-related-products-chip--empty {
+            min-height: auto;
+            padding: 0;
+            border: 0;
+            background: none;
+            color: #64748b;
+            font-size: 0.92rem;
+            font-weight: 500;
+        }
+
+        body.posts-modal-open {
+            overflow: hidden;
+        }
+
+        .posts-modal[hidden] {
+            display: none !important;
+        }
+
+        .posts-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px;
+            background: rgba(15, 23, 42, 0.62);
+            backdrop-filter: blur(6px);
+        }
+
+        .posts-modal__dialog {
+            position: relative;
+            z-index: 1;
+            width: min(1120px, 100%);
+            max-height: calc(100vh - 56px);
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr) auto;
+            overflow: hidden;
+            border-radius: 28px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+            box-shadow: 0 30px 90px rgba(15, 23, 42, 0.30);
+        }
+
+        .posts-modal__header,
+        .posts-modal__footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 22px 24px;
+        }
+
+        .posts-modal__header {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 0.98));
+        }
+
+        .posts-modal__header-copy {
+            display: grid;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .posts-modal__eyebrow {
+            display: inline-flex;
+            width: fit-content;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.38rem 0.72rem;
+            background: rgba(37, 99, 235, 0.08);
+            color: #1d4ed8;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .posts-modal__header h5 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #0f172a;
+        }
+
+        .posts-modal__header p {
+            margin: 0;
+            color: #64748b;
+            max-width: 720px;
+            line-height: 1.6;
+        }
+
+        .posts-modal__header-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .posts-modal__selection-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(37, 99, 235, 0.1);
+            color: #1d4ed8;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .posts-modal__body {
+            min-height: 0;
+            padding: 18px 24px 22px;
+            overflow: auto;
+            background: linear-gradient(180deg, rgba(248, 250, 252, 0.82), rgba(255, 255, 255, 0.98) 28%);
+        }
+
+        .posts-modal__toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+            padding: 0 6px;
+            color: #64748b;
+        }
+
+        .posts-modal__toolbar strong {
+            color: #0f172a;
+            font-size: 0.98rem;
+        }
+
+        .posts-modal__footer {
+            border-top: 1px solid rgba(148, 163, 184, 0.18);
+            background: rgba(248, 250, 252, 0.95);
+            align-items: center;
+        }
+
+        .posts-modal__actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .posts-modal__actions .btn-primary-posts {
+            min-width: 148px;
+        }
+
+        .posts-modal__actions .btn-ghost-posts {
+            background: rgba(148, 163, 184, 0.12);
+        }
+
+        .posts-checkbox-card--product {
+            position: relative;
+            display: grid;
+            grid-template-columns: 20px minmax(0, 1fr) auto;
+            gap: 14px;
+            align-items: flex-start;
+            min-height: 116px;
+            padding: 16px 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+            cursor: pointer;
+            user-select: none;
+            transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, transform 0.22s ease;
+        }
+
+        .posts-checkbox-card--product:hover {
+            border-color: rgba(37, 99, 235, 0.24);
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .posts-checkbox-card--product:focus-within {
+            border-color: rgba(37, 99, 235, 0.42);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), 0 16px 32px rgba(15, 23, 42, 0.08);
+        }
+
+        .posts-checkbox-card--product input {
+            width: 18px;
+            height: 18px;
+            margin: 4px 0 0;
+            accent-color: #2563eb;
+            cursor: pointer;
+        }
+
+        .posts-checkbox-card--product.is-selected {
+            border-color: rgba(37, 99, 235, 0.42);
+            background: linear-gradient(180deg, rgba(239, 246, 255, 0.98), rgba(255, 255, 255, 0.98));
+            box-shadow: 0 18px 40px rgba(37, 99, 235, 0.14);
+            transform: translateY(-2px);
+        }
+
+        .posts-checkbox-card__content {
+            display: grid;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .posts-checkbox-card__content strong {
+            color: #0f172a;
+            font-size: 0.98rem;
+            line-height: 1.45;
+            overflow-wrap: anywhere;
+        }
+
+        .posts-checkbox-card__meta-label {
+            font-size: 0.73rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+        .posts-checkbox-card__meta-value {
+            color: #64748b;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            overflow-wrap: anywhere;
+        }
+
+        .posts-checkbox-card__state {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 34px;
+            padding: 0.42rem 0.72rem;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.12);
+            color: #64748b;
+            font-size: 0.78rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .posts-checkbox-card--product.is-selected .posts-checkbox-card__state {
+            background: rgba(37, 99, 235, 0.14);
+            color: #1d4ed8;
+        }
+
+        .posts-checkbox-card {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 14px;
+            border-radius: 18px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .posts-checkbox-card input {
+            margin-top: 3px;
+        }
+
+        .posts-checkbox-card span {
+            display: grid;
+            gap: 4px;
+        }
+
+        .posts-checkbox-card small,
+        .posts-gallery-preview__item small {
+            color: #64748b;
+        }
+
+        .posts-cover-upload {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        .posts-cover-upload__controls {
+            display: grid;
+            gap: 12px;
+        }
+
+        .posts-cover-upload--unified {
+            align-items: start;
+        }
+
+        .posts-input--file {
+            padding: 0.7rem 0.85rem;
+        }
+
+        .posts-input--file::file-selector-button {
+            margin-right: 12px;
+            border: 0;
+            border-radius: 10px;
+            padding: 0.7rem 0.95rem;
+            background: rgba(37, 99, 235, 0.1);
+            color: #1d4ed8;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .posts-cover-preview {
+            display: grid;
+            gap: 12px;
+            min-height: 220px;
+            padding: 16px;
+            border-radius: 20px;
+            border: 1px dashed rgba(148, 163, 184, 0.32);
+            background: rgba(248, 250, 252, 0.88);
+            align-content: start;
+        }
+
+        .posts-cover-preview__image {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            border-radius: 16px;
+            background: #e2e8f0;
+        }
+
+        .posts-cover-preview__placeholder {
+            display: grid;
+            gap: 4px;
+            color: #64748b;
+        }
+
+        .posts-cover-preview__meta {
+            display: grid;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #475569;
+            word-break: break-word;
+        }
+
+        .posts-cover-files-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .posts-cover-files-list__item {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: 10px;
+            align-items: start;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .posts-cover-files-list__badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 72px;
+            padding: 0.42rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            background: rgba(148, 163, 184, 0.14);
+            color: #475569;
+        }
+
+        .posts-cover-files-list__badge.is-cover {
+            background: rgba(37, 99, 235, 0.12);
+            color: #1d4ed8;
+        }
+
+        .posts-cover-files-list__badge.is-gallery {
+            background: rgba(16, 185, 129, 0.12);
+            color: #047857;
+        }
+
+        .posts-cover-files-list__content {
+            display: grid;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .posts-cover-files-list__content strong,
+        .posts-cover-files-list__content small {
+            overflow-wrap: anywhere;
+        }
+
+        .posts-cover-files-list__content small {
+            color: #64748b;
+        }
+
+        .posts-cover-preview.is-empty .posts-cover-preview__placeholder {
+            display: grid;
+        }
+
+        .posts-cover-preview:not(.is-empty) .posts-cover-preview__placeholder {
+            display: none;
+        }
+
+        .posts-cover-preview__clear {
+            width: fit-content;
+        }
+
+        .posts-media-manual {
+            display: grid;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 18px;
+            border: 1px dashed rgba(148, 163, 184, 0.26);
+            background: rgba(248, 250, 252, 0.9);
+        }
+
+        .posts-media-manual.is-hidden {
+            display: none;
+        }
+
+        .posts-gallery-legacy-input {
+            display: none;
+        }
+
+        .posts-gallery-builder {
+            margin-top: 14px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .posts-gallery-dropzone {
+            display: grid;
+            gap: 14px;
+            padding: 18px;
+            border-radius: 22px;
+            border: 1px dashed rgba(37, 99, 235, 0.28);
+            background: linear-gradient(180deg, rgba(239, 246, 255, 0.72), rgba(248, 250, 252, 0.92));
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .posts-gallery-dropzone.is-dragover {
+            border-color: rgba(37, 99, 235, 0.55);
+            box-shadow: 0 16px 36px rgba(37, 99, 235, 0.12);
+            background: linear-gradient(180deg, rgba(219, 234, 254, 0.88), rgba(239, 246, 255, 0.96));
+        }
+
+        .posts-gallery-dropzone__content {
+            display: grid;
+            gap: 8px;
+            color: #1e293b;
+        }
+
+        .posts-gallery-dropzone__content strong {
+            font-size: 1rem;
+        }
+
+        .posts-gallery-dropzone__chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .posts-gallery-dropzone__chips span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.42rem 0.74rem;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.88);
+            color: #1d4ed8;
+            border: 1px solid rgba(37, 99, 235, 0.12);
+        }
+
+        .posts-gallery-file-input {
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .posts-gallery-toolbar {
+            display: grid;
+            gap: 6px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(248, 250, 252, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .posts-gallery-toolbar strong {
+            color: #0f172a;
+        }
+
+        .posts-gallery-toolbar span {
+            color: #64748b;
+        }
+
+        .posts-gallery-canvas {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .posts-gallery-card,
+        .posts-gallery-empty {
+            border-radius: 22px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+        }
+
+        .posts-gallery-card {
+            display: grid;
+            grid-template-columns: minmax(180px, 0.82fr) minmax(0, 1fr);
+            gap: 16px;
+            padding: 14px;
+            align-items: stretch;
+        }
+
+        .posts-gallery-card__preview,
+        .posts-gallery-card__body,
+        .posts-gallery-card__meta,
+        .posts-gallery-card__field {
+            display: grid;
+            gap: 10px;
+        }
+
+        .posts-gallery-card__preview {
+            position: relative;
+            align-content: start;
+        }
+
+        .posts-gallery-card__order,
+        .posts-gallery-card__badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            padding: 0.42rem 0.72rem;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 700;
+        }
+
+        .posts-gallery-card__order {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            background: rgba(15, 23, 42, 0.76);
+            color: #fff;
+        }
+
+        .posts-gallery-card__badge {
+            background: rgba(37, 99, 235, 0.08);
+            color: #1d4ed8;
+        }
+
+        .posts-gallery-card__image {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-radius: 18px;
+            background: #e2e8f0;
+        }
+
+        .posts-gallery-card__meta strong,
+        .posts-gallery-card__meta span,
+        .posts-gallery-card__field span {
+            overflow-wrap: anywhere;
+        }
+
+        .posts-gallery-card__meta strong {
+            color: #0f172a;
+        }
+
+        .posts-gallery-card__meta span,
+        .posts-gallery-empty span {
+            color: #64748b;
+        }
+
+        .posts-gallery-card__field span {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .posts-gallery-card__remove {
+            width: fit-content;
+        }
+
+        .posts-gallery-empty {
+            grid-column: 1 / -1;
+            padding: 22px 20px;
+            display: grid;
+            gap: 6px;
+            text-align: center;
+        }
+
+        @@media (max-width: 900px) {
+            .posts-gallery-canvas,
+            .posts-gallery-card {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .posts-validation-summary,
+        .field-validation-error {
+            color: #be123c;
+            font-size: 0.92rem;
+        }
+
+        .posts-validation-summary ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .posts-filter-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .posts-filter-row .is-active {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18);
+        }
+
+        .posts-table-shell {
+            margin-top: 14px;
+            overflow-x: auto;
+        }
+
+        .posts-table {
+            min-width: 1320px;
+        }
+
+        .posts-table thead th {
+            background: rgba(241, 245, 249, 0.8);
+        }
+
+        .posts-table tbody td {
+            vertical-align: top;
+        }
+
+        .posts-table__main {
+            display: grid;
+            gap: 10px;
+            min-width: 320px;
+        }
+
+        .posts-table__title-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .posts-table__id,
+        .posts-table__slug,
+        .posts-table__category span,
+        .posts-table__schedule span,
+        .posts-inline-meta span {
+            color: #64748b;
+        }
+
+        .posts-inline-meta {
+            display: flex;
+            gap: 10px 16px;
+            flex-wrap: wrap;
+            font-size: 0.84rem;
+        }
+
+        .posts-table__category,
+        .posts-table__schedule,
+        .posts-table__actions {
+            display: grid;
+            gap: 8px;
+        }
+
+        .posts-table__actions {
+            min-width: 190px;
+        }
+
+        .posts-action-inline-form {
+            margin: 0;
+        }
+
+        .posts-resource-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .posts-pill,
+        .posts-status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.48rem 0.72rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .posts-pill {
+            background: rgba(148, 163, 184, 0.14);
+            color: #475569;
+        }
+
+        .posts-pill--ready {
+            background: rgba(16, 185, 129, 0.14);
+            color: #047857;
+        }
+
+        .posts-pill--missing {
+            background: rgba(244, 63, 94, 0.12);
+            color: #be123c;
+        }
+
+        .posts-status-badge--published {
+            background: rgba(16, 185, 129, 0.14);
+            color: #047857;
+        }
+
+        .posts-status-badge--review {
+            background: rgba(245, 158, 11, 0.14);
+            color: #b45309;
+        }
+
+        .posts-status-badge--draft {
+            background: rgba(71, 85, 105, 0.14);
+            color: #334155;
+        }
+
+        .posts-status-badge--hidden {
+            background: rgba(148, 163, 184, 0.2);
+            color: #475569;
+        }
+
+
+        .posts-empty-state {
+            display: grid;
+            gap: 6px;
+            padding: 18px;
+        }
+
+        .posts-pagination {
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .posts-pagination__summary {
+            display: flex;
+            gap: 10px 14px;
+            align-items: center;
+            flex-wrap: wrap;
+            color: #64748b;
+        }
+
+        .posts-pagination__summary strong {
+            color: #0f172a;
+        }
+
+        .posts-pagination__nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .posts-pagination__link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            padding: 0.72rem 0.95rem;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: #fff;
+            color: #334155;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .posts-pagination__link:hover {
+            transform: translateY(-1px);
+            border-color: rgba(37, 99, 235, 0.22);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .posts-pagination__link.is-current {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+        }
+
+        .posts-pagination__link.is-disabled {
+            pointer-events: none;
+            opacity: 0.45;
+            box-shadow: none;
+        }
+
+        @@media (max-width: 1400px) {
+            .posts-section-nav {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .posts-metrics-grid,
+            .posts-workflow-grid,
+            .posts-resource-board {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @@media (max-width: 1200px) {
+            .posts-dashboard-grid,
+            .posts-toolbar,
+            .posts-editor-grid,
+            .posts-form-grid--2,
+            .posts-checkbox-grid,
+            .posts-cover-upload {
+                grid-template-columns: 1fr;
+            }
+
+            .posts-checkbox-grid--products {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .posts-action-grid,
+            .posts-category-grid,
+            .posts-resource-board {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @@media (max-width: 900px) {
+            .posts-hero__headline {
+                flex-direction: column;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .posts-section-nav,
+            .posts-metrics-grid,
+            .posts-workflow-grid,
+            .posts-action-grid,
+            .posts-category-grid,
+            .posts-resource-board {
+                grid-template-columns: 1fr;
+            }
+
+            .posts-hero__actions,
+            .posts-panel__actions,
+            .posts-topbar__buttons,
+            .posts-editor-actions {
+                width: 100%;
+            }
+
+            .posts-hero__actions > *,
+            .posts-panel__actions > *,
+            .posts-topbar__buttons > *,
+            .posts-editor-actions > *,
+            .posts-filter-row a,
+            .posts-pagination__link {
+                width: 100%;
+            }
+
+            .posts-pagination__summary,
+            .posts-pagination__nav {
+                width: 100%;
+            }
+
+            .posts-modal {
+                padding: 12px;
+            }
+
+            .posts-checkbox-grid--products {
+                grid-template-columns: 1fr;
+            }
+
+            .posts-modal__header,
+            .posts-modal__body,
+            .posts-modal__footer {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .posts-modal__header,
+            .posts-modal__toolbar,
+            .posts-modal__footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .posts-modal__header-actions,
+            .posts-modal__actions,
+            .posts-related-products-trigger {
+                width: 100%;
+            }
+
+            .posts-modal__header-actions > *,
+            .posts-modal__actions > * {
+                width: 100%;
+            }
+
+            .posts-related-products-summary {
+                align-items: flex-start;
+            }
+
+            .posts-related-products-chip__label {
+                max-width: 100%;
+            }
+
+            .posts-checkbox-card--product {
+                grid-template-columns: 20px minmax(0, 1fr);
+            }
+
+            .posts-checkbox-card__state {
+                grid-column: 2;
+                justify-self: start;
+            }
+        }
+    </style>
+}
+
+<script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var shell = document.querySelector('[data-posts-sections]');
+        if (!shell) {
+            return;
+        }
+
+        var navItems = Array.prototype.slice.call(document.querySelectorAll('[data-posts-nav] .js-posts-section-trigger'));
+        var panels = Array.prototype.slice.call(shell.querySelectorAll('[data-section-panel]'));
+        var allowedSections = ['posts', 'overview', 'editor', 'categories'];
+        var coverFileInput = document.querySelector('[data-media-file-input]');
+        var coverUrlInput = document.querySelector('[data-cover-url-input]');
+        var coverPreview = document.querySelector('[data-cover-preview]');
+        var coverPreviewImage = document.querySelector('[data-cover-preview-image]');
+        var coverPreviewLabel = document.querySelector('[data-cover-preview-label]');
+        var coverFilesList = document.querySelector('[data-cover-files-list]');
+        var clearUploadButton = document.querySelector('[data-clear-upload]');
+        var manualMediaPanel = document.querySelector('[data-manual-media-panel]');
+        var manualGalleryInput = document.querySelector('[data-manual-gallery-input]');
+        var galleryInput = document.querySelector('[data-gallery-input]');
+        var galleryList = document.querySelector('[data-gallery-list]');
+        var galleryToolbarNote = document.querySelector('[data-gallery-toolbar-note]');
+        var mediaDropzone = document.querySelector('[data-media-dropzone]');
+        var contentTextarea = document.querySelector('[data-rich-editor]');
+        var richEditorShell = document.querySelector('[data-rich-editor-shell]');
+        var contentEditorStatus = document.querySelector('[data-rich-editor-status]');
+        var editorForm = shell.querySelector('.posts-editor-form');
+        var categoryCheckboxes = Array.prototype.slice.call(document.querySelectorAll('input[name="Editor.Input.SelectedCategoryIds"]'));
+        var primaryCategorySelect = document.querySelector('[data-primary-category-select]');
+        var titleInput = editorForm ? editorForm.querySelector('[data-title-input]') : null;
+        var slugInput = editorForm ? editorForm.querySelector('[data-slug-input]') : null;
+        var relatedProductsModal = document.querySelector('[data-related-products-modal]');
+        var relatedProductsDialog = relatedProductsModal ? relatedProductsModal.querySelector('.posts-modal__dialog') : null;
+        var relatedProductsOpenButton = document.querySelector('[data-related-products-open]');
+        var relatedProductsCloseButtons = Array.prototype.slice.call(document.querySelectorAll('[data-related-products-close]'));
+        var relatedProductsApplyButton = document.querySelector('[data-related-products-apply]');
+        var relatedProductCheckboxes = Array.prototype.slice.call(document.querySelectorAll('[data-related-product-checkbox]'));
+        var relatedProductsCount = document.querySelector('[data-related-products-count]');
+        var relatedProductsModalCount = document.querySelector('[data-related-products-modal-count]');
+        var relatedProductsDescription = document.querySelector('[data-related-products-description]');
+        var relatedProductsChips = document.querySelector('[data-related-products-chips]');
+        var uploadEntries = [];
+        var persistedGalleryItems = [];
+        var itemSeed = 0;
+        var hasManualSlugOverride = false;
+
+        function normalizeSectionName(value) {
+            if (!value) {
+                return null;
+            }
+
+            var normalized = value.replace('#', '').replace('-panel', '').trim().toLowerCase();
+            return allowedSections.indexOf(normalized) >= 0 ? normalized : null;
+        }
+
+        function activateSection(name, shouldUpdateHash) {
+            var target = normalizeSectionName(name) || 'posts';
+
+            panels.forEach(function (panel) {
+                var isActive = panel.getAttribute('data-section-panel') === target;
+                panel.classList.toggle('is-active', isActive);
+                panel.hidden = !isActive;
+            });
+
+            navItems.forEach(function (item) {
+                var isActive = item.getAttribute('data-section-target') === target;
+                item.classList.toggle('is-active', isActive);
+                item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+
+            if (shouldUpdateHash) {
+                var newHash = '#' + target + '-panel';
+                if (window.location.hash !== newHash) {
+                    history.replaceState(null, '', newHash);
+                }
+            }
+        }
+
+        function createItemId(prefix) {
+            itemSeed += 1;
+            return prefix + '-' + itemSeed;
+        }
+
+        function showContentEditorStatus(message, tone) {
+            if (!contentEditorStatus || !richEditorShell) {
+                return;
+            }
+
+            contentEditorStatus.textContent = message;
+            richEditorShell.classList.remove('is-loading', 'is-ready', 'has-error');
+
+            if (tone === 'ready') {
+                richEditorShell.classList.add('is-ready');
+            }
+            else if (tone === 'error') {
+                richEditorShell.classList.add('has-error');
+            }
+        }
+
+        function readFileAsDataUrl(file) {
+            return new Promise(function (resolve, reject) {
+                var reader = new FileReader();
+
+                reader.onload = function () {
+                    resolve(reader.result);
+                };
+
+                reader.onerror = function () {
+                    reject(new Error('Không thể đọc file ảnh.'));
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function pickInlineImage(callback) {
+            var picker = document.createElement('input');
+            picker.type = 'file';
+            picker.accept = 'image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp';
+
+            picker.addEventListener('change', function () {
+                var file = picker.files && picker.files[0] ? picker.files[0] : null;
+                if (!file) {
+                    return;
+                }
+
+                readFileAsDataUrl(file)
+                    .then(function (dataUrl) {
+                        callback(dataUrl, file);
+                    })
+                    .catch(function () {
+                        showContentEditorStatus('Không thể chèn ảnh vừa chọn. Vui lòng thử lại.', 'error');
+                    });
+            });
+
+            picker.click();
+        }
+
+        function initializeRichEditor() {
+            if (!contentTextarea) {
+                return;
+            }
+
+            if (typeof tinymce === 'undefined') {
+                showContentEditorStatus('Không tải được trình soạn thảo trực quan. Hệ thống đang dùng ô nhập nội dung mặc định.', 'error');
+                return;
+            }
+
+            tinymce.init({
+                target: contentTextarea,
+                promotion: false,
+                branding: false,
+                menubar: 'file edit view insert format tools table help',
+                plugins: 'autolink autoresize charmap code fullscreen image link lists table wordcount',
+                toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat code fullscreen',
+                toolbar_sticky: true,
+                min_height: 560,
+                autoresize_bottom_margin: 24,
+                block_formats: 'Đoạn văn=p; Tiêu đề 1=h1; Tiêu đề 2=h2; Tiêu đề 3=h3',
+                contextmenu: 'undo redo | bold italic | link image table',
+                paste_data_images: true,
+                automatic_uploads: true,
+                image_title: true,
+                image_caption: true,
+                images_file_types: 'jpg,jpeg,png,webp',
+                file_picker_types: 'image',
+                file_picker_callback: function (callback, value, meta) {
+                    if (!meta || meta.filetype !== 'image') {
+                        return;
+                    }
+
+                    pickInlineImage(function (dataUrl, file) {
+                        callback(dataUrl, { alt: file.name });
+                        showContentEditorStatus('Ảnh đã được chèn trực tiếp vào nội dung bài viết.', 'ready');
+                    });
+                },
+                images_upload_handler: function (blobInfo, progress) {
+                    return new Promise(function (resolve, reject) {
+                        if (typeof progress === 'function') {
+                            progress(100);
+                        }
+
+                        readFileAsDataUrl(blobInfo.blob())
+                            .then(function (dataUrl) {
+                                showContentEditorStatus('Ảnh đã được nhúng trực tiếp vào nội dung bài viết.', 'ready');
+                                resolve(dataUrl);
+                            })
+                            .catch(function () {
+                                reject('Không thể xử lý ảnh để chèn vào nội dung.');
+                            });
+                    });
+                },
+                content_style: 'body { font-family: "Plus Jakarta Sans", Arial, sans-serif; font-size: 16px; line-height: 1.8; color: #1f2937; padding: 18px 22px; } img { max-width: 100%; height: auto; } figure { margin: 1.6rem 0; }',
+                setup: function (editor) {
+                    editor.on('init', function () {
+                        showContentEditorStatus('Trình soạn thảo đã sẵn sàng. Bạn có thể viết bài như Word.', 'ready');
+                    });
+
+                    editor.on('change input undo redo SetContent', function () {
+                        editor.save();
+                    });
+
+                    editor.on('drop paste', function () {
+                        showContentEditorStatus('Bạn có thể dán hoặc kéo thả ảnh trực tiếp vào vùng nội dung.', 'ready');
+                    });
+                }
+            });
+        }
+
+        function buildSlug(value) {
+            return (value || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd')
+                .replace(/[^a-z0-9\s-]/g, ' ')
+                .replace(/[\s_-]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        function refreshSlugOverrideState() {
+            if (!slugInput) {
+                return;
+            }
+
+            var generatedFromTitle = buildSlug(titleInput ? titleInput.value : '');
+            var normalizedSlug = buildSlug(slugInput.value);
+            slugInput.value = normalizedSlug;
+            hasManualSlugOverride = normalizedSlug.length > 0 && normalizedSlug !== generatedFromTitle;
+        }
+
+        function syncSlugFromTitle() {
+            if (!titleInput || !slugInput || hasManualSlugOverride) {
+                return;
+            }
+
+            slugInput.value = buildSlug(titleInput.value);
+        }
+
+        function syncPrimaryCategorySelect() {
+            if (!primaryCategorySelect) {
+                return;
+            }
+
+            var selectedCategoryValues = categoryCheckboxes
+                .filter(function (checkbox) {
+                    return checkbox.checked;
+                })
+                .map(function (checkbox) {
+                    return checkbox.value;
+                });
+
+            Array.prototype.slice.call(primaryCategorySelect.options).forEach(function (option) {
+                if (!option.value) {
+                    option.disabled = false;
+                    return;
+                }
+
+                option.disabled = selectedCategoryValues.indexOf(option.value) === -1;
+            });
+
+            if (!primaryCategorySelect.value || selectedCategoryValues.indexOf(primaryCategorySelect.value) === -1) {
+                primaryCategorySelect.value = selectedCategoryValues.length > 0 ? selectedCategoryValues[0] : '';
+            }
+        }
+
+        function syncRelatedProductCardStates() {
+            relatedProductCheckboxes.forEach(function (checkbox) {
+                var card = checkbox.closest('.posts-checkbox-card');
+                if (!card) {
+                    return;
+                }
+
+                var state = card.querySelector('[data-related-product-state]');
+                card.classList.toggle('is-selected', checkbox.checked);
+
+                if (state) {
+                    state.textContent = checkbox.checked ? 'Đã chọn' : 'Nhấn để chọn';
+                }
+            });
+        }
+
+        function updateRelatedProductsSummary() {
+            if (!relatedProductsCount || !relatedProductsDescription || !relatedProductsChips) {
+                return;
+            }
+
+            var selectedProducts = relatedProductCheckboxes
+                .filter(function (checkbox) {
+                    return checkbox.checked;
+                })
+                .map(function (checkbox) {
+                    return {
+                        id: checkbox.value,
+                        label: checkbox.getAttribute('data-product-label') || checkbox.value
+                    };
+                });
+
+            if (relatedProductsModalCount) {
+                relatedProductsModalCount.textContent = selectedProducts.length > 0
+                    ? selectedProducts.length + ' sản phẩm đã chọn'
+                    : 'Chưa chọn sản phẩm';
+            }
+
+            relatedProductsChips.innerHTML = '';
+
+            if (selectedProducts.length === 0) {
+                relatedProductsCount.hidden = true;
+                relatedProductsCount.textContent = '0 sản phẩm đã chọn';
+                relatedProductsDescription.textContent = 'Chưa chọn sản phẩm';
+
+                var emptyChip = document.createElement('span');
+                emptyChip.className = 'posts-related-products-chip posts-related-products-chip--empty';
+                emptyChip.textContent = 'Chưa chọn sản phẩm';
+                relatedProductsChips.appendChild(emptyChip);
+                syncRelatedProductCardStates();
+                return;
+            }
+
+            relatedProductsCount.hidden = false;
+            relatedProductsCount.textContent = selectedProducts.length + ' sản phẩm đã chọn';
+            relatedProductsDescription.textContent = 'Có thể bấm vào tag để bỏ nhanh sản phẩm hoặc mở danh sách để chọn thêm.';
+
+            selectedProducts.forEach(function (product) {
+                var chip = document.createElement('button');
+                var label = document.createElement('span');
+                var removeIcon = document.createElement('span');
+
+                chip.type = 'button';
+                chip.className = 'posts-related-products-chip';
+                chip.setAttribute('data-related-products-remove', product.id);
+                chip.setAttribute('aria-label', 'Bỏ sản phẩm ' + product.label);
+
+                label.className = 'posts-related-products-chip__label';
+                label.textContent = product.label;
+
+                removeIcon.className = 'posts-related-products-chip__remove';
+                removeIcon.setAttribute('aria-hidden', 'true');
+                removeIcon.textContent = '×';
+
+                chip.appendChild(label);
+                chip.appendChild(removeIcon);
+                relatedProductsChips.appendChild(chip);
+            });
+
+            syncRelatedProductCardStates();
+        }
+
+        function toggleRelatedProductsModal(shouldOpen) {
+            if (!relatedProductsModal) {
+                return;
+            }
+
+            relatedProductsModal.hidden = !shouldOpen;
+            relatedProductsModal.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+            document.body.classList.toggle('posts-modal-open', shouldOpen);
+
+            if (relatedProductsOpenButton) {
+                relatedProductsOpenButton.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+            }
+
+            if (shouldOpen) {
+                var focusTarget = relatedProductCheckboxes.filter(function (checkbox) {
+                    return checkbox.checked;
+                })[0] || relatedProductCheckboxes[0] || relatedProductsDialog || relatedProductsModal;
+
+                window.setTimeout(function () {
+                    if (focusTarget && typeof focusTarget.focus === 'function') {
+                        focusTarget.focus();
+                    }
+                }, 0);
+
+                return;
+            }
+
+            if (relatedProductsOpenButton) {
+                relatedProductsOpenButton.focus();
+            }
+        }
+
+        function parseLegacyGalleryInput(rawValue) {
+            return (rawValue || '')
+                .split(/\r?\n/)
+                .map(function (line) {
+                    return line.trim();
+                })
+                .filter(function (line) {
+                    return line.length > 0;
+                })
+                .map(function (line) {
+                    var separatorIndex = line.indexOf('|');
+                    var imageUrl = separatorIndex >= 0 ? line.slice(0, separatorIndex).trim() : line;
+                    var caption = separatorIndex >= 0 ? line.slice(separatorIndex + 1).trim() : '';
+
+                    if (!imageUrl) {
+                        return null;
+                    }
+
+                    return {
+                        id: createItemId('existing'),
+                        kind: 'existing',
+                        url: imageUrl,
+                        caption: caption
+                    };
+                })
+                .filter(function (item) {
+                    return !!item;
+                });
+        }
+
+        function serializeLegacyGalleryItems(items) {
+            return items
+                .map(function (item) {
+                    var url = (item.url || '').trim();
+                    var caption = (item.caption || '').trim();
+
+                    if (!url) {
+                        return '';
+                    }
+
+                    return caption ? url + ' | ' + caption : url;
+                })
+                .filter(function (line) {
+                    return line.length > 0;
+                })
+                .join('\r\n');
+        }
+
+        function syncImageFiles() {
+            if (!coverFileInput || typeof DataTransfer === 'undefined') {
+                return;
+            }
+
+            var dataTransfer = new DataTransfer();
+            uploadEntries.forEach(function (entry) {
+                dataTransfer.items.add(entry.file);
+            });
+
+            coverFileInput.files = dataTransfer.files;
+        }
+
+        function syncGalleryInput() {
+            if (!galleryInput) {
+                return;
+            }
+
+            var uploadLines = uploadEntries.slice(1).map(function (entry, index) {
+                var token = '__UPLOAD__' + (index + 1);
+                var caption = (entry.caption || '').trim();
+                return caption ? token + ' | ' + caption : token;
+            });
+
+            var persistedLines = serializeLegacyGalleryItems(persistedGalleryItems);
+            var allLines = uploadLines.slice();
+
+            if (persistedLines) {
+                allLines.push(persistedLines);
+            }
+
+            galleryInput.value = allLines.filter(function (line) {
+                return line && line.length > 0;
+            }).join('\r\n');
+
+            if (manualGalleryInput) {
+                manualGalleryInput.value = serializeLegacyGalleryItems(persistedGalleryItems);
+            }
+        }
+
+        function setManualModeState() {
+            var hasUploads = uploadEntries.length > 0;
+
+            if (manualMediaPanel) {
+                manualMediaPanel.classList.toggle('is-hidden', hasUploads);
+            }
+
+            if (coverUrlInput) {
+                coverUrlInput.disabled = hasUploads;
+            }
+
+            if (manualGalleryInput) {
+                manualGalleryInput.disabled = hasUploads;
+            }
+
+            if (galleryToolbarNote) {
+                galleryToolbarNote.textContent = hasUploads
+                    ? 'Ảnh đầu tiên đang được dùng làm cover. Các ảnh còn lại đang nằm trong gallery preview bên dưới.'
+                    : 'Chưa có ảnh upload. Hãy chọn một hoặc nhiều ảnh để tạo gallery tự động.';
+            }
+
+            if (clearUploadButton) {
+                clearUploadButton.hidden = !hasUploads;
+            }
+        }
+
+        function setCoverPreviewState(source, labelText) {
+            if (!coverPreview || !coverPreviewImage || !coverPreviewLabel) {
+                return;
+            }
+
+            var hasSource = !!source;
+            coverPreview.classList.toggle('is-empty', !hasSource);
+            coverPreviewImage.hidden = !hasSource;
+            coverPreviewImage.src = hasSource ? source : '';
+            coverPreviewLabel.textContent = labelText || (hasSource ? source : 'Chưa có ảnh được chọn');
+        }
+
+        function renderSelectedFiles() {
+            if (!coverFilesList) {
+                return;
+            }
+
+            coverFilesList.innerHTML = '';
+
+            if (uploadEntries.length === 0) {
+                coverFilesList.hidden = true;
+                return;
+            }
+
+            uploadEntries.forEach(function (entry, index) {
+                var item = document.createElement('div');
+                item.className = 'posts-cover-files-list__item';
+
+                var badge = document.createElement('span');
+                badge.className = 'posts-cover-files-list__badge ' + (index === 0 ? 'is-cover' : 'is-gallery');
+                badge.textContent = index === 0 ? 'Cover' : 'Gallery ' + index;
+
+                var content = document.createElement('div');
+                content.className = 'posts-cover-files-list__content';
+
+                var title = document.createElement('strong');
+                title.textContent = entry.file.name;
+
+                var meta = document.createElement('small');
+                meta.textContent = Math.max(1, Math.round(entry.file.size / 1024)) + ' KB';
+
+                content.appendChild(title);
+                content.appendChild(meta);
+                item.appendChild(badge);
+                item.appendChild(content);
+                coverFilesList.appendChild(item);
+            });
+
+            coverFilesList.hidden = false;
+        }
+
+        function updateCoverPreview() {
+            if (uploadEntries.length > 0) {
+                var coverEntry = uploadEntries[0];
+                var label = uploadEntries.length === 1
+                    ? coverEntry.file.name + ' · Cover image'
+                    : coverEntry.file.name + ' · Cover image · +' + (uploadEntries.length - 1) + ' ảnh gallery';
+
+                setCoverPreviewState(coverEntry.previewUrl, label);
+                return;
+            }
+
+            var url = coverUrlInput ? (coverUrlInput.value || '').trim() : '';
+            setCoverPreviewState(url, url || 'Chưa có ảnh được chọn');
+        }
+
+        function createGalleryEmptyState() {
+            var empty = document.createElement('div');
+            empty.className = 'posts-gallery-empty';
+
+            var title = document.createElement('strong');
+            title.textContent = uploadEntries.length > 0
+                ? 'Chưa có ảnh gallery từ file upload'
+                : 'Chưa có ảnh gallery';
+
+            var description = document.createElement('span');
+            description.textContent = uploadEntries.length > 0
+                ? 'Hiện chỉ có ảnh cover. Hãy chọn thêm ảnh để bổ sung gallery tự động.'
+                : 'Chọn nhiều ảnh để tạo gallery tự động cho bài viết.';
+
+            empty.appendChild(title);
+            empty.appendChild(description);
+            return empty;
+        }
+
+        function removeUploadEntry(entryId) {
+            uploadEntries = uploadEntries.filter(function (entry) {
+                if (entry.id === entryId) {
+                    if (entry.previewUrl && entry.previewUrl.indexOf('blob:') === 0) {
+                        URL.revokeObjectURL(entry.previewUrl);
+                    }
+
+                    return false;
+                }
+
+                return true;
+            });
+
+            syncImageFiles();
+            setManualModeState();
+            updateCoverPreview();
+            renderSelectedFiles();
+            renderGalleryItems();
+        }
+
+        function removePersistedGalleryItem(itemId) {
+            persistedGalleryItems = persistedGalleryItems.filter(function (item) {
+                return item.id !== itemId;
+            });
+
+            syncGalleryInput();
+            renderGalleryItems();
+        }
+
+        function renderGalleryItems() {
+            if (!galleryList) {
+                return;
+            }
+
+            galleryList.innerHTML = '';
+
+            var renderedItems = uploadEntries.slice(1).map(function (entry) {
+                return {
+                    id: entry.id,
+                    kind: 'upload',
+                    previewUrl: entry.previewUrl,
+                    title: entry.file.name,
+                    description: Math.max(1, Math.round(entry.file.size / 1024)) + ' KB',
+                    caption: entry.caption || ''
+                };
+            }).concat(persistedGalleryItems.map(function (item) {
+                return {
+                    id: item.id,
+                    kind: 'existing',
+                    previewUrl: item.url,
+                    title: item.url,
+                    description: item.url,
+                    caption: item.caption || ''
+                };
+            }));
+
+            if (renderedItems.length === 0) {
+                galleryList.appendChild(createGalleryEmptyState());
+                syncGalleryInput();
+                return;
+            }
+
+            renderedItems.forEach(function (item, index) {
+                var article = document.createElement('article');
+                article.className = 'posts-gallery-card';
+
+                var preview = document.createElement('div');
+                preview.className = 'posts-gallery-card__preview';
+
+                var order = document.createElement('span');
+                order.className = 'posts-gallery-card__order';
+                order.textContent = String(index + 1).padStart(2, '0');
+
+                var image = document.createElement('img');
+                image.className = 'posts-gallery-card__image';
+                image.alt = 'Gallery preview ' + (index + 1);
+                image.src = item.previewUrl || '';
+
+                preview.appendChild(order);
+                preview.appendChild(image);
+
+                var body = document.createElement('div');
+                body.className = 'posts-gallery-card__body';
+
+                var meta = document.createElement('div');
+                meta.className = 'posts-gallery-card__meta';
+
+                var title = document.createElement('strong');
+                title.textContent = item.title;
+
+                var badge = document.createElement('span');
+                badge.className = 'posts-gallery-card__badge';
+                badge.textContent = item.kind === 'upload' ? 'Tự lưu từ upload chính' : 'Nguồn thủ công / đã có sẵn';
+
+                var description = document.createElement('span');
+                description.textContent = item.description;
+
+                meta.appendChild(title);
+                meta.appendChild(badge);
+                meta.appendChild(description);
+
+                var field = document.createElement('label');
+                field.className = 'posts-gallery-card__field';
+
+                var fieldLabel = document.createElement('span');
+                fieldLabel.textContent = 'Caption ảnh';
+
+                var captionInput = document.createElement('input');
+                captionInput.type = 'text';
+                captionInput.className = 'posts-input';
+                captionInput.value = item.caption;
+                captionInput.placeholder = 'Nhập caption cho ảnh này';
+                captionInput.addEventListener('input', function () {
+                    if (item.kind === 'upload') {
+                        uploadEntries.forEach(function (entry) {
+                            if (entry.id === item.id) {
+                                entry.caption = captionInput.value || '';
+                            }
+                        });
+                    }
+                    else {
+                        persistedGalleryItems.forEach(function (existingItem) {
+                            if (existingItem.id === item.id) {
+                                existingItem.caption = captionInput.value || '';
+                            }
+                        });
+                    }
+
+                    syncGalleryInput();
+                });
+
+                field.appendChild(fieldLabel);
+                field.appendChild(captionInput);
+
+                var removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'btn-ghost-posts posts-gallery-card__remove';
+                removeButton.textContent = 'Xoá ảnh';
+                removeButton.addEventListener('click', function () {
+                    if (item.kind === 'upload') {
+                        removeUploadEntry(item.id);
+                        return;
+                    }
+
+                    removePersistedGalleryItem(item.id);
+                });
+
+                body.appendChild(meta);
+                body.appendChild(field);
+                body.appendChild(removeButton);
+
+                article.appendChild(preview);
+                article.appendChild(body);
+                galleryList.appendChild(article);
+            });
+
+            syncGalleryInput();
+        }
+
+        function appendUploadFiles(fileList) {
+            var files = Array.prototype.slice.call(fileList || []).filter(function (file) {
+                return !!file;
+            });
+
+            if (files.length === 0) {
+                return;
+            }
+
+            files.forEach(function (file) {
+                uploadEntries.push({
+                    id: createItemId('upload'),
+                    file: file,
+                    previewUrl: URL.createObjectURL(file),
+                    caption: ''
+                });
+            });
+
+            syncImageFiles();
+            setManualModeState();
+            updateCoverPreview();
+            renderSelectedFiles();
+            renderGalleryItems();
+        }
+
+        function clearSelectedUploads() {
+            uploadEntries.forEach(function (entry) {
+                if (entry.previewUrl && entry.previewUrl.indexOf('blob:') === 0) {
+                    URL.revokeObjectURL(entry.previewUrl);
+                }
+            });
+
+            uploadEntries = [];
+            syncImageFiles();
+            setManualModeState();
+            updateCoverPreview();
+            renderSelectedFiles();
+            renderGalleryItems();
+        }
+
+        document.querySelectorAll('.js-posts-section-trigger[data-section-target]').forEach(function (trigger) {
+            var href = trigger.getAttribute('href') || '';
+            var isInPageLink = href === '' || href.charAt(0) === '#';
+
+            if (!isInPageLink) {
+                return;
+            }
+
+            trigger.addEventListener('click', function (event) {
+                event.preventDefault();
+                activateSection(trigger.getAttribute('data-section-target'), true);
+            });
+        });
+
+        if (titleInput && slugInput) {
+            ['input', 'change'].forEach(function (eventName) {
+                titleInput.addEventListener(eventName, function () {
+                    if (!hasManualSlugOverride || !slugInput.value.trim()) {
+                        syncSlugFromTitle();
+                    }
+                });
+            });
+
+            ['input', 'change', 'blur'].forEach(function (eventName) {
+                slugInput.addEventListener(eventName, function () {
+                    refreshSlugOverrideState();
+
+                    if (!hasManualSlugOverride) {
+                        syncSlugFromTitle();
+                    }
+                });
+            });
+        }
+
+        if (coverFileInput) {
+            coverFileInput.addEventListener('change', function () {
+                appendUploadFiles(coverFileInput.files);
+            });
+        }
+
+        if (coverUrlInput) {
+            ['input', 'change'].forEach(function (eventName) {
+                coverUrlInput.addEventListener(eventName, function () {
+                    if (uploadEntries.length === 0) {
+                        updateCoverPreview();
+                    }
+                });
+            });
+        }
+
+        if (manualGalleryInput) {
+            ['input', 'change'].forEach(function (eventName) {
+                manualGalleryInput.addEventListener(eventName, function () {
+                    if (uploadEntries.length > 0) {
+                        return;
+                    }
+
+                    persistedGalleryItems = parseLegacyGalleryInput(manualGalleryInput.value);
+                    renderGalleryItems();
+                });
+            });
+        }
+
+        if (clearUploadButton) {
+            clearUploadButton.addEventListener('click', clearSelectedUploads);
+        }
+
+        categoryCheckboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', syncPrimaryCategorySelect);
+        });
+
+        relatedProductCheckboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', updateRelatedProductsSummary);
+        });
+
+        if (relatedProductsChips) {
+            relatedProductsChips.addEventListener('click', function (event) {
+                var trigger = event.target;
+
+                while (trigger && trigger !== relatedProductsChips && !trigger.getAttribute('data-related-products-remove')) {
+                    trigger = trigger.parentElement;
+                }
+
+                if (!trigger || trigger === relatedProductsChips) {
+                    return;
+                }
+
+                relatedProductCheckboxes.forEach(function (checkbox) {
+                    if (checkbox.value === trigger.getAttribute('data-related-products-remove')) {
+                        checkbox.checked = false;
+                    }
+                });
+
+                updateRelatedProductsSummary();
+            });
+        }
+
+        if (relatedProductsOpenButton) {
+            relatedProductsOpenButton.addEventListener('click', function () {
+                toggleRelatedProductsModal(true);
+            });
+        }
+
+        relatedProductsCloseButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                toggleRelatedProductsModal(false);
+            });
+        });
+
+        if (relatedProductsModal) {
+            relatedProductsModal.addEventListener('click', function (event) {
+                if (event.target === relatedProductsModal) {
+                    toggleRelatedProductsModal(false);
+                }
+            });
+        }
+
+        if (relatedProductsDialog) {
+            relatedProductsDialog.addEventListener('click', function (event) {
+                event.stopPropagation();
+            });
+        }
+
+        if (relatedProductsApplyButton) {
+            relatedProductsApplyButton.addEventListener('click', function () {
+                toggleRelatedProductsModal(false);
+            });
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key !== 'Escape' || !relatedProductsModal || relatedProductsModal.hidden) {
+                return;
+            }
+
+            event.preventDefault();
+            toggleRelatedProductsModal(false);
+        });
+
+        if (mediaDropzone && coverFileInput) {
+            ['dragenter', 'dragover'].forEach(function (eventName) {
+                mediaDropzone.addEventListener(eventName, function (event) {
+                    event.preventDefault();
+                    mediaDropzone.classList.add('is-dragover');
+                });
+            });
+
+            ['dragleave', 'dragend', 'drop'].forEach(function (eventName) {
+                mediaDropzone.addEventListener(eventName, function (event) {
+                    event.preventDefault();
+                    mediaDropzone.classList.remove('is-dragover');
+                });
+            });
+
+            mediaDropzone.addEventListener('drop', function (event) {
+                var droppedFiles = event.dataTransfer ? event.dataTransfer.files : null;
+                appendUploadFiles(droppedFiles);
+            });
+
+            mediaDropzone.addEventListener('click', function (event) {
+                if (event.target === coverFileInput) {
+                    return;
+                }
+
+                coverFileInput.click();
+            });
+
+            mediaDropzone.addEventListener('keydown', function (event) {
+                if (event.key !== 'Enter' && event.key !== ' ') {
+                    return;
+                }
+
+                event.preventDefault();
+                coverFileInput.click();
+            });
+        }
+
+        if (editorForm) {
+            editorForm.addEventListener('submit', function () {
+                if (typeof tinymce !== 'undefined') {
+                    tinymce.triggerSave();
+                }
+
+                syncImageFiles();
+                syncGalleryInput();
+            });
+        }
+
+        persistedGalleryItems = parseLegacyGalleryInput(manualGalleryInput ? manualGalleryInput.value : (galleryInput ? galleryInput.value : ''));
+        initializeRichEditor();
+        refreshSlugOverrideState();
+        syncSlugFromTitle();
+        syncPrimaryCategorySelect();
+        updateRelatedProductsSummary();
+
+        var hashSection = normalizeSectionName(window.location.hash);
+        var initialSection = normalizeSectionName(shell.getAttribute('data-initial-section')) || 'posts';
+        activateSection(hashSection || initialSection, false);
+        setManualModeState();
+        updateCoverPreview();
+        renderSelectedFiles();
+        renderGalleryItems();
+
+        window.addEventListener('hashchange', function () {
+            var changedSection = normalizeSectionName(window.location.hash);
+            if (changedSection) {
+                activateSection(changedSection, false);
+            }
+        });
+
+        window.addEventListener('beforeunload', function () {
+            uploadEntries.forEach(function (entry) {
+                if (entry.previewUrl && entry.previewUrl.indexOf('blob:') === 0) {
+                    URL.revokeObjectURL(entry.previewUrl);
+                }
+            });
+        });
+    });
+</script>

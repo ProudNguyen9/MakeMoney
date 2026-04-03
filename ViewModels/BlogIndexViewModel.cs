@@ -12,6 +12,8 @@ public class BlogCardViewModel
 
     public string CoverImage { get; set; } = string.Empty;
 
+    public List<string> ImageSequence { get; set; } = [];
+
     public string CategoryName { get; set; } = "Tin tức";
 
     public DateTime? PublishedAt { get; set; }
