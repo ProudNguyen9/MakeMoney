@@ -8,6 +8,24 @@ public class AdminProductsViewModel
 {
     public List<AdminProductListItemViewModel> Products { get; set; } = new();
 
+    public string? SearchTerm { get; set; }
+
+    public int CurrentPage { get; set; } = 1;
+
+    public int PageSize { get; set; }
+
+    public int TotalProducts { get; set; }
+
+    public int TotalPages { get; set; }
+
+    public int StartItemIndex => TotalProducts == 0 ? 0 : ((CurrentPage - 1) * PageSize) + 1;
+
+    public int EndItemIndex => TotalProducts == 0 ? 0 : Math.Min(CurrentPage * PageSize, TotalProducts);
+
+    public bool HasPreviousPage => CurrentPage > 1;
+
+    public bool HasNextPage => CurrentPage < TotalPages;
+
     public List<AdminCategoryListItemViewModel> Categories { get; set; } = new();
 
     public AdminProductEditorViewModel Editor { get; set; } = new();
@@ -101,6 +119,10 @@ public class AdminProductEditorViewModel
     public bool IsFeatured { get; set; }
 
     public List<AdminProductImageItemViewModel> ExistingImages { get; set; } = new();
+
+    public List<int> RemovedImageIds { get; set; } = new();
+
+    public bool RemovePrimaryImage { get; set; }
 
     public List<AdminPriceHistoryItemViewModel> PriceHistories { get; set; } = new();
 

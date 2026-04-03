@@ -5,9 +5,14 @@
     var successMessage = TempData["AdminProductsSuccess"] as string;
     var errorMessage = TempData["AdminProductsError"] as string;
     var editor = Model.Editor;
-    var selectedProductLabel = Model.ShowEditor
-        ? (Model.IsCreateMode ? "Đang mở popup thêm mới" : $"Đang mở popup: {editor.Name}")
-        : "Chưa mở biểu mẫu";
+    var routeProductId = !Model.IsCreateMode && editor.Id.HasValue ? editor.Id : null;
+    var routeCategoryId = Model.IsCreateMode ? editor.CategoryId : null;
+    var routeCategoryEditId = Model.CategoryEditor.Id;
+    var routeCreate = Model.ShowEditor && Model.IsCreateMode;
+    var searchTerm = Model.SearchTerm;
+    var pageWindowStart = Math.Max(1, Model.CurrentPage - 2);
+    var pageWindowEnd = Math.Min(Model.TotalPages, pageWindowStart + 4);
+    pageWindowStart = Math.Max(1, pageWindowEnd - 4);
 }
 
 <header class="topbar" id="products-section">
@@ -24,7 +29,7 @@
                 <span>@Model.Products.Count sản phẩm</span>
                 <span>@Model.Categories.Count loại sản phẩm</span>
                 <span>@(Model.Products.Count(product => product.IsFeatured)) nổi bật</span>
-                <span>@selectedProductLabel</span>
+             
             </div>
         </div>
     </div>
@@ -32,6 +37,7 @@
         <a class="admin-toolbar-button admin-toolbar-button--ghost"
            asp-controller="Admin"
            asp-action="Products"
+           asp-route-search="@searchTerm"
            asp-route-manageCategories="true">
             <span class="admin-toolbar-button__icon">▦</span>
             <span>
@@ -42,6 +48,7 @@
         <a class="admin-toolbar-button admin-toolbar-button--primary"
            asp-controller="Admin"
            asp-action="Products"
+           asp-route-search="@searchTerm"
            asp-route-create="true">
             <span class="admin-toolbar-button__icon">＋</span>
             <span>
@@ -72,8 +79,41 @@
             <div class="admin-products-summary">
                 <span class="admin-products-summary__item">Có ảnh: @Model.Products.Count(product => product.ImageCount > 0)</span>
                 <span class="admin-products-summary__item">Ẩn: @Model.Products.Count(product => product.Status == "inactive")</span>
+                <span class="admin-products-summary__item">Hiển thị @Model.StartItemIndex-@Model.EndItemIndex / @Model.TotalProducts</span>
             </div>
         </div>
+
+        <form method="get" asp-controller="Admin" asp-action="Products" class="admin-filter-toolbar">
+            <input type="hidden" name="page" value="1" />
+            <input type="hidden" name="id" value="@routeProductId" />
+            <input type="hidden" name="categoryId" value="@routeCategoryId" />
+            <input type="hidden" name="categoryEditId" value="@routeCategoryEditId" />
+            <input type="hidden" name="manageCategories" value="@Model.ShowCategoryManager" />
+            <input type="hidden" name="create" value="@routeCreate" />
+
+            <label class="search-box admin-filter-toolbar__search" aria-label="Tìm sản phẩm">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text"
+                       name="search"
+                       value="@searchTerm"
+                       placeholder="Tìm theo tên, slug, category, trạng thái, mô tả..." />
+            </label>
+
+            <div class="admin-filter-toolbar__buttons">
+                <button type="submit" class="admin-filter-toolbar__submit">Lọc dữ liệu</button>
+                <a asp-controller="Admin"
+                   asp-action="Products"
+                   asp-route-id="@routeProductId"
+                   asp-route-categoryId="@routeCategoryId"
+                   asp-route-categoryEditId="@routeCategoryEditId"
+                   asp-route-manageCategories="@Model.ShowCategoryManager"
+                   asp-route-create="@routeCreate"
+                   class="admin-filter-toolbar__reset">Làm mới</a>
+            </div>
+        </form>
 
         <div class="table-shell">
             <table class="product-table admin-products-table">
@@ -175,6 +215,64 @@
                 </tbody>
             </table>
         </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <div class="admin-products-pagination">
+                <div class="admin-products-pagination__summary">
+                    <span class="admin-products-pagination__eyebrow">Điều hướng danh sách</span>
+                    <strong>Trang @Model.CurrentPage / @Model.TotalPages</strong>
+                    <span>Đang hiển thị @Model.StartItemIndex-@Model.EndItemIndex trong tổng số @Model.TotalProducts sản phẩm</span>
+                </div>
+                <div class="admin-products-pagination__actions">
+                    <a class="admin-products-pagination__button @(Model.HasPreviousPage ? string.Empty : "is-disabled")"
+                       asp-controller="Admin"
+                       asp-action="Products"
+                       asp-route-page="@(Model.CurrentPage - 1)"
+                       asp-route-id="@routeProductId"
+                       asp-route-categoryId="@routeCategoryId"
+                       asp-route-manageCategories="@Model.ShowCategoryManager"
+                       asp-route-create="@routeCreate"
+                       asp-route-search="@searchTerm"
+                       asp-route-categoryEditId="@routeCategoryEditId"
+                       aria-disabled="@(!Model.HasPreviousPage)">
+                        <span class="admin-products-pagination__button-icon">←</span>
+                        <span>Trước</span>
+                    </a>
+
+                    @for (var pageNumber = pageWindowStart; pageNumber <= pageWindowEnd; pageNumber++)
+                    {
+                        <a class="admin-products-pagination__button @(pageNumber == Model.CurrentPage ? "is-active" : string.Empty)"
+                           asp-controller="Admin"
+                           asp-action="Products"
+                           asp-route-page="@pageNumber"
+                           asp-route-id="@routeProductId"
+                           asp-route-categoryId="@routeCategoryId"
+                           asp-route-manageCategories="@Model.ShowCategoryManager"
+                           asp-route-create="@routeCreate"
+                           asp-route-search="@searchTerm"
+                           asp-route-categoryEditId="@routeCategoryEditId">
+                            @pageNumber
+                        </a>
+                    }
+
+                    <a class="admin-products-pagination__button @(Model.HasNextPage ? string.Empty : "is-disabled")"
+                       asp-controller="Admin"
+                       asp-action="Products"
+                       asp-route-page="@(Model.CurrentPage + 1)"
+                       asp-route-id="@routeProductId"
+                       asp-route-categoryId="@routeCategoryId"
+                       asp-route-manageCategories="@Model.ShowCategoryManager"
+                       asp-route-create="@routeCreate"
+                       asp-route-search="@searchTerm"
+                       asp-route-categoryEditId="@routeCategoryEditId"
+                       aria-disabled="@(!Model.HasNextPage)">
+                        <span>Sau</span>
+                        <span class="admin-products-pagination__button-icon">→</span>
+                    </a>
+                </div>
+            </div>
+        }
     </section>
 
     @if (Model.ShowEditor)
@@ -307,6 +405,21 @@
                                             <div>
                                                 <strong>@(image.IsPrimary ? "PrimaryImage" : $"ProductImage #{image.OrderIndex}")</strong>
                                                 <span>@image.ImageUrl</span>
+
+                                                @if (image.IsPrimary)
+                                                {
+                                                    <label class="admin-image-toggle">
+                                                        <input asp-for="Editor.RemovePrimaryImage" type="checkbox" />
+                                                        <span>Xóa ảnh chính hiện tại</span>
+                                                    </label>
+                                                }
+                                                else if (image.Id.HasValue)
+                                                {
+                                                    <label class="admin-image-toggle">
+                                                        <input type="checkbox" name="Editor.RemovedImageIds" value="@image.Id" />
+                                                        <span>Xóa ảnh này</span>
+                                                    </label>
+                                                }
                                             </div>
                                         </div>
                                     }
@@ -562,7 +675,67 @@
         .admin-products-top-actions {
             margin-left: auto;
             justify-content: flex-end;
-            align-items: stretch;
+            align-items: flex-end;
+        }
+
+        .admin-filter-toolbar {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .admin-filter-toolbar__search {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            min-height: 48px;
+            padding: 0.8rem 1rem;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 16px;
+            background: #fff;
+            color: #0f172a;
+        }
+
+        .admin-filter-toolbar__search input {
+            flex: 1 1 auto;
+            border: 0;
+            outline: none;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+        }
+
+        .admin-filter-toolbar__buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-filter-toolbar__submit,
+        .admin-filter-toolbar__reset {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0.8rem 1.25rem;
+            border-radius: 16px;
+            border: 0;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .admin-filter-toolbar__submit {
+            color: #1d4ed8;
+            background: rgba(37, 99, 235, 0.12);
+        }
+
+        .admin-filter-toolbar__reset {
+            color: #475569;
+            background: rgba(148, 163, 184, 0.14);
         }
 
         .admin-toolbar-button {
@@ -689,6 +862,92 @@
         .admin-products-price-label,
         .admin-muted {
             font-size: 0.84rem;
+        }
+
+        .admin-products-pagination {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-top: 18px;
+            padding: 18px 20px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 20px;
+            background: linear-gradient(135deg, #f8fbff 0%, #eff6ff 48%, #f8fafc 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+        }
+
+        .admin-products-pagination__summary {
+            display: grid;
+            gap: 4px;
+            min-width: 220px;
+        }
+
+        .admin-products-pagination__eyebrow {
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #2563eb;
+        }
+
+        .admin-products-pagination__summary strong {
+            font-size: 1rem;
+            color: #0f172a;
+        }
+
+        .admin-products-pagination__summary span {
+            color: #475569;
+            line-height: 1.45;
+        }
+
+        .admin-products-pagination__actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .admin-products-pagination__button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 44px;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            background: rgba(255, 255, 255, 0.92);
+            color: #1e293b;
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .admin-products-pagination__button:hover {
+            transform: translateY(-1px);
+            border-color: rgba(37, 99, 235, 0.35);
+            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.12);
+        }
+
+        .admin-products-pagination__button.is-active {
+            border-color: transparent;
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 55%, #60a5fa 100%);
+            color: #fff;
+            box-shadow: 0 16px 32px rgba(37, 99, 235, 0.26);
+        }
+
+        .admin-products-pagination__button.is-disabled {
+            opacity: 0.45;
+            pointer-events: none;
+            box-shadow: none;
+        }
+
+        .admin-products-pagination__button-icon {
+            font-size: 0.95rem;
+            line-height: 1;
         }
 
         .admin-products-summary__item,
@@ -969,6 +1228,21 @@
         .admin-existing-image-card {
             display: grid;
             gap: 10px;
+        }
+
+        .admin-image-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 0.84rem;
+            color: #b91c1c;
+            font-weight: 600;
+        }
+
+        .admin-image-toggle input {
+            width: 16px;
+            height: 16px;
         }
 
         .admin-existing-image-card img {
