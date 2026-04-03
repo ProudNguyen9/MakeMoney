@@ -19,13 +19,16 @@
             cursor: pointer;
         }
 
-        body.blog-page #blog-list .post-visual {
+        body.blog-page #blog-list .post-visual,
+        body.blog-page #blog-list .materials-card-media {
             padding: 0;
-            aspect-ratio: 16 / 10;
+            aspect-ratio: 4 / 3;
+            min-height: 260px;
             overflow: hidden;
         }
 
-        body.blog-page #blog-list .post-visual img {
+        body.blog-page #blog-list .post-visual img,
+        body.blog-page #blog-list .materials-card-media img {
             display: block;
             width: 100%;
             height: 100%;
@@ -153,8 +156,10 @@
                                 <div class="col-md-6" data-aos="fade-up" data-aos-delay="@animationDelay">
                                     <article class="post-card h-100 js-post-card"
                                              data-detail-url="@Url.Action("Detail", "Blog", new { slug = post.Slug })">
-                                        <div class="post-visual">
-                                            <img src="@post.CoverImage" alt="@post.Title" class="img-fluid w-100 h-100"
+                                        <div class="post-visual materials-card-media">
+                                            <img src="@post.CoverImage" alt="@post.Title" class="img-fluid w-100 h-100 materials-hover-image js-blog-card-image"
+                                                 data-image-sequence="@string.Join("|", post.ImageSequence)"
+                                                 data-default-image="@post.CoverImage"
                                                  loading="lazy" style="object-fit: cover;">
                                         </div>
                                         <div class="post-body">
@@ -560,11 +565,18 @@
                             return;
                         }
 
-                        blogList.innerHTML = posts.map((post, index) => `
+                        blogList.innerHTML = posts.map((post, index) => {
+                                                        const imageSequence = Array.isArray(post.imageSequence)
+                                                            ? post.imageSequence.filter(Boolean)
+                                                            : [];
+                                                        const coverImage = post.coverImage ?? '/assets/img/blog/blog-1.jpg';
+                                                        const resolvedImageSequence = imageSequence.length > 0 ? imageSequence : [coverImage];
+
+                                                        return `
                                                         <div class="col-md-6" data-aos="fade-up" data-aos-delay="${100 + (index % 6) * 50}">
                                                             <article class="post-card h-100 js-post-card" data-detail-url="${post.detailUrl ?? '/Blog'}">
-                                                                <div class="post-visual">
-                                                                    <img src="${post.coverImage ?? '/assets/img/blog/blog-1.jpg'}" alt="${post.title ?? 'Tin tức'}" class="img-fluid w-100 h-100" loading="lazy" style="object-fit: cover;">
+                                                                <div class="post-visual materials-card-media">
+                                                                    <img src="${coverImage}" alt="${post.title ?? 'Tin tức'}" class="img-fluid w-100 h-100 materials-hover-image js-blog-card-image" data-image-sequence="${resolvedImageSequence.join('|')}" data-default-image="${coverImage}" loading="lazy" style="object-fit: cover;">
                                                                 </div>
                                                                 <div class="post-body">
                                                                     <div class="post-meta">
@@ -590,7 +602,10 @@
                                                                     <a href="${post.detailUrl ?? '/Blog'}" class="post-link"><i class="bi bi-arrow-right-circle-fill"></i> Xem chi tiết</a>
                                                                 </div>
                                                             </article>
-                                                        </div>`).join('');
+                                                        </div>`;
+                        }).join('');
+
+                        initializeBlogCardImageRotation();
                     }
 
                     function renderPagination(currentPage, totalPages) {
@@ -696,6 +711,61 @@
                         window.history.pushState({}, '', `/Blog?${historyParams.toString()}`);
                     }
 
+                    function initializeBlogCardImageRotation() {
+                        document.querySelectorAll('#blog-list .materials-card-media').forEach(mediaElement => {
+                            const imageElement = mediaElement.querySelector('img');
+
+                            if (!imageElement || imageElement.dataset.rotationInitialized === 'true') {
+                                return;
+                            }
+
+                            const sequence = (imageElement.dataset.imageSequence || '')
+                                .split('|')
+                                .map(item => item.trim())
+                                .filter(Boolean);
+
+                            if (sequence.length <= 1) {
+                                imageElement.dataset.rotationInitialized = 'true';
+                                return;
+                            }
+
+                            const defaultImage = imageElement.dataset.defaultImage || sequence[0];
+                            let intervalId = null;
+                            let currentIndex = 0;
+
+                            const showImageAtIndex = index => {
+                                currentIndex = ((index % sequence.length) + sequence.length) % sequence.length;
+                                imageElement.src = sequence[currentIndex] || defaultImage;
+                            };
+
+                            const startHoverRotation = () => {
+                                if (intervalId) {
+                                    return;
+                                }
+
+                                showImageAtIndex(1);
+
+                                intervalId = window.setInterval(() => {
+                                    showImageAtIndex(currentIndex + 1);
+                                }, 900);
+                            };
+
+                            const stopHoverRotation = () => {
+                                if (intervalId) {
+                                    window.clearInterval(intervalId);
+                                    intervalId = null;
+                                }
+
+                                showImageAtIndex(0);
+                                imageElement.src = defaultImage;
+                            };
+
+                            imageElement.dataset.rotationInitialized = 'true';
+                            mediaElement.addEventListener('mouseenter', startHoverRotation);
+                            mediaElement.addEventListener('mouseleave', stopHoverRotation);
+                        });
+                    }
+
                     function bindPaginationAjax() {
                         document.querySelectorAll('.js-blog-page-link').forEach(link => {
                             link.addEventListener('click', event => {
@@ -757,6 +827,7 @@
                         });
                     }
 
+                    initializeBlogCardImageRotation();
                     bindPaginationAjax();
                     bindPopularTagSearch();
                     bindCategoryFilter();
