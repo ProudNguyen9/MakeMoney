@@ -31,7 +31,7 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
-<body>
+<body class="@(ViewData["BodyClass"] as string)">
     <partial name="P_Header" />
 
     @RenderBody()

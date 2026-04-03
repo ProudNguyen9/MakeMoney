@@ -133,6 +133,12 @@ namespace WebThuMuaPheLieu.Controllers
             return View(vm);
         }
 
+        public IActionResult About()
+        {
+            ViewData["Title"] = "Giới thiệu";
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
