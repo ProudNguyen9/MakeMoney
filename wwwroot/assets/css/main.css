@@ -8186,12 +8186,12 @@ body.about-page .about-page-main {
 }
 
 body.about-page .about-hero.scrap-hero {
-  min-height: 600px;
-  padding: 160px 0 96px;
+  min-height: 460px;
+  padding: 30px 0 56px;
 }
 
 body.about-page .about-hero .hero-content {
-  max-width: 760px;
+  max-width: 1000px;
 }
 
 body.about-page .about-hero-lead {

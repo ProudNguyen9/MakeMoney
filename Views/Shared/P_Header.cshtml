@@ -3,17 +3,17 @@
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase)
         && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
+    var isAboutPage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase)
+        && string.Equals(currentAction, "About", StringComparison.OrdinalIgnoreCase);
     var isProductPage = string.Equals(currentController, "Product", StringComparison.OrdinalIgnoreCase)
         && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
-
-
     var isPricingPage = string.Equals(currentController, "Pricing", StringComparison.OrdinalIgnoreCase)
         && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
-
     var isBlogPage = string.Equals(currentController, "Blog", StringComparison.OrdinalIgnoreCase)
         && (string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase)
             || string.Equals(currentAction, "Detail", StringComparison.OrdinalIgnoreCase));
-
+    var isContactPage = string.Equals(currentController, "Contact", StringComparison.OrdinalIgnoreCase)
+        && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
 }
 
 <header id="header" class="header">
@@ -59,7 +59,7 @@
                         <ul>
                             <li><a asp-controller="Home" asp-action="Index" class="@(isHomePage ? "active" : null)">Trang
                                 chủ</a></li>
-                                <li><a href="~/about.html">Giới thiệu</a></li>
+                                <li><a asp-controller="Home" asp-action="About" class="@(isAboutPage ? "active" : null)">Giới thiệu</a></li>
                                 <li class="dropdown">
                                     <a href="~/services.html">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
                                     <ul>
@@ -82,10 +82,10 @@
 
                                     <li><a asp-controller="Blog" asp-action="Index" class="@(isBlogPage ? "active" : null)">Tin tức</a></li>
 
-                                    <li><a href="~/contact.html">Liên hệ</a></li>
+                                    <li><a asp-controller="Contact" asp-action="Index" class="@(isContactPage ? "active" : null)">Liên hệ</a></li>
                                 </ul>
                             </nav>
-                            <a href="#quote-form" class="header-cta d-none d-lg-inline-flex">
+                            <a asp-controller="Contact" asp-action="Index" class="header-cta d-none d-lg-inline-flex">
                                 <i class="bi bi-lightning-charge-fill"></i>
                                 Báo giá ngay
 
