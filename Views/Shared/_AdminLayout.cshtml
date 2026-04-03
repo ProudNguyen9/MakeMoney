@@ -14,8 +14,8 @@
 </head>
 
 <body>
-    <div class="admin-shell">
-        <aside class="sidebar">
+    <div class="admin-shell" data-admin-shell>
+        <aside class="sidebar" data-admin-sidebar>
             <!-- Brand -->
             <div class="sidebar__brand">
                 <div class="sidebar__logo">
@@ -34,6 +34,7 @@
                     <h1>Phế Liệu Pro</h1>
                     <p>Admin Dashboard</p>
                 </div>
+               
             </div>
 
             <!-- Navigation -->
@@ -104,15 +105,13 @@
                 </a>
             </nav>
 
-            <!-- Footer Status -->
             <div class="sidebar__footer">
-                <div class="sidebar__status">
-                    <div class="sidebar__status-indicator"></div>
-                    <div class="sidebar__status-text">
-                        <strong>Hệ thống hoạt động</strong>
-                        <span>Đồng bộ 3 phút trước</span>
-                    </div>
-                </div>
+                <button type="button" class="sidebar__toggle" data-sidebar-toggle aria-label="Thu gọn thanh bên"
+                        aria-expanded="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                </button>
             </div>
         </aside>
 
@@ -120,6 +119,37 @@
             @RenderBody()
         </main>
     </div>
+
+    <script>
+            (function () {
+                var shell = document.querySelector('[data-admin-shell]');
+                var toggle = document.querySelector('[data-sidebar-toggle]');
+                if (!shell || !toggle) {
+                    return;
+                }
+
+                var collapsedClass = 'admin-shell--sidebar-collapsed';
+                var storageKey = 'admin-sidebar-collapsed';
+
+                function applyState(isCollapsed) {
+                    shell.classList.toggle(collapsedClass, isCollapsed);
+                    toggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+                    toggle.setAttribute('aria-label', isCollapsed ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên');
+                }
+
+                var savedState = window.localStorage ? window.localStorage.getItem(storageKey) : null;
+                applyState(savedState === 'true');
+
+                toggle.addEventListener('click', function () {
+                    var nextState = !shell.classList.contains(collapsedClass);
+                    applyState(nextState);
+
+                    if (window.localStorage) {
+                        window.localStorage.setItem(storageKey, nextState ? 'true' : 'false');
+                    }
+                });
+            })();
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -77,6 +77,11 @@ textarea:focus {
     min-height: 100vh;
     display: grid;
     grid-template-columns: 300px minmax(0, 1fr);
+    transition: grid-template-columns var(--transition);
+}
+
+.admin-shell--sidebar-collapsed {
+    grid-template-columns: 96px minmax(0, 1fr);
 }
 
 .sidebar {
@@ -90,6 +95,7 @@ textarea:focus {
     background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
     border-right: 1px solid rgba(148, 163, 184, 0.15);
     box-shadow: 2px 0 12px rgba(15, 23, 42, 0.04);
+    transition: padding var(--transition), gap var(--transition);
 }
 
 .sidebar__brand {
@@ -98,6 +104,28 @@ textarea:focus {
     gap: 16px;
     padding-bottom: 22px;
     border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.sidebar__toggle {
+    margin-top: auto;
+    width: 100%;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: var(--text-soft);
+    transition: transform var(--transition), background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.sidebar__toggle:hover {
+    background: #e2e8f0;
+    color: var(--primary);
+    border-color: rgba(37, 99, 235, 0.22);
 }
 
 .sidebar__logo {
@@ -230,6 +258,53 @@ textarea:focus {
 
 .sidebar__item-text {
     flex: 1;
+}
+
+.admin-shell--sidebar-collapsed .sidebar {
+    padding: 28px 14px;
+    gap: 24px;
+}
+
+.admin-shell--sidebar-collapsed .sidebar__brand {
+    gap: 12px;
+}
+
+.admin-shell--sidebar-collapsed .sidebar__brand-text,
+.admin-shell--sidebar-collapsed .sidebar__nav-label,
+.admin-shell--sidebar-collapsed .sidebar__item-text,
+.admin-shell--sidebar-collapsed .sidebar__status-text {
+    display: none;
+}
+
+.admin-shell--sidebar-collapsed .sidebar__brand {
+    justify-content: center;
+}
+
+.admin-shell--sidebar-collapsed .sidebar__item {
+    justify-content: center;
+    padding: 13px 10px;
+}
+
+.admin-shell--sidebar-collapsed .sidebar__item::before {
+    left: 6px;
+}
+
+.admin-shell--sidebar-collapsed .sidebar__status {
+    justify-content: center;
+    padding: 14px;
+}
+
+.admin-shell--sidebar-collapsed .sidebar__footer {
+    padding-top: 16px;
+}
+
+.admin-shell--sidebar-collapsed .sidebar__toggle {
+    width: 100%;
+    padding: 10px 0;
+}
+
+.admin-shell--sidebar-collapsed .sidebar__toggle svg {
+    transform: rotate(180deg);
 }
 
 .sidebar__footer {

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -163,6 +164,7 @@ public class BlogController : Controller
                 title = post.Title,
                 summary = post.Summary,
                 coverImage = post.CoverImage,
+                imageSequence = post.ImageSequence,
                 categoryName = post.CategoryName,
                 publishedAt = post.PublishedAt?.ToString("dd/MM/yyyy"),
                 likeCount = post.LikeCount,
@@ -346,6 +348,18 @@ public class BlogController : Controller
                 })
             .ToListAsync();
 
+        var galleryImages = await _context.BlogImages
+            .AsNoTracking()
+            .Where(image => image.BlogId.HasValue && postIds.Contains(image.BlogId.Value))
+            .OrderBy(image => image.OrderIndex ?? int.MaxValue)
+            .ThenBy(image => image.Id)
+            .Select(image => new
+            {
+                PostId = image.BlogId!.Value,
+                ImageUrl = image.ImageUrl
+            })
+            .ToListAsync();
+
         var categoryByPostId = categories
             .Where(item => item.PostId.HasValue)
             .GroupBy(item => item.PostId!.Value)
@@ -353,10 +367,39 @@ public class BlogController : Controller
                 group => group.Key,
                 group => group.Select(item => item.Name).FirstOrDefault(name => !string.IsNullOrWhiteSpace(name)) ?? "Tin tức");
 
+        var imageSequenceByPostId = galleryImages
+            .Where(item => !string.IsNullOrWhiteSpace(item.ImageUrl))
+            .GroupBy(item => item.PostId)
+            .ToDictionary(
+                group => group.Key,
+                group => group
+                    .Select(item => NormalizeBlogImagePath(item.ImageUrl))
+                    .Where(imageUrl => !string.IsNullOrWhiteSpace(imageUrl))
+                    .ToList());
+
         return posts
             .Select(post =>
             {
                 categoryByPostId.TryGetValue(post.Id, out var postCategoryName);
+                var coverImage = NormalizeBlogImagePath(post.CoverImage);
+                var gallerySequence = imageSequenceByPostId.GetValueOrDefault(post.Id) ?? [];
+                var imageSequence = new List<string>();
+
+                if (!string.IsNullOrWhiteSpace(coverImage))
+                {
+                    imageSequence.Add(coverImage);
+                }
+
+                imageSequence.AddRange(gallerySequence);
+                imageSequence = imageSequence
+                    .Where(imageUrl => !string.IsNullOrWhiteSpace(imageUrl))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList();
+
+                if (imageSequence.Count == 0)
+                {
+                    imageSequence.Add(NormalizeBlogImagePath(null));
+                }
 
                 return new BlogCardViewModel
                 {
@@ -364,7 +407,8 @@ public class BlogController : Controller
                     Slug = BuildBlogSlug(post.Slug, post.Id),
                     Title = post.Title ?? "Tin tức đang cập nhật",
                     Summary = BuildBlogSummary(post.Excerpt, post.Content),
-                    CoverImage = NormalizeBlogImagePath(post.CoverImage),
+                    CoverImage = imageSequence[0],
+                    ImageSequence = imageSequence,
                     CategoryName = postCategoryName ?? "Tin tức",
                     PublishedAt = post.PublishedAt,
                     LikeCount = post.LikeCount
@@ -449,6 +493,7 @@ public class BlogController : Controller
             return "Nội dung bài viết đang được cập nhật.";
         }
 
+        summary = WebUtility.HtmlDecode(summary);
         summary = Regex.Replace(summary, "<.*?>", string.Empty).Trim();
         return summary.Length > 180 ? $"{summary[..177]}..." : summary;
     }
