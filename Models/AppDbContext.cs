@@ -234,9 +234,9 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<BlogPostCategory>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("blog_post_categories");
+            entity.HasKey(e => new { e.PostId, e.CategoryId });
+
+            entity.ToTable("blog_post_categories");
 
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
             entity.Property(e => e.PostId).HasColumnName("post_id");
@@ -252,9 +252,9 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<BlogPostProduct>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("blog_post_products");
+            entity.HasKey(e => new { e.PostId, e.ProductId });
+
+            entity.ToTable("blog_post_products");
 
             entity.Property(e => e.PostId).HasColumnName("post_id");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
