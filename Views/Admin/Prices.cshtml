@@ -3,6 +3,7 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var selectedProduct = Model.CurrentPriceEditor;
     var hasSelectedProduct = selectedProduct.ProductId > 0;
+    var searchTerm = Model.SearchTerm;
 }
 
 <header class="topbar" id="price-overview-header" 
@@ -37,66 +38,6 @@
 
 <section class="admin-prices-layout">
     <div class="admin-prices-layout__current">
-        <section class="panel admin-price-panel admin-price-panel--current-highlight">
-            <div class="panel__head admin-price-panel__head">
-                <div>
-                    <p class="eyebrow">Giá hiện tại</p>
-                    <h3>Thông tin đang áp dụng</h3>
-                </div>
-                <div class="panel__head-actions admin-history-actions">
-                    @if (hasSelectedProduct)
-                    {
-                        <a class="admin-prices-action-button admin-prices-action-button--current"
-                           asp-controller="Admin"
-                           asp-action="Prices"
-                           asp-route-productId="@selectedProduct.ProductId"
-                           asp-route-editCurrent="true">
-                            <span class="admin-prices-action-button__icon">↗</span>
-                            <span>
-                                <strong>Cập nhật giá</strong>
-                                <small>Chỉnh nhanh giá hiện tại</small>
-                            </span>
-                        </a>
-                    }
-                </div>
-            </div>
-
-            @if (!hasSelectedProduct)
-            {
-                <div class="admin-empty-state">
-                    <strong>Chưa chọn sản phẩm.</strong>
-                    <span>Chọn một sản phẩm ở danh sách bên dưới để xem giá hiện tại.</span>
-                </div>
-            }
-            else
-            {
-                <div class="admin-price-summary">
-                    <div class="admin-price-summary__main">
-                        <strong>@selectedProduct.ProductName</strong>
-                        <span>@selectedProduct.CategoryName</span>
-                    </div>
-                    <div class="admin-price-summary__price">
-                        <strong>@(selectedProduct.PriceValue?.ToString("N0") ?? "Chưa có giá")</strong>
-                        <span>@(string.IsNullOrWhiteSpace(selectedProduct.Unit) ? "Chưa có đơn vị" : $"/{selectedProduct.Unit}")</span>
-                    </div>
-                    <dl class="admin-price-summary__meta">
-                        <div>
-                            <dt>Nhãn giá</dt>
-                            <dd>@(string.IsNullOrWhiteSpace(selectedProduct.PriceLabel) ? "-" : selectedProduct.PriceLabel)</dd>
-                        </div>
-                        <div>
-                            <dt>Trạng thái</dt>
-                            <dd>@(string.IsNullOrWhiteSpace(selectedProduct.Status) ? "Không rõ" : selectedProduct.Status)</dd>
-                        </div>
-                        <div>
-                            <dt>Cập nhật lần cuối</dt>
-                            <dd>@(selectedProduct.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa cập nhật")</dd>
-                        </div>
-                    </dl>
-                </div>
-            }
-        </section>
-
         <section class="panel admin-price-panel admin-price-panel--product-selector">
             <div class="panel__head admin-price-panel__head">
                 <div>
@@ -105,6 +46,32 @@
                 </div>
                 <span class="admin-price-selector-count">@Model.Products.Count sản phẩm</span>
             </div>
+
+            <form method="get" asp-controller="Admin" asp-action="Prices" class="admin-filter-toolbar">
+                <input type="hidden" name="productId" value="@(hasSelectedProduct ? selectedProduct.ProductId : null)" />
+                <input type="hidden" name="historyId" value="@Model.HistoryEditor.Id" />
+                <input type="hidden" name="createHistory" value="@Model.IsHistoryCreateMode" />
+                <input type="hidden" name="editCurrent" value="@Model.ShowCurrentPriceEditor" />
+
+                <label class="search-box admin-filter-toolbar__search" aria-label="Tìm sản phẩm bảng giá">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text"
+                           name="search"
+                           value="@searchTerm"
+                           placeholder="Tìm theo tên, slug, category, trạng thái, mô tả..." />
+                </label>
+
+                <div class="admin-filter-toolbar__buttons">
+                    <button type="submit" class="admin-filter-toolbar__submit">Lọc dữ liệu</button>
+                    <a asp-controller="Admin"
+                       asp-action="Prices"
+                       asp-route-productId="@(hasSelectedProduct ? selectedProduct.ProductId : null)"
+                       class="admin-filter-toolbar__reset">Làm mới</a>
+                </div>
+            </form>
 
             <div class="admin-price-product-list">
                 @if (Model.Products.Count == 0)
@@ -116,28 +83,45 @@
                 }
                 else
                 {
-                    @foreach (var product in Model.Products)
-                    {
-                        <a class="admin-price-product-card @(product.IsSelected ? "is-selected" : string.Empty)"
-                           asp-controller="Admin"
-                           asp-action="Prices"
-                           asp-route-productId="@product.Id">
-                            <div>
-                                <strong>@product.Name</strong>
-                                <span>@product.CategoryName</span>
-                            </div>
-                            <div class="admin-price-product-card__actions">
-                                <div class="admin-price-product-card__value">
-                                    <strong>@(product.PriceValue?.ToString("N0") ?? "Chưa có giá")</strong>
-                                    <span>@(string.IsNullOrWhiteSpace(product.Unit) ? "" : $"/{product.Unit}")</span>
-                                </div>
-                                <span class="admin-price-product-card__cta">Chọn sản phẩm</span>
-                            </div>
-                        </a>
-                    }
-                }
-            </div>
-        </section>
+                     @foreach (var product in Model.Products)
+                     {
+                         <div class="admin-price-product-card @(product.IsSelected ? "is-selected" : string.Empty)">
+                             <a class="admin-price-product-card__content"
+                                asp-controller="Admin"
+                                asp-action="Prices"
+                                asp-route-productId="@product.Id">
+                                 <div>
+                                     <strong>@product.Name</strong>
+                                     <span>@product.CategoryName</span>
+                                     <span class="admin-price-product-card__meta">Cập nhật: @(product.UpdatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa cập nhật")</span>
+                                 </div>
+                                 <div class="admin-price-product-card__value">
+                                     <strong>@(product.PriceValue?.ToString("N0") ?? "Chưa có giá")</strong>
+                                     <span>@(string.IsNullOrWhiteSpace(product.Unit) ? "" : $"/{product.Unit}")</span>
+                                 </div>
+                             </a>
+                             <div class="admin-price-product-card__actions">
+                                 <a class="admin-price-product-card__cta"
+                                    asp-controller="Admin"
+                                    asp-action="Prices"
+                                    asp-route-productId="@product.Id"
+                                    asp-route-search="@searchTerm">
+                                     Chọn sản phẩm
+                                 </a>
+                                 <a class="admin-price-product-card__edit"
+                                    asp-controller="Admin"
+                                    asp-action="Prices"
+                                    asp-route-productId="@product.Id"
+                                    asp-route-search="@searchTerm"
+                                    asp-route-editCurrent="true">
+                                     Sửa giá hiện tại
+                                 </a>
+                             </div>
+                         </div>
+                     }
+                 }
+             </div>
+         </section>
 
         @if (Model.ShowCurrentPriceEditor)
         {
@@ -340,36 +324,46 @@
 
                     <form asp-controller="Admin" asp-action="SavePriceHistory" method="post" class="admin-price-form admin-price-form--modal">
                         @Html.AntiForgeryToken()
-                        <input asp-for="HistoryEditor.Id" type="hidden" />
+                        <input type="hidden" name="Id" value="@Model.HistoryEditor.Id" />
+                        <input type="hidden" name="ProductId" value="@Model.HistoryEditor.ProductId" />
+
+                        @if (TempData["AdminPricesError"] is string historyErrorMessage && Model.ShowHistoryEditor)
+                        {
+                            <div class="admin-feedback admin-feedback--error admin-feedback--modal">@historyErrorMessage</div>
+                        }
 
                         <div class="admin-form-grid admin-form-grid--modal-history">
                             <label class="admin-form-field">
                                 <span>Sản phẩm *</span>
-                                <select asp-for="HistoryEditor.ProductId" asp-items="Model.ProductOptions"></select>
+                                <select name="ProductId" asp-items="Model.ProductOptions"></select>
                             </label>
                             <label class="admin-form-field">
                                 <span>Giá lịch sử *</span>
-                                <input asp-for="HistoryEditor.PriceValue" type="number" step="0.01" placeholder="Nhập giá cần lưu" />
+                                <input name="PriceValue" value="@Model.HistoryEditor.PriceValue" type="number" step="0.01" placeholder="Nhập giá cần lưu" />
                             </label>
                             <label class="admin-form-field">
                                 <span>Đơn vị</span>
-                                <input asp-for="HistoryEditor.PriceUnit" type="text" placeholder="kg, tấn..." />
+                                <input name="PriceUnit" value="@Model.HistoryEditor.PriceUnit" type="text" placeholder="kg, tấn..." />
                             </label>
                             <label class="admin-form-field">
                                 <span>Loại giá</span>
-                                <input asp-for="HistoryEditor.PriceType" type="text" placeholder="initial, previous, market..." />
+                                <input name="PriceType" value="@Model.HistoryEditor.PriceType" type="text" placeholder="initial, previous, market..." />
                             </label>
                             <label class="admin-form-field admin-form-field--full">
                                 <span>Ghi chú</span>
-                                <textarea asp-for="HistoryEditor.Note" rows="4" placeholder="Mô tả thêm cho lần cập nhật giá"></textarea>
+                                <textarea name="Note" rows="4" placeholder="Mô tả thêm cho lần cập nhật giá">@Model.HistoryEditor.Note</textarea>
                             </label>
                             <label class="admin-form-field">
                                 <span>Ngày hiệu lực</span>
-                                <input asp-for="HistoryEditor.EffectiveDate" type="date" />
+                                <input type="date"
+                                       name="EffectiveDate"
+                                       value="@(Model.HistoryEditor.EffectiveDate?.ToString("yyyy-MM-dd"))" />
                             </label>
                             <label class="admin-form-field">
                                 <span>Ngày ghi nhận</span>
-                                <input asp-for="HistoryEditor.RecordedAt" type="datetime-local" />
+                                <input type="datetime-local"
+                                       name="RecordedAt"
+                                       value="@(Model.HistoryEditor.RecordedAt?.ToString("yyyy-MM-ddTHH:mm"))" />
                             </label>
                         </div>
 
@@ -446,6 +440,66 @@
         margin-left: auto;
     }
 
+    .admin-filter-toolbar {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 0 22px 18px;
+    }
+
+    .admin-filter-toolbar__search {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        min-height: 48px;
+        padding: 0.8rem 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.24);
+        border-radius: 16px;
+        background: #fff;
+        color: #0f172a;
+    }
+
+    .admin-filter-toolbar__search input {
+        flex: 1 1 auto;
+        border: 0;
+        outline: none;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+    }
+
+    .admin-filter-toolbar__buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .admin-filter-toolbar__submit,
+    .admin-filter-toolbar__reset {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 0.8rem 1.25rem;
+        border-radius: 16px;
+        border: 0;
+        text-decoration: none;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .admin-filter-toolbar__submit {
+        color: #1d4ed8;
+        background: rgba(37, 99, 235, 0.12);
+    }
+
+    .admin-filter-toolbar__reset {
+        color: #475569;
+        background: rgba(148, 163, 184, 0.14);
+    }
+
     .admin-prices-layout {
         display: grid;
         grid-template-columns: minmax(360px, 0.95fr) minmax(0, 1.55fr);
@@ -478,11 +532,6 @@
         overflow: auto;
     }
 
-    .admin-price-panel--current-highlight {
-        border: 1px solid rgba(20, 184, 166, 0.16);
-        box-shadow: 0 20px 48px rgba(20, 184, 166, 0.1);
-    }
-
     .admin-price-panel--product-selector {
         border: 1px solid rgba(148, 163, 184, 0.14);
     }
@@ -501,35 +550,57 @@
     }
 
     .admin-price-product-card {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        display: grid;
         gap: 12px;
         padding: 14px 16px;
         border-radius: 18px;
         border: 1px solid rgba(148, 163, 184, 0.24);
         background: rgba(255, 255, 255, 0.78);
-        color: inherit;
-        text-decoration: none;
         transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .admin-price-product-card__actions {
-        display: grid;
-        gap: 8px;
-        justify-items: end;
+    .admin-price-product-card__content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        color: inherit;
+        text-decoration: none;
     }
 
-    .admin-price-product-card__cta {
+    .admin-price-product-card__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .admin-price-product-card__cta,
+    .admin-price-product-card__edit {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         padding: 6px 10px;
         border-radius: 999px;
-        background: rgba(22, 101, 52, 0.1);
-        color: #166534;
         font-size: 0.78rem;
         font-weight: 700;
+        text-decoration: none;
+    }
+
+    .admin-price-product-card__cta {
+        background: rgba(22, 101, 52, 0.1);
+        color: #166534;
+    }
+
+    .admin-price-product-card__edit {
+        background: rgba(15, 118, 110, 0.1);
+        color: #0f766e;
+    }
+
+    .admin-price-product-card__cta:hover,
+    .admin-price-product-card__edit:hover,
+    .admin-price-product-card__content:hover {
+        filter: brightness(0.98);
     }
 
     .admin-price-product-card:hover,
@@ -547,6 +618,11 @@
     .admin-price-product-card span {
         color: #64748b;
         font-size: 0.88rem;
+    }
+
+    .admin-price-product-card__meta {
+        margin-top: 6px;
+        font-size: 0.78rem;
     }
 
     .admin-price-product-card__value {
@@ -639,55 +715,6 @@
         background: transparent;
         border: 0;
         box-shadow: none;
-    }
-
-    .admin-price-summary {
-        display: grid;
-        gap: 14px;
-        padding: 0 22px 22px;
-    }
-
-    .admin-price-summary__main {
-        display: grid;
-        gap: 4px;
-    }
-
-    .admin-price-summary__main strong,
-    .admin-price-summary__price strong {
-        display: block;
-        color: #0f172a;
-    }
-
-    .admin-price-summary__main span,
-    .admin-price-summary__price span,
-    .admin-price-summary__meta dt,
-    .admin-price-summary__meta dd {
-        color: #64748b;
-    }
-
-    .admin-price-summary__price strong {
-        font-size: 1.6rem;
-        line-height: 1.1;
-    }
-
-    .admin-price-summary__meta {
-        display: grid;
-        gap: 10px;
-        margin: 0;
-    }
-
-    .admin-price-summary__meta div {
-        display: grid;
-        gap: 4px;
-        padding: 12px 14px;
-        border-radius: 16px;
-        background: rgba(248, 250, 252, 0.9);
-        border: 1px solid rgba(148, 163, 184, 0.18);
-    }
-
-    .admin-price-summary__meta dt,
-    .admin-price-summary__meta dd {
-        margin: 0;
     }
 
     .admin-history-grid {

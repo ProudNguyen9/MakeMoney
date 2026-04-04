@@ -1,0 +1,541 @@
+@model WebThuMuaPheLieu.ViewModels.ContactPageViewModel
+@{
+    Layout = "_HomeLayout";
+    ViewData["Title"] = "Liên hệ";
+
+    string displayPhone = string.IsNullOrWhiteSpace(Model.Phone) ? "0909 123 456" : Model.Phone;
+    string phoneHref = $"tel:{new string(displayPhone.Where(char.IsDigit).ToArray())}";
+    string emailHref = string.IsNullOrWhiteSpace(Model.Email) ? "mailto:contact@phelieupro.vn" : $"mailto:{Model.Email}";
+}
+<style>
+.owner-box {
+    padding: 14px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f0fdf4, #ffffff);
+    border: 1px solid rgba(21, 128, 61, 0.12);
+}
+
+.owner-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #15803d;
+    box-shadow: 0 6px 14px rgba(21, 128, 61, 0.2);
+}
+
+.owner-phone {
+    color: #15803d;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.owner-phone:hover {
+    text-decoration: underline;
+}
+</style>
+
+
+<section class="contact-page-section contact-intro">
+    <div class="container-fluid contact-page-shell" data-aos="fade-up">
+        <div class="section-header">
+            <h2>Kết nối nhanh với Phế Liệu Thành Trung</h2>
+            <p>
+                Chúng tôi nhận khảo sát tận nơi, hỗ trợ báo giá nhanh cho kho xưởng, công trình, cửa hàng và hộ gia đình
+                có nhu cầu thanh lý phế liệu.
+            </p>
+        </div>
+
+        @if (TempData["ContactSuccess"] is string successMessage)
+        {
+            <div class="alert alert-success contact-alert mb-4" role="alert">@successMessage</div>
+        }
+
+        @if (TempData["ContactError"] is string errorMessage)
+        {
+            <div class="alert alert-danger contact-alert mb-4" role="alert">@errorMessage</div>
+        }
+
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-5">
+                <div class="contact-card contact-company-card h-100">
+                    <span class="contact-highlight"><i class="bi bi-stars"></i> Hỗ trợ phản hồi nhanh trong ngày</span>
+                    <h3>Thông tin liên hệ</h3>
+                    <div class="owner-box d-flex align-items-center gap-3 mb-3">
+
+                    <!-- Avatar -->
+                    <img src="~/images/owner.jpg"
+                        class="owner-avatar"
+                        alt="Chủ thu mua" />
+
+                    <!-- Info -->
+                    <div>
+                        <strong class="d-block">Anh Thành Trung</strong>
+                        <small class="text-muted">Chủ thu mua trực tiếp</small>
+
+                    </div>
+
+                </div>
+
+                    <ul class="contact-list">
+                        <li>
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <div>
+                                <strong>Địa chỉ</strong>
+                                <span>@Model.Address</span>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="bi bi-telephone-fill"></i>
+                            <div>
+                                <strong>Hotline</strong>
+                                <a href="@phoneHref">@displayPhone</a>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="bi bi-envelope-fill"></i>
+                            <div>
+                                <strong>Email</strong>
+                                <a href="@emailHref">@Model.Email</a>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="bi bi-truck"></i>
+                            <div>
+                                <strong>Khu vực phục vụ</strong>
+                                <span>@Model.PurchaseAreas</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="contact-cta-bar">
+                        <a href="@phoneHref" class="contact-cta-primary"><i class="bi bi-telephone-outbound-fill"></i> Gọi ngay</a>
+                        <a href="#contact-form" class="contact-cta-secondary"><i class="bi bi-chat-dots-fill"></i> Gửi yêu cầu</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="contact-card contact-form-card" id="contact-form">
+                    <h3>Để lại yêu cầu thu mua</h3>
+                    <p class="lead">
+                        Điền thông tin bên dưới để chúng tôi chủ động liên hệ, tư vấn phương án thu gom và báo giá phù hợp.
+                    </p>
+
+                    <form asp-controller="Contact" asp-action="Index" method="post" class="contact-request-form">
+                        @Html.AntiForgeryToken()
+                        <div class="row gy-3">
+                            <div class="col-md-6">
+                                <input asp-for="Name" class="form-control" placeholder="Họ và tên" />
+                            </div>
+                            <div class="col-md-6">
+                                <input asp-for="PhoneInput" class="form-control" placeholder="Số điện thoại" />
+                            </div>
+                            <div class="col-md-6">
+                                <input asp-for="EmailInput" class="form-control" placeholder="Email" />
+                            </div>
+                            <div class="col-md-6">
+                                <select asp-for="RequestType" class="form-select">
+                                    <option value="Thu mua phế liệu tận nơi">Thu mua phế liệu tận nơi</option>
+                                    <option value="Khảo sát kho xưởng">Khảo sát kho xưởng</option>
+                                    <option value="Dọn kho thanh lý">Dọn kho thanh lý</option>
+                                    <option value="Thu gom định kỳ">Thu gom định kỳ</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <input asp-for="Area" class="form-control" placeholder="Địa chỉ hoặc khu vực cần thu mua" />
+                            </div>
+                            <div class="col-12">
+                                <textarea asp-for="Message" class="form-control" rows="6" placeholder="Mô tả loại hàng, số lượng ước tính, thời gian cần thu mua..."></textarea>
+                            </div>
+                            <div class="col-12 text-center text-lg-start">
+                                <button type="submit" class="scrap-btn">Gửi yêu cầu ngay</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="contact-page-section pt-0">
+    <div class="container-fluid contact-page-shell" data-aos="fade-up" data-aos-delay="100">
+        <div class="row g-4 align-items-stretch">
+            <div class="col-lg-7">
+                <div class="contact-card contact-map-box h-100">
+                    <div class="contact-map-head">
+                        <span class="contact-highlight"><i class="bi bi-pin-map-fill"></i> Khảo sát và thu mua tận nơi</span>
+                        <h3>Bản đồ khu vực liên hệ</h3>
+                        <p>Đội ngũ của chúng tôi linh hoạt di chuyển để khảo sát nhanh tại nội thành và các khu vực lân cận.</p>
+                    </div>
+                    <div class="contact-map-embed">
+                        <iframe
+                            src="https://maps.google.com/maps?q=88%20Qu%E1%BB%91c%20l%E1%BB%99%201A%2C%20Qu%E1%BA%ADn%2012%2C%20TP.%20H%E1%BB%93%20Ch%C3%AD%20Minh&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="row g-4 h-100">
+                    <div class="col-12">
+                        <div class="contact-card contact-mini-card h-100">
+                            <span class="icon"><i class="bi bi-clock-history"></i></span>
+                            <div>
+                                <h4>Thời gian làm việc</h4>
+                                <p>Hỗ trợ tiếp nhận yêu cầu linh hoạt và ưu tiên khảo sát nhanh cho đơn hàng số lượng lớn.</p>
+                                <div class="contact-hours">
+                                    <div class="item"><span>Thứ 2 - Thứ 7</span><strong>07:00 - 20:00</strong></div>
+                                    <div class="item"><span>Chủ nhật</span><strong>08:00 - 17:00</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="contact-card contact-mini-card h-100">
+                            <span class="icon"><i class="bi bi-shield-check"></i></span>
+                            <div>
+                                <h4>Cam kết dịch vụ</h4>
+                                <p>Khảo sát đúng hẹn, báo giá minh bạch, cân đo rõ ràng và thanh toán nhanh ngay sau khi hoàn tất thu mua.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Styles {
+    <style>
+        :root {
+            --scrap-green: #15803d;
+            --scrap-green-dark: #166534;
+            --scrap-green-soft: #f0fdf4;
+            --scrap-orange: #fbbf24;
+            --scrap-orange-soft: #fef3c7;
+            --scrap-text: #455a64;
+        }
+
+        body {
+            color: var(--scrap-text);
+            background: linear-gradient(180deg, #f7fbf8 0%, #ffffff 100%);
+        }
+
+        .contact-page-shell {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            padding-left: 72px;
+            padding-right: 72px;
+        }
+
+        .contact-page-section {
+            padding: 80px 0;
+        }
+
+        .contact-intro {
+            padding-top: 50px;
+        }
+
+        .section-header h2 {
+            color: var(--scrap-green-dark);
+            font-weight: 900;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .section-header p {
+            color: #42574e;
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 1.75;
+             padding: 20px;
+        }
+
+        .section-header h2:after {
+            background: var(--scrap-orange);
+        }
+
+        .contact-alert {
+            border: 0;
+            border-radius: 18px;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .contact-card {
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 16px 36px rgba(15, 32, 24, 0.08);
+            border: 1px solid #edf2ee;
+            background: #fff;
+            padding: 32px;
+            height: 100%;
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #fbbf24, #15803d, #0ea5e9);
+            opacity: 0.8;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 40px rgba(21, 128, 61, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
+            border-color: rgba(21, 128, 61, 0.18);
+        }
+
+        .contact-card h3,
+        .contact-card h4 {
+            color: var(--scrap-green-dark);
+            font-weight: 800;
+            margin-bottom: 14px;
+            letter-spacing: -0.02em;
+        }
+
+        .contact-card p {
+            color: #64748b;
+            line-height: 1.75;
+            margin-bottom: 0;
+        }
+
+        .contact-highlight {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--scrap-orange-soft);
+            color: #9a6700;
+            font-weight: 800;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .contact-list {
+            list-style: none;
+            margin: 24px 0 0;
+            padding: 0;
+            display: grid;
+            gap: 16px;
+        }
+
+        .contact-list li {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fdfb 100%);
+            border: 1px solid rgba(21, 128, 61, 0.1);
+        }
+
+        .contact-list i,
+        .contact-mini-card .icon {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(21, 128, 61, 0.12), rgba(15, 165, 233, 0.08));
+            color: var(--scrap-green);
+            font-size: 20px;
+            border: 1px solid rgba(21, 128, 61, 0.14);
+            box-shadow: 0 4px 12px rgba(21, 128, 61, 0.08);
+        }
+
+        .contact-list strong,
+        .contact-mini-card h4 {
+            display: block;
+            color: var(--scrap-green-dark);
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .contact-list a {
+            color: #4b6359;
+            text-decoration: none;
+        }
+
+        .contact-mini-card {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .contact-mini-card p {
+            font-size: 14px;
+        }
+
+        .contact-form-card .lead {
+            margin-bottom: 24px;
+            color: #5b6f67;
+        }
+
+        .contact-form-card .form-control,
+        .contact-form-card .form-select {
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid rgba(21, 128, 61, 0.12);
+            box-shadow: none;
+            background: #fff;
+            color: #344e41;
+        }
+
+        .contact-form-card .form-control:focus,
+        .contact-form-card .form-select:focus {
+            border-color: rgba(21, 128, 61, 0.38);
+            box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.08);
+        }
+
+        .scrap-btn {
+            background: var(--scrap-green);
+            border: 0;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 999px;
+            font-weight: 700;
+            transition: 0.3s ease;
+        }
+
+        .scrap-btn:hover {
+            background: var(--scrap-green-dark);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(21, 128, 61, 0.18);
+        }
+
+        .contact-map-box {
+            padding: 0;
+        }
+
+        .contact-map-head {
+            padding: 28px 32px 0;
+        }
+
+        .contact-map-embed {
+            padding: 0 20px 20px;
+        }
+
+        .contact-map-embed iframe {
+            width: 100%;
+            height: 360px;
+            border: 0;
+            border-radius: 20px;
+        }
+
+        .contact-hours {
+            display: grid;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .contact-hours .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 18px;
+            border-radius: 16px;
+            background: #f7fbf8;
+            border: 1px solid #edf2ee;
+            color: #486258;
+            font-weight: 600;
+        }
+
+        .contact-cta-bar {
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .contact-cta-bar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .contact-cta-primary {
+            background: linear-gradient(135deg, #fff3a6 0%, #ffd84d 35%, #f4b400 68%, #cb8f00 100%);
+            color: #173326;
+            box-shadow: 0 12px 24px rgba(244, 180, 0, 0.22);
+        }
+
+        .contact-cta-secondary {
+            background: #f0fdf4;
+            color: var(--scrap-green-dark);
+            border: 1px solid rgba(21, 128, 61, 0.14);
+        }
+
+        @@media (max-width: 1199px) {
+            .contact-page-shell {
+                padding-left: 52px;
+                padding-right: 52px;
+            }
+        }
+
+        @@media (max-width: 991px) {
+            .contact-intro {
+                padding-top: 64px;
+            }
+
+            .contact-map-embed iframe {
+                height: 300px;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .contact-page-shell {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .contact-page-section {
+                padding: 56px 0;
+            }
+
+            .contact-card {
+                padding: 24px 20px;
+            }
+
+            .contact-map-head {
+                padding: 24px 20px 0;
+            }
+
+            .contact-map-embed {
+                padding: 0 14px 14px;
+            }
+
+            .contact-map-embed iframe {
+                height: 260px;
+            }
+        }
+
+        @@media (max-width: 575px) {
+            .contact-list li,
+            .contact-hours .item,
+            .contact-cta-bar {
+                padding: 14px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+}
