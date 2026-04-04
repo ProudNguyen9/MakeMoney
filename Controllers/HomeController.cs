@@ -142,9 +142,11 @@ namespace WebThuMuaPheLieu.Controllers
             return View(vm);
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> About()
         {
+            var contactInfo = await _contactInfoHelper.GetContactInfoAsync();
             ViewData["Title"] = "Giới thiệu";
+            ViewData["ContactInfo"] = contactInfo;
             return View();
         }
 

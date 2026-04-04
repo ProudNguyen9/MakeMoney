@@ -1,7 +1,11 @@
+@using WebThuMuaPheLieu.helpper
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Giới thiệu";
     ViewData["BodyClass"] = "about-page";
+    var contactInfo = ViewData["ContactInfo"] as ContactInfoSettings ?? new ContactInfoSettings();
+    var aboutPhone = !string.IsNullOrWhiteSpace(contactInfo.Phone) ? contactInfo.Phone : "0909 123 456";
+    var aboutPhoneHref = $"tel:{new string(aboutPhone.Where(char.IsDigit).ToArray())}";
 }
 
 <section id="about-hero" class="about-hero scrap-hero d-flex align-items-center">
@@ -48,8 +52,8 @@
                     <a asp-controller="Contact" asp-action="Index" class="hero-btn-primary">
                         <i class="bi bi-send-fill"></i> Liên hệ ngay
                     </a>
-                    <a href="tel:0909123456" class="hero-btn-secondary">
-                        <i class="bi bi-telephone-fill"></i> 0909 123 456
+                    <a href="@aboutPhoneHref" class="hero-btn-secondary">
+                        <i class="bi bi-telephone-fill"></i> @aboutPhone
                     </a>
                 </div>
             </div>
@@ -71,7 +75,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="about-hero-panel__floating">
+                        
+                        <div class="about-hero-panel__floating" 
+                                 style="    width: 95%;
+                                            position: absolute;
+                                            left: 20px;
+                                            right: 0;
+                                            bottom: -70px;">
                             <span><i class="bi bi-lightning-charge-fill"></i> Ưu tiên hỗ trợ nhanh tại TP.HCM, Bình Dương, Đồng Nai</span>
                         </div>
                     </div>
@@ -80,8 +90,8 @@
                         <a asp-controller="Contact" asp-action="Index" class="hero-btn-primary">
                             <i class="bi bi-send-fill"></i> Liên hệ ngay
                         </a>
-                        <a href="tel:0909123456" class="hero-btn-secondary">
-                            <i class="bi bi-telephone-fill"></i> 0909 123 456
+                        <a href="@aboutPhoneHref" class="hero-btn-secondary">
+                            <i class="bi bi-telephone-fill"></i> @aboutPhone
                         </a>
                     </div>
                 </div>
@@ -291,11 +301,17 @@
             font-weight: 800;
         }
 
-        body.about-page .about-hero-gallery__thumbs {
+       body.about-page .about-hero-gallery__thumbs {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 14px;
             margin-top: 14px;
+        }
+
+        body.about-page .about-hero-gallery__thumbs img {
+            height: 180px;       /* tăng lên 140px / 160px tùy bạn */
+            object-fit: cover;   /* giữ ảnh không bị méo */
+            border-radius: 8px;
         }
 
         body.about-page .about-hero-thumb {
@@ -320,7 +336,7 @@
 
         body.about-page .about-hero-thumb img {
             width: 100%;
-            height: 72px;
+            height: 110px;
             object-fit: cover;
             border-radius: 16px;
             display: block;
@@ -388,11 +404,11 @@
         }
 
         body.about-page .about-hero-actions--panel {
-            margin-top: 50px;
+            margin-top: 70px;
             justify-content: flex-start;
             gap: 20px;
             flex-wrap: nowrap;
-            padding-left: 40px;
+            padding-left: 90px;
         }
 
         body.about-page .about-hero-actions--mobile {
