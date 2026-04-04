@@ -1,9 +1,11 @@
 ﻿@using WebThuMuaPheLieu.helpper
-@inject IContactInfoHelper ContactInfoHelper
 @inject AppDbContext DbContext
-
+@inject IContactInfoHelper ContactInfoHelper
 @{
     var contact = await ContactInfoHelper.GetContactInfoAsync();
+    var headerPhone = !string.IsNullOrWhiteSpace(contact.Phone) ? contact.Phone : "0909 123 456";
+    var headerEmail = !string.IsNullOrWhiteSpace(contact.Gmail) ? contact.Gmail : "info@phelieuhoangdoanh.com";
+    var headerLocation = string.IsNullOrWhiteSpace(contact.PurchaseAreas) ? (string.IsNullOrWhiteSpace(contact.Address) ? "Phục vụ TP.HCM, Bình Dương, Đồng Nai" : contact.Address) : contact.PurchaseAreas;
     var facebookLink = string.IsNullOrWhiteSpace(contact.Facebook) ? "#" : (contact.Facebook.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Facebook.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Facebook : $"https://{contact.Facebook.TrimStart('/')}");
     var zaloLink = string.IsNullOrWhiteSpace(contact.Zalo) ? "#" : (contact.Zalo.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Zalo.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Zalo : $"https://zalo.me/{contact.Zalo.TrimStart('/')}");
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
@@ -37,26 +39,29 @@
             <div class="header-top-left">
                 <div class="header-top-item">
                     <i class="bi bi-telephone-fill"></i>
-                    <a href="tel:@contact.Phone">@contact.Phone</a>
+                    <a href="tel:@(new string(headerPhone.Where(char.IsDigit).ToArray()))">Hotline: @headerPhone</a>
                 </div>
                 <div class="header-top-item">
                     <i class="bi bi-envelope-fill"></i>
-                    <a href="mailto:@contact.Gmail">@contact.Gmail</a>
+                    <a href="mailto:@headerEmail">@headerEmail</a>
                 </div>
                 <div class="header-top-item">
                     <i class="bi bi-pin-map-fill"></i>
-                    <span>Phục vụ TP.HCM, Bình Dương, Đồng Nai</span>
+                    <span>@headerLocation</span>
                 </div>
-
-                <div class="header-social">
-                    <a href="@facebookLink" title="Facebook" target="_blank" rel="noopener noreferrer"><i class="bi bi-facebook"></i></a>
-                    <a href="@zaloLink" title="Zalo" target="_blank" rel="noopener noreferrer"><i class="bi bi-chat-dots"></i></a>
-                    <a href="@zaloLink" title="YouTube" target="_blank" rel="noopener noreferrer"><i class="bi bi-youtube"></i></a>
-                    <a href="@zaloLink" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram"></i></a>
-
+                <div class="header-top-item">
+                    <i class="bi bi-flower1"></i>
+                    <span class="tag-location">
+                        Giới thiệu ngay – Hoa hồng cao 🔥
+                    </span>
                 </div>
             </div>
-            
+            <div class="header-social">
+                <a href="@facebookLink" title="Facebook" target="_blank" rel="noopener noreferrer"><i class="bi bi-facebook"></i></a>
+                <a href="@zaloLink" title="Zalo" target="_blank" rel="noopener noreferrer"><i class="bi bi-chat-dots"></i></a>
+                <a href="@zaloLink" title="YouTube" target="_blank" rel="noopener noreferrer"><i class="bi bi-youtube"></i></a>
+                <a href="@zaloLink" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram"></i></a>
+            </div>
         </div>
 
         <div class="header-main-bar">
@@ -71,36 +76,37 @@
                         <ul>
                             <li><a asp-controller="Home" asp-action="Index" class="@(isHomePage ? "active" : null)">Trang
                                 chủ</a></li>
-                                <li><a asp-controller="Home" asp-action="About" class="@(isAboutPage ? "active" : null)">Giới
-                                    thiệu</a></li>
-                                    <li class="dropdown">
-                                        <a asp-controller="Home" asp-action="Index" asp-fragment="services">Dịch vụ <i
-                                            class="bi bi-chevron-down dropdown-indicator"></i></a>
-                                            <ul>
-                                                @foreach (var service in serviceMenuItems)
-                                                {
-                                                    <li>
-                                                        <a asp-controller="Blog" asp-action="Detail"
-                                                           asp-route-slug="@(!string.IsNullOrWhiteSpace(service.Slug) ? service.Slug : service.Id.ToString())">@service.Title</a>
-                                                    </li>
-                                                }
-                                            </ul>
-                                        </li>
-                                        <li><a asp-controller="Product" asp-action="Index"
-                                                   class="@(isProductPage ? "active" : null)">Mặt hàng</a></li>
-                                            <li><a asp-controller="Pricing" asp-action="Index"
-                                                       class="@(isPricingPage ? "active" : null)">Bảng giá</a></li>
-                                                <li><a asp-controller="Blog" asp-action="Index" class="@(isBlogPage ? "active" : null)">Tin
-                                                    tức</a></li>
-                                                    <li><a asp-controller="Contact" asp-action="Index"
-                                                               class="@(isContactPage ? "active" : null)">Liên hệ</a></li>
-                                                    </ul>
-                                                </nav>
-                                                <a asp-controller="Contact" asp-action="Index" class="header-cta d-none d-lg-inline-flex">
-                                                    <i class="bi bi-lightning-charge-fill"></i>
-                                                    Báo giá ngay
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </header>
+                                <li><a asp-controller="Home" asp-action="About" class="@(isAboutPage ? "active" : null)">Giới thiệu</a></li>
+                                <li class="dropdown">
+                                    <a asp-controller="Home" asp-action="Index" asp-fragment="services">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                                    <ul>
+                                        @foreach (var service in serviceMenuItems)
+                                        {
+                                            <li>
+                                                <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(service.Slug) ? service.Slug : service.Id.ToString())">@service.Title</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                                <li><a asp-controller="Product" asp-action="Index"
+                                           class="@(isProductPage ? "active" : null)">Mặt hàng</a></li>
+
+
+                                    <li><a asp-controller="Pricing" asp-action="Index"
+                                           class="@(isPricingPage ? "active" : null)">Bảng giá</a></li>
+
+                                    <li><a asp-controller="Blog" asp-action="Index" class="@(isBlogPage ? "active" : null)">Tin tức</a></li>
+
+                                    <li><a asp-controller="Contact" asp-action="Index" class="@(isContactPage ? "active" : null)">Liên hệ</a></li>
+                                </ul>
+                            </nav>
+                            <a asp-controller="Contact" asp-action="Index" class="header-cta d-none d-lg-inline-flex">
+                                <i class="bi bi-lightning-charge-fill"></i>
+                                Báo giá ngay
+
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </header>
