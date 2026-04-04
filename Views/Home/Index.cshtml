@@ -2,20 +2,46 @@
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Trang chủ";
+
+    var heroBanner = Model?.Banner;
+    var contactInfo = Model?.ContactInfo ?? new WebThuMuaPheLieu.helpper.ContactInfoSettings();
+    var heroLine1 = !string.IsNullOrWhiteSpace(heroBanner?.TitleLine1) ? heroBanner.TitleLine1 : "Chuyên thu mua";
+    var heroLine2 = !string.IsNullOrWhiteSpace(heroBanner?.TitleLine2) ? heroBanner.TitleLine2 : "phế liệu giá cao";
+    var heroLine3 = !string.IsNullOrWhiteSpace(heroBanner?.TitleLine3) ? heroBanner.TitleLine3 : "uy tín hàng đầu";
+    var heroLine4 = !string.IsNullOrWhiteSpace(heroBanner?.TitleLine4) ? heroBanner.TitleLine4 : "cho doanh nghiệp";
+    var heroButtonPrimaryText = !string.IsNullOrWhiteSpace(heroBanner?.ButtonPrimaryText) ? heroBanner.ButtonPrimaryText : "Nhận báo giá ngay";
+    var heroButtonPrimaryLink = !string.IsNullOrWhiteSpace(heroBanner?.ButtonPrimaryLink) ? heroBanner.ButtonPrimaryLink : "#quote-form";
+    var heroButtonSecondaryText = !string.IsNullOrWhiteSpace(heroBanner?.ButtonSecondaryText) ? heroBanner.ButtonSecondaryText : "Xem mặt hàng thu mua";
+    var heroButtonSecondaryLink = !string.IsNullOrWhiteSpace(heroBanner?.ButtonSecondaryLink) ? heroBanner.ButtonSecondaryLink : "#materials";
+    var heroImages = (heroBanner?.Images ?? Array.Empty<WebThuMuaPheLieu.helpper.BannerInjectImageSettings>())
+        .Where(image => !string.IsNullOrWhiteSpace(image.ImageUrl))
+        .OrderBy(image => image.OrderIndex)
+        .ThenBy(image => image.Id)
+        .ToList();
+    var defaultHeroImages = new[]
+    {
+        new { Url = Url.Content("~/assets/img/satthep.png"), Alt = "Thu mua sắt thép phế liệu tại kho bãi" },
+        new { Url = Url.Content("~/assets/img/dongnhom.jpg"), Alt = "Thu mua đồng nhôm và kim loại màu" },
+        new { Url = Url.Content("~/assets/img/maymoc.jpg"), Alt = "Thu mua máy móc công nghiệp và phế liệu cơ khí" }
+    };
+    var referralPhoneNumber = !string.IsNullOrWhiteSpace(contactInfo.Phone) ? contactInfo.Phone : "0888.03.7777";
+    var referralPhoneHref = $"tel:{new string(referralPhoneNumber.Where(char.IsDigit).ToArray())}";
+    var referralZaloValue = string.IsNullOrWhiteSpace(contactInfo.Zalo) ? "0888037777" : contactInfo.Zalo.Trim();
+    var referralZaloLink = referralZaloValue.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+        || referralZaloValue.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+        ? referralZaloValue
+        : $"https://zalo.me/{referralZaloValue.TrimStart('/')}";
+    var referralContactLink = Url.Content("~/contact.html");
 }
 
 <section id="hero" class="hero scrap-hero d-flex align-items-center">
     <div class="container-fluid home-wide-shell position-relative">
         <div class="row align-items-center gy-5">
             <div class="col-lg-5 hero-content" data-aos="fade-right" data-aos-delay="100">
-                <h2 class="hero-title"><span class="hero-title-line">Chuyên thu mua</span><span>phế liệu giá
-                    cao</span><span class="hero-title-line">uy tín hàng đầu </span><span class="hero-title-tail">cho
-                    doanh nghiệp</span></h2>
+                <h2 class="hero-title"><span class="hero-title-line">@heroLine1</span><span>@heroLine2</span><span class="hero-title-line">@heroLine3</span><span class="hero-title-tail">@heroLine4</span></h2>
                     <div class="hero-actions">
-                        <a href="#quote-form" class="hero-btn-primary"><i class="bi bi-telephone-fill"></i> Nhận báo giá
-                            ngay</a>
-                            <a href="#materials" class="hero-btn-secondary"><i class="bi bi-arrow-down-circle"></i> Xem mặt hàng
-                                thu mua</a>
+                        <a href="@heroButtonPrimaryLink" class="hero-btn-primary"><i class="bi bi-telephone-fill"></i> @heroButtonPrimaryText</a>
+                            <a href="@heroButtonSecondaryLink" class="hero-btn-secondary"><i class="bi bi-arrow-down-circle"></i> @heroButtonSecondaryText</a>
                             </div>
                         </div>
                         <div class="col-lg-7" data-aos="fade-left" data-aos-delay="180">
@@ -24,19 +50,26 @@
                                     <div class="hero-illustration-mask">
                                         <div class="slides-1 swiper hero-banner-slider">
                                             <div class="swiper-wrapper">
-                                                <div class="swiper-slide">
-                                                    <img src="~/assets/img/satthep.png" alt="Thu mua sắt thép phế liệu tại kho bãi"
-                                                         class="img-fluid w-100">
-                                                    </div>
-                                                    <div class="swiper-slide">
-                                                        <img src="~/assets/img/dongnhom.jpg" alt="Thu mua đồng nhôm và kim loại màu"
-                                                             class="img-fluid w-100">
-                                                        </div>
+                                                @if (heroImages.Any())
+                                                {
+                                                    @foreach (var image in heroImages)
+                                                    {
                                                         <div class="swiper-slide">
-                                                            <img src="~/assets/img/maymoc.jpg"
-                                                                 alt="Thu mua máy móc công nghiệp và phế liệu cơ khí"
+                                                            <img src="@Url.Content(NormalizeAssetPath(image.ImageUrl))" alt="@(string.IsNullOrWhiteSpace(image.Caption) ? heroLine1 : image.Caption)"
                                                                  class="img-fluid w-100">
-                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    @foreach (var image in defaultHeroImages)
+                                                    {
+                                                        <div class="swiper-slide">
+                                                            <img src="@image.Url" alt="@image.Alt"
+                                                                 class="img-fluid w-100">
+                                                        </div>
+                                                    }
+                                                }
                                                         </div>
                                                     </div>
                                                 </div>
@@ -314,6 +347,28 @@
                                                 return normalized;
                                             }
 
+                                            string NormalizeAssetPath(string? imagePath)
+                                            {
+                                                if (string.IsNullOrWhiteSpace(imagePath))
+                                                {
+                                                    return "~/assets/img/satthep.png";
+                                                }
+
+                                                var normalized = imagePath.Replace("\\", "/").Trim();
+
+                                                if (normalized.StartsWith("~/", StringComparison.Ordinal))
+                                                {
+                                                    return normalized;
+                                                }
+
+                                                if (normalized.StartsWith("/", StringComparison.Ordinal))
+                                                {
+                                                    return $"~{normalized}";
+                                                }
+
+                                                return $"~/{normalized.TrimStart('/')}";
+                                            }
+
                                             string[] BuildImageSequence(WebThuMuaPheLieu.Models.Product product)
                                             {
                                                 var imageSequence = (product.ProductImages ?? new List<WebThuMuaPheLieu.Models.ProductImage>())
@@ -390,12 +445,12 @@
                                                                                                                     </div>
 
                                                                                                                     <div class="referral-highlight__actions">
-                                                                                                                        <a href="tel:0888.03.7777" class="referral-btn referral-btn--primary"><i
-                                                                                                                            class="bi bi-telephone-fill"></i> Gọi nhận chính sách hoa hồng</a>
-                                                                                                                            <a href="http://zalo.me/0888037777" class="referral-btn referral-btn--secondary"><i
-                                                                                                                                class="bi bi-chat-dots-fill"></i> Nhắn Zalo gửi mối ngay</a>
-                                                                                                                                <a href="~/contact.html" class="referral-btn referral-btn--ghost"><i
-                                                                                                                                    class="bi bi-send-fill"></i> Gửi thông tin liên hệ để được tư vấn</a>
+                                                                                                                         <a href="@referralPhoneHref" class="referral-btn referral-btn--primary"><i
+                                                                                                                             class="bi bi-telephone-fill"></i> Gọi nhận chính sách hoa hồng</a>
+                                                                                                                             <a href="@referralZaloLink" class="referral-btn referral-btn--secondary" target="_blank" rel="noopener noreferrer"><i
+                                                                                                                                 class="bi bi-chat-dots-fill"></i> Nhắn Zalo gửi mối ngay</a>
+                                                                                                                                 <a href="@referralContactLink" class="referral-btn referral-btn--ghost"><i
+                                                                                                                                     class="bi bi-send-fill"></i> Gửi thông tin liên hệ để được tư vấn</a>
                                                                                                                                 </div>
                                                                                                                             </div>
                                                                                                                         </div>
@@ -447,10 +502,10 @@
                                                                                                                                                                                                     </div>
 
                                                                                                                                                                                                     <div class="coverage-actions">
-                                                                                                                                                                                                        <a href="tel:0888.03.7777" class="coverage-action coverage-action--primary"><i
+                                                                                                                                                                                                        <a href="@referralPhoneHref" class="coverage-action coverage-action--primary"><i
                                                                                                                                                                                                             class="bi bi-telephone-fill"></i> Gọi xác nhận khu vực</a>
-                                                                                                                                                                                                            <a href="http://zalo.me/0888037777" class="coverage-action coverage-action--secondary"><i
-                                                                                                                                                                                                                class="bi bi-chat-dots-fill"></i> Gửi vị trí qua Zalo</a>
+                                                                                                                                                                                                            <a href="@referralZaloLink" class="coverage-action coverage-action--secondary" target="_blank" rel="noopener noreferrer"><i
+                                                                                                                                                                                                               class="bi bi-chat-dots-fill"></i> Gửi vị trí qua Zalo</a>
                                                                                                                                                                                                             </div>
                                                                                                                                                                                                         </div>
 

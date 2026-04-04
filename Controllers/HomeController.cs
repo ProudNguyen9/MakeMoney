@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebThuMuaPheLieu.helpper;
 using WebThuMuaPheLieu.Models;
 using WebThuMuaPheLieu.ViewModels;
 
@@ -11,14 +12,20 @@ namespace WebThuMuaPheLieu.Controllers
     {
 
         private readonly AppDbContext _context;
+        private readonly IBannerInjectHelper _bannerInjectHelper;
+        private readonly IContactInfoHelper _contactInfoHelper;
 
-        public HomeController(AppDbContext context)
+        public HomeController(AppDbContext context, IBannerInjectHelper bannerInjectHelper, IContactInfoHelper contactInfoHelper)
         {
             _context = context;
+            _bannerInjectHelper = bannerInjectHelper;
+            _contactInfoHelper = contactInfoHelper;
         }
 
         public async Task<IActionResult> Index()
         {
+            var banners = await _bannerInjectHelper.GetActiveBannersAsync();
+            var contactInfo = await _contactInfoHelper.GetContactInfoAsync();
             var products = await _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.ProductImages)
@@ -29,6 +36,8 @@ namespace WebThuMuaPheLieu.Controllers
 
             var viewModel = new HomeIndexViewModel
             {
+                Banner = banners.FirstOrDefault(),
+                ContactInfo = contactInfo,
                 Products = products
             };
 
