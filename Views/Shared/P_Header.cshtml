@@ -1,9 +1,11 @@
-@using WebThuMuaPheLieu.helpper
+﻿@using WebThuMuaPheLieu.helpper
 @inject IContactInfoHelper ContactInfoHelper
 @inject AppDbContext DbContext
 
 @{
     var contact = await ContactInfoHelper.GetContactInfoAsync();
+    var facebookLink = string.IsNullOrWhiteSpace(contact.Facebook) ? "#" : (contact.Facebook.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Facebook.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Facebook : $"https://{contact.Facebook.TrimStart('/')}");
+    var zaloLink = string.IsNullOrWhiteSpace(contact.Zalo) ? "#" : (contact.Zalo.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Zalo.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Zalo : $"https://zalo.me/{contact.Zalo.TrimStart('/')}");
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var isHomePage = string.Equals(currentController, "Home", StringComparison.OrdinalIgnoreCase)
@@ -45,19 +47,16 @@
                     <i class="bi bi-pin-map-fill"></i>
                     <span>Phục vụ TP.HCM, Bình Dương, Đồng Nai</span>
                 </div>
-                <div class="header-top-item">
-                    <i class="bi bi-flower1"></i>
-                    <span class="tag-location">
-                        Giới thiệu ngay – Hoa hồng cao 🔥
-                    </span>
+
+                <div class="header-social">
+                    <a href="@facebookLink" title="Facebook" target="_blank" rel="noopener noreferrer"><i class="bi bi-facebook"></i></a>
+                    <a href="@zaloLink" title="Zalo" target="_blank" rel="noopener noreferrer"><i class="bi bi-chat-dots"></i></a>
+                    <a href="@zaloLink" title="YouTube" target="_blank" rel="noopener noreferrer"><i class="bi bi-youtube"></i></a>
+                    <a href="@zaloLink" title="Instagram" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram"></i></a>
+
                 </div>
             </div>
-            <div class="header-social">
-                <a href="#" title="Facebook" target="_blank"><i class="bi bi-facebook"></i></a>
-                <a href="#" title="Zalo" target="_blank"><i class="bi bi-chat-dots"></i></a>
-                <a href="#" title="YouTube" target="_blank"><i class="bi bi-youtube"></i></a>
-                <a href="#" title="Instagram" target="_blank"><i class="bi bi-instagram"></i></a>
-            </div>
+            
         </div>
 
         <div class="header-main-bar">
