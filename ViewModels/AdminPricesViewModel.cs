@@ -6,6 +6,8 @@ public class AdminPricesViewModel
 {
     public List<AdminPriceProductItemViewModel> Products { get; set; } = new();
 
+    public string? SearchTerm { get; set; }
+
     public List<SelectListItem> ProductOptions { get; set; } = new();
 
     public AdminCurrentPriceEditorViewModel CurrentPriceEditor { get; set; } = new();
