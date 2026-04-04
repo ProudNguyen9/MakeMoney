@@ -1,3 +1,16 @@
+@using WebThuMuaPheLieu.helpper
+@inject IContactInfoHelper ContactInfoHelper
+@{
+    var contact = await ContactInfoHelper.GetContactInfoAsync();
+    var footerPhone = !string.IsNullOrWhiteSpace(contact.Phone) ? contact.Phone : "0909 686 889";
+    var footerPhoneDigits = new string(footerPhone.Where(char.IsDigit).ToArray());
+    var footerPhoneHref = string.IsNullOrWhiteSpace(footerPhoneDigits) ? "tel:0909686889" : $"tel:{footerPhoneDigits}";
+    var footerEmail = !string.IsNullOrWhiteSpace(contact.Gmail) ? contact.Gmail : "info@phelieuthanhphat.vn";
+    var footerAddress = !string.IsNullOrWhiteSpace(contact.Address) ? contact.Address : "88 Quốc lộ 1A, P. An Phú Đông, Quận 12, TP. Hồ Chí Minh";
+    var facebookLink = string.IsNullOrWhiteSpace(contact.Facebook) ? "#" : (contact.Facebook.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Facebook.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Facebook : $"https://{contact.Facebook.TrimStart('/')}");
+    var zaloLink = string.IsNullOrWhiteSpace(contact.Zalo) ? "#" : (contact.Zalo.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Zalo.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Zalo : $"https://zalo.me/{contact.Zalo.TrimStart('/')}");
+}
+
 <footer id="footer" class="footer">
     <div class="footer-content position-relative">
         <div class="container">
@@ -7,20 +20,19 @@
                     <div class="footer-info">
                         <h3>Phế Liệu Hoàng Doanh</h3>
                         <p>
-                            88 Quốc lộ 1A, P. An Phú Đông <br>
-                            Quận 12, TP. Hồ Chí Minh<br><br>
-                            <strong>Hotline:</strong> 0909 686 889<br>
-                            <strong>Email:</strong> info@phelieuthanhphat.vn<br>
+                            @footerAddress<br><br>
+                            <strong>Hotline:</strong> @footerPhone<br>
+                            <strong>Email:</strong> @footerEmail<br>
                         </p>
                         <div class="social-links d-flex mt-3">
-                            <a href="#" class="d-flex align-items-center justify-content-center"><i
+                            <a href="@facebookLink" class="d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer"><i
                                 class="bi bi-facebook"></i></a>
-                                <a href="#" class="d-flex align-items-center justify-content-center"><i
-                                    class="bi bi-instagram"></i></a>
-                                    <a href="#" class="d-flex align-items-center justify-content-center"><i
-                                        class="bi bi-youtube"></i></a>
-                                        <a href="#" class="d-flex align-items-center justify-content-center"><i
-                                            class="bi bi-telephone"></i></a>
+                                <a href="@zaloLink" class="d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer"><i
+                                     class="bi bi-instagram"></i></a>
+                                    <a href="@zaloLink" class="d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer"><i
+                                         class="bi bi-youtube"></i></a>
+                                        <a href="@footerPhoneHref" class="d-flex align-items-center justify-content-center"><i
+                                             class="bi bi-telephone"></i></a>
                                         </div>
                                     </div>
                                 </div>
@@ -87,23 +99,23 @@
 
                 <div class="social-button is-open">
                     <div class="social-button-content">
-                        <a href="tel:0888.03.7777" class="call-icon" rel="nofollow" aria-label="Hotline 0888.03.7777">
+                        <a href="@footerPhoneHref" class="call-icon" rel="nofollow" aria-label="Hotline @footerPhone">
                             <i class="fas fa-phone-alt" aria-hidden="true"></i>
                             <div class="animated alo-circle"></div>
                             <div class="animated alo-circle-fill"></div>
-                            <span>Hotline: 0888.03.7777</span>
+                            <span>Hotline: @footerPhone</span>
                         </a>
-                        <a href="https://www.facebook.com/tocdoviet/" class="mes" aria-label="Nhắn tin Facebook">
+                        <a href="@facebookLink" class="mes" aria-label="Nhắn tin Facebook" target="_blank" rel="noopener noreferrer">
                             <i class="fab fa-facebook-messenger" aria-hidden="true"></i>
                             <div class="animated alo-circle"></div>
                             <div class="animated alo-circle-fill"></div>
                             <span>Nhắn tin Facebook</span>
                         </a>
-                        <a href="http://zalo.me/0888037777" class="zalo" aria-label="Zalo 0888.03.7777">
+                        <a href="@zaloLink" class="zalo" aria-label="Zalo @footerPhone" target="_blank" rel="noopener noreferrer">
                             <span class="social-button-zalo-text">Zalo</span>
                             <div class="animated alo-circle"></div>
                             <div class="animated alo-circle-fill"></div>
-                            <span>Zalo: 0888.03.7777</span>
+                            <span>Zalo: @footerPhone</span>
                         </a>
                     </div>
                 </div>

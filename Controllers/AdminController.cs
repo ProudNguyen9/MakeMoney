@@ -1273,9 +1273,19 @@ public class AdminController : Controller
             return imageUrl ?? string.Empty;
         }
 
-        var extension = Path.GetExtension(imageUrl);
+        var normalizedImageUrl = imageUrl.Trim().Replace("\\", "/");
+        if (normalizedImageUrl.StartsWith("~/", StringComparison.Ordinal))
+        {
+            normalizedImageUrl = normalizedImageUrl[2..];
+        }
+        else if (normalizedImageUrl.StartsWith("/", StringComparison.Ordinal))
+        {
+            normalizedImageUrl = normalizedImageUrl[1..];
+        }
+
+        var extension = Path.GetExtension(normalizedImageUrl);
         var activeFileName = $"banner-{orderIndex}{extension}";
-        var sourcePath = Path.Combine(_environment.WebRootPath, imageUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+        var sourcePath = Path.Combine(_environment.WebRootPath, normalizedImageUrl.Replace('/', Path.DirectorySeparatorChar));
         var activeFolderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "bannersandseos");
         Directory.CreateDirectory(activeFolderPath);
 

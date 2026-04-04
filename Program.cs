@@ -26,6 +26,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 builder.Services.AddScoped<IContactInfoHelper, ContactInfoHelper>();
+builder.Services.AddScoped<IBannerInjectHelper, BannerInjectHelper>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
