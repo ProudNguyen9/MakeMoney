@@ -1,3 +1,4 @@
+@inject AppDbContext DbContext
 @{
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
@@ -14,6 +15,14 @@
             || string.Equals(currentAction, "Detail", StringComparison.OrdinalIgnoreCase));
     var isContactPage = string.Equals(currentController, "Contact", StringComparison.OrdinalIgnoreCase)
         && string.Equals(currentAction, "Index", StringComparison.OrdinalIgnoreCase);
+
+    var serviceMenuItems = DbContext.BlogPosts
+        .Where(post => post.Status == "published"
+            && DbContext.BlogPostCategories.Any(category => category.PostId == post.Id && category.CategoryId == 1))
+        .OrderByDescending(post => post.PublishedAt ?? post.CreatedAt)
+        .ThenByDescending(post => post.Id)
+        .Select(post => new { post.Title, post.Slug, post.Id })
+        .ToList();
 }
 
 <header id="header" class="header">
@@ -61,16 +70,14 @@
                                 chủ</a></li>
                                 <li><a asp-controller="Home" asp-action="About" class="@(isAboutPage ? "active" : null)">Giới thiệu</a></li>
                                 <li class="dropdown">
-                                    <a href="~/services.html">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
+                                    <a asp-controller="Home" asp-action="Index" asp-fragment="services">Dịch vụ <i class="bi bi-chevron-down dropdown-indicator"></i></a>
                                     <ul>
-                                        <li><a href="~/services.html">Thu mua phế liệu công ty</a></li>
-                                        <li><a href="~/services.html">Thu mua phế liệu nhà dân</a></li>
-                                        <li><a href="~/services.html">Phân loại xử lý phế liệu</a></li>
-                                        <li><a href="~/services.html">Thu mua phế liệu nhà xưởng</a></li>
-                                        <li><a href="~/services.html">Thu mua phế liệu giá cao, tận nơi</a></li>
-                                        <li><a href="~/services.html">Thu mua phế liệu công trình</a></li>
-                                        <li><a href="~/services.html">Thu mua thanh lý kho xưởng</a></li>
-                                        <li><a href="~/services.html">Thu mua số lượng lớn giá cao</a></li>
+                                        @foreach (var service in serviceMenuItems)
+                                        {
+                                            <li>
+                                                <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(service.Slug) ? service.Slug : service.Id.ToString())">@service.Title</a>
+                                            </li>
+                                        }
                                     </ul>
                                 </li>
                                 <li><a asp-controller="Product" asp-action="Index"
