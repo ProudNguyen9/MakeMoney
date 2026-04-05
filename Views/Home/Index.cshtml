@@ -9,10 +9,18 @@
     var heroLine2 = !string.IsNullOrWhiteSpace(heroBanner?.TitleLine2) ? heroBanner.TitleLine2 : "phế liệu giá cao";
     var heroLine3 = !string.IsNullOrWhiteSpace(heroBanner?.TitleLine3) ? heroBanner.TitleLine3 : "uy tín hàng đầu";
     var heroLine4 = !string.IsNullOrWhiteSpace(heroBanner?.TitleLine4) ? heroBanner.TitleLine4 : "cho doanh nghiệp";
+    var referralPhoneNumber = !string.IsNullOrWhiteSpace(contactInfo.Phone) ? contactInfo.Phone : "0888.03.7777";
+    var referralPhoneHref = $"tel:{new string(referralPhoneNumber.Where(char.IsDigit).ToArray())}";
+    var referralZaloValue = string.IsNullOrWhiteSpace(contactInfo.Zalo) ? "0888037777" : contactInfo.Zalo.Trim();
+    var referralZaloLink = referralZaloValue.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+        || referralZaloValue.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+        ? referralZaloValue
+        : $"https://zalo.me/{referralZaloValue.TrimStart('/')}";
+    var referralContactLink = Url.Content("~/contact.html");
     var heroButtonPrimaryText = !string.IsNullOrWhiteSpace(heroBanner?.ButtonPrimaryText) ? heroBanner.ButtonPrimaryText : "Nhận báo giá ngay";
-    var heroButtonPrimaryLink = !string.IsNullOrWhiteSpace(heroBanner?.ButtonPrimaryLink) ? heroBanner.ButtonPrimaryLink : "#quote-form";
+    var heroButtonPrimaryLink = referralPhoneHref;
     var heroButtonSecondaryText = !string.IsNullOrWhiteSpace(heroBanner?.ButtonSecondaryText) ? heroBanner.ButtonSecondaryText : "Xem mặt hàng thu mua";
-    var heroButtonSecondaryLink = !string.IsNullOrWhiteSpace(heroBanner?.ButtonSecondaryLink) ? heroBanner.ButtonSecondaryLink : "#materials";
+    var heroButtonSecondaryLink = Url.Action("Index", "Product") ?? "/Product";
     var heroImages = (heroBanner?.Images ?? Array.Empty<WebThuMuaPheLieu.helpper.BannerInjectImageSettings>())
         .Where(image => !string.IsNullOrWhiteSpace(image.ImageUrl))
         .OrderBy(image => image.OrderIndex)
@@ -24,14 +32,6 @@
         new { Url = Url.Content("~/assets/img/dongnhom.jpg"), Alt = "Thu mua đồng nhôm và kim loại màu" },
         new { Url = Url.Content("~/assets/img/maymoc.jpg"), Alt = "Thu mua máy móc công nghiệp và phế liệu cơ khí" }
     };
-    var referralPhoneNumber = !string.IsNullOrWhiteSpace(contactInfo.Phone) ? contactInfo.Phone : "0888.03.7777";
-    var referralPhoneHref = $"tel:{new string(referralPhoneNumber.Where(char.IsDigit).ToArray())}";
-    var referralZaloValue = string.IsNullOrWhiteSpace(contactInfo.Zalo) ? "0888037777" : contactInfo.Zalo.Trim();
-    var referralZaloLink = referralZaloValue.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-        || referralZaloValue.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
-        ? referralZaloValue
-        : $"https://zalo.me/{referralZaloValue.TrimStart('/')}";
-    var referralContactLink = Url.Content("~/contact.html");
 }
 
 <section id="hero" class="hero scrap-hero d-flex align-items-center">
@@ -367,6 +367,34 @@
                                                 }
 
                                                 return $"~/{normalized.TrimStart('/')}";
+                                            }
+
+                                            string ResolveHeroActionLink(string? configuredLink, string phoneHref, string zaloHref, string fallback)
+                                            {
+                                                if (string.IsNullOrWhiteSpace(configuredLink))
+                                                {
+                                                    return fallback;
+                                                }
+
+                                                var normalized = configuredLink.Trim();
+                                                var normalizedLower = normalized.ToLowerInvariant();
+
+                                                if (normalizedLower.StartsWith("tel:")
+                                                    || normalizedLower.Contains("gọi")
+                                                    || normalizedLower.Contains("hotline")
+                                                    || normalizedLower.Contains("phone"))
+                                                {
+                                                    return phoneHref;
+                                                }
+
+                                                if (normalizedLower.Contains("zalo")
+                                                    || normalizedLower.StartsWith("http://zalo.me")
+                                                    || normalizedLower.StartsWith("https://zalo.me"))
+                                                {
+                                                    return zaloHref;
+                                                }
+
+                                                return normalized;
                                             }
 
                                             string[] BuildImageSequence(WebThuMuaPheLieu.Models.Product product)
