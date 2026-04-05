@@ -104,10 +104,13 @@
             color: #6b7280;
             font-size: 0.94rem;
         }
-.section-header h2:before,
+        @@media (max-width: 768px) {
+            .section-header h2:before,
             .section-header h2:after {
                 display: none;
             }
+        }
+
         .blog-detail-breadcrumb a {
             color: #15803d;
             text-decoration: none;

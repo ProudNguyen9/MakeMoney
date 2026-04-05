@@ -109,10 +109,13 @@
         rel="stylesheet" />
   <link href="~/css/detail.css" rel="stylesheet" />
   <style>
-    .section-header h2:before,
-            .section-header h2:after {
-                display: none;
-            }
+    @@media (max-width: 768px) {
+      .section-header h2:before,
+      .section-header h2:after {
+        display: none;
+      }
+    }
+
     /* Scope styles for Home/Detail only */
     body.home-detail-page .detail-main,
     body.home-detail-page .detail-main * {
