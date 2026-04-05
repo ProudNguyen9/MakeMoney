@@ -494,6 +494,64 @@
                 margin-top: -60px;
             }
 
+            .pricing-page .table-container {
+                padding: 0 0.9rem 1.25rem;
+            }
+
+            .pricing-page .custom-table {
+                table-layout: fixed;
+            }
+
+            .pricing-page .custom-table th,
+            .pricing-page .custom-table td {
+                padding: 0.9rem 0.55rem;
+            }
+
+            .pricing-page .custom-table th:nth-child(3),
+            .pricing-page .custom-table th:nth-child(5),
+            .pricing-page .custom-table th:nth-child(6),
+            .pricing-page .custom-table th:nth-child(7),
+            .pricing-page .custom-table td:nth-child(3),
+            .pricing-page .custom-table td:nth-child(5),
+            .pricing-page .custom-table td:nth-child(6),
+            .pricing-page .custom-table td:nth-child(7) {
+                display: none;
+            }
+
+            .pricing-page .custom-table th:nth-child(1),
+            .pricing-page .custom-table td:nth-child(1) {
+                width: 56px;
+                white-space: nowrap;
+            }
+
+            .pricing-page .custom-table th:nth-child(2),
+            .pricing-page .custom-table td:nth-child(2) {
+                width: auto;
+            }
+
+            .pricing-page .custom-table th:nth-child(4),
+            .pricing-page .custom-table td:nth-child(4) {
+                width: 118px;
+                text-align: right;
+                white-space: nowrap;
+            }
+
+            .pricing-page .custom-table td:nth-child(2) {
+                font-size: 0.94rem;
+                line-height: 1.45;
+            }
+
+            .pricing-page .custom-table td:nth-child(4) .price-text,
+            .pricing-page .custom-table .price-text {
+                font-size: 1rem !important;
+            }
+
+            .pricing-page .custom-table .empty-row td {
+                display: table-cell;
+                width: auto;
+                text-align: center;
+            }
+
             .pricing-page .price-text {
                 font-size: 1.25rem;
             }
@@ -505,6 +563,14 @@
             .pricing-page .pricing-hero-heading h2,
             .pricing-page .featured-products-section--pricing .section-header h2 {
                 font-size: 24px !important;
+            }
+
+            .pricing-page .pricing-hero-heading h2::before,
+            .pricing-page .pricing-hero-heading h2::after,
+            .pricing-page .featured-products-section--pricing .section-header h2::before,
+            .pricing-page .featured-products-section--pricing .section-header h2::after {
+                display: none !important;
+                content: none !important;
             }
 
             .pricing-page .hero-summary {

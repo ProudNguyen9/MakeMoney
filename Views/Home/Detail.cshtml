@@ -1,6 +1,7 @@
 @model WebThuMuaPheLieu.ViewModels.ProductDetailViewModel
 @{
   Layout = "_HomeLayout";
+  ViewData["BodyClass"] = "home-detail-page";
 }
 
 @{
@@ -107,9 +108,678 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
   <link href="~/css/detail.css" rel="stylesheet" />
+  <style>
+    .section-header h2:before,
+            .section-header h2:after {
+                display: none;
+            }
+    /* Scope styles for Home/Detail only */
+    body.home-detail-page .detail-main,
+    body.home-detail-page .detail-main * {
+      box-sizing: border-box;
+    }
+
+    body.home-detail-page .detail-main a {
+      text-decoration: none;
+    }
+
+    body.home-detail-page .detail-main img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    body.home-detail-page .detail-main button {
+      color: inherit;
+    }
+
+    /* Fix product image card width on Home/Detail */
+    body.home-detail-page .detail-thumb-grid {
+      align-items: stretch;
+    }
+
+    body.home-detail-page .detail-thumb {
+      display: block;
+      width: 100%;
+      padding: 0;
+      background: transparent;
+      min-height: 0;
+    }
+
+    body.home-detail-page .detail-thumb img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      object-fit: cover;
+    }
+
+    body.home-detail-page .detail-thumb-caption {
+      left: 0;
+      right: 0;
+      width: auto;
+    }
+
+    body.home-detail-page .detail-page-banner {
+      position: relative;
+      overflow: hidden;
+      padding: 88px 0 120px;
+      color: #fff;
+      background-color: #15803d;
+      background-image: linear-gradient(rgba(21, 128, 61, 0.88), rgba(21, 128, 61, 0.9)), url('/assets/default/ảnh%20nền.png');
+      background-size: cover;
+      background-position: center;
+    }
+
+    body.home-detail-page .detail-page-banner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.02));
+    }
+
+    body.home-detail-page .detail-page-banner::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 120px;
+      background: linear-gradient(180deg, rgba(21, 128, 61, 0) 0%, rgba(21, 128, 61, 0.16) 35%, rgba(248, 250, 252, 1) 100%);
+      pointer-events: none;
+    }
+
+    body.home-detail-page .detail-page-banner-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    body.home-detail-page .detail-page-banner-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-bottom: 1rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #f8fafc;
+      text-transform: uppercase;
+    }
+
+    body.home-detail-page .detail-page-banner-kicker .material-symbols-outlined {
+      font-size: 1rem;
+    }
+
+    body.home-detail-page .detail-page-banner-title {
+      margin: 0;
+      color: #ffffff;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+
+    body.home-detail-page .detail-page-banner-summary {
+      margin: 1rem auto 0;
+      max-width: 760px;
+      font-size: 1rem;
+      line-height: 1.75;
+      color: rgba(255, 255, 255, 0.92);
+    }
+
+    /* Mobile only for Home/Detail */
+    @@media (max-width: 768px) {
+      body.home-detail-page {
+        overflow-x: hidden;
+      }
+
+      body.home-detail-page .detail-shell {
+        width: min(100%, calc(100% - 24px));
+        margin: 0 auto;
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      body.home-detail-page .detail-trust-highlight {
+        padding: 18px 16px;
+        border-radius: 20px;
+      }
+
+      body.home-detail-page .detail-trust-highlight h2 {
+        font-size: 1.6rem;
+        line-height: 1.3;
+      }
+
+      body.home-detail-page .detail-trust-highlight p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      body.home-detail-page .detail-trust-stats {
+        gap: 12px;
+      }
+
+      body.home-detail-page .detail-trust-stat {
+        padding: 14px;
+        border-radius: 16px;
+      }
+
+      body.home-detail-page .detail-trust-stat strong {
+        font-size: 1.6rem;
+      }
+
+      body.home-detail-page .detail-trust-stat span {
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+      }
+
+      body.home-detail-page .detail-main {
+        padding-top: 0;
+      }
+
+      body.home-detail-page .detail-page-banner {
+        padding: 60px 0 110px;
+      }
+
+      body.home-detail-page .detail-page-banner-kicker {
+        margin-bottom: 0.9rem;
+      }
+
+      body.home-detail-page .detail-page-banner-title {
+        font-size: 2rem;
+      }
+
+      body.home-detail-page .detail-page-banner-summary {
+        font-size: 0.98rem;
+        line-height: 1.7;
+      }
+
+      body.home-detail-page .detail-section,
+      body.home-detail-page .detail-soft-section,
+      body.home-detail-page .detail-process-section,
+      body.home-detail-page .detail-trust-section {
+        padding-top: 24px;
+        padding-bottom: 24px;
+      }
+
+      body.home-detail-page .detail-grid-hero,
+      body.home-detail-page .detail-two-col,
+      body.home-detail-page .detail-trust-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      body.home-detail-page .detail-gallery-stack,
+      body.home-detail-page .detail-content-stack {
+        gap: 12px;
+      }
+
+      body.home-detail-page .detail-hero-main {
+        min-height: 0;
+        height: clamp(250px, 72vw, 360px);
+        border-radius: 20px;
+      }
+
+      body.home-detail-page .detail-news-desc {
+        font-size: 0.95rem;
+        line-height: 1.65;
+        padding: 0 4px;
+      }
+
+      body.home-detail-page .detail-hero-main img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      body.home-detail-page .detail-hero-overlay {
+        padding: 14px;
+      }
+
+      body.home-detail-page .detail-hero-overlay-inner {
+        gap: 8px;
+      }
+
+      body.home-detail-page .detail-hero-title {
+        font-size: 1.05rem;
+        line-height: 1.3;
+      }
+
+      body.home-detail-page .detail-hero-desc {
+        font-size: 0.84rem;
+        line-height: 1.55;
+        max-width: 100%;
+      }
+
+      body.home-detail-page .detail-thumb-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      body.home-detail-page .detail-thumb {
+        border-radius: 14px;
+      }
+
+      body.home-detail-page .detail-thumb-caption {
+        padding: 6px 8px;
+        font-size: 10px;
+      }
+
+      body.home-detail-page .detail-service-badge,
+      body.home-detail-page .detail-referral-badge,
+      body.home-detail-page .detail-pill,
+      body.home-detail-page .detail-trust-badge {
+        max-width: 100%;
+        white-space: normal;
+        line-height: 1.4;
+      }
+
+      body.home-detail-page .detail-heading-block h1,
+      body.home-detail-page .detail-section-head h2,
+      body.home-detail-page .detail-process-head h2,
+      body.home-detail-page .detail-trust-highlight h2,
+      body.home-detail-page .detail-referral-card h2,
+      body.home-detail-page .detail-referral-title {
+        font-size: clamp(1.4rem, 6vw, 1.85rem);
+        line-height: 1.25;
+        letter-spacing: 0.01em;
+      }
+
+      body.home-detail-page .detail-heading-block p,
+      body.home-detail-page .detail-process-head p,
+      body.home-detail-page .detail-referral-card p,
+      body.home-detail-page .detail-trust-highlight p,
+      body.home-detail-page .detail-review-text,
+      body.home-detail-page .detail-process-card p {
+        font-size: 0.95rem;
+        line-height: 1.7;
+      }
+
+      body.home-detail-page .detail-price-box {
+        padding: 16px 16px 14px;
+        border-radius: 20px;
+      }
+
+      body.home-detail-page .detail-price-box-inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      body.home-detail-page .detail-price-row {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      body.home-detail-page .detail-price-label {
+        margin-bottom: 8px;
+      }
+
+      body.home-detail-page .detail-price-value {
+        display: block;
+        width: 100%;
+        font-size: clamp(1.55rem, 7vw, 2rem);
+        line-height: 1.2;
+        word-break: break-word;
+      }
+
+      body.home-detail-page .detail-price-note,
+      body.home-detail-page .detail-trend-pill {
+        display: block;
+        max-width: 100%;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+
+      body.home-detail-page .detail-trend-pill {
+        width: 100%;
+        justify-content: flex-start;
+        align-items: flex-start;
+        border-radius: 16px;
+        padding: 10px 12px;
+        font-size: 0.88rem;
+      }
+
+      body.home-detail-page .detail-feature-grid,
+      body.home-detail-page .detail-referral-grid,
+      body.home-detail-page .detail-process-grid,
+      body.home-detail-page .detail-trust-stats,
+      body.home-detail-page .detail-trust-tags {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      body.home-detail-page .detail-feature-grid {
+        display: none;
+      }
+
+      body.home-detail-page .detail-feature-item {
+        min-height: 54px;
+        padding: 12px 14px;
+        margin-bottom: 0;
+        border-radius: 16px;
+      }
+
+      body.home-detail-page .detail-action-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        padding-top: 4px;
+      }
+
+      body.home-detail-page .detail-related-carousel-wrap {
+        margin-left: -4px;
+        margin-right: -4px;
+      }
+
+      body.home-detail-page .detail-related-products-swiper {
+        overflow: visible;
+      }
+
+      body.home-detail-page .detail-related-products-swiper .swiper-slide {
+        height: auto;
+      }
+
+      body.home-detail-page .detail-related-card {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      body.home-detail-page .detail-related-card .materials-badge {
+        max-width: calc(100% - 16px);
+      }
+
+      body.home-detail-page .detail-related-card .materials-card-body {
+        flex: 1 1 auto;
+        width: 100%;
+        padding: 14px 14px 16px;
+      }
+
+      body.home-detail-page .detail-related-card .card-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      body.home-detail-page .detail-btn-hotline,
+      body.home-detail-page .detail-btn-zalo,
+      body.home-detail-page .detail-btn-primary,
+      body.home-detail-page .detail-btn-contact {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 52px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        font-size: 0.94rem;
+        line-height: 1.35;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      body.home-detail-page .detail-btn-hotline .material-symbols-outlined,
+      body.home-detail-page .detail-btn-zalo .material-symbols-outlined,
+      body.home-detail-page .detail-btn-primary .material-symbols-outlined,
+      body.home-detail-page .detail-btn-contact .material-symbols-outlined {
+        flex: 0 0 auto;
+        font-size: 19px !important;
+        line-height: 1;
+      }
+
+      body.home-detail-page .detail-soft-panel,
+      body.home-detail-page .detail-referral-card,
+      body.home-detail-page .detail-process-panel,
+      body.home-detail-page .detail-trust-highlight,
+      body.home-detail-page .detail-review-card {
+        padding: 18px 16px;
+        border-radius: 20px;
+      }
+
+      body.home-detail-page .detail-section-head-row,
+      body.home-detail-page .detail-review-top,
+      body.home-detail-page .detail-review-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      body.home-detail-page .detail-referral-visual {
+        min-height: 300px;
+        border-radius: 20px;
+      }
+
+      body.home-detail-page .detail-referral-overlay {
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+        padding: 20px 16px 16px;
+        border-radius: 16px;
+      }
+
+      body.home-detail-page .detail-referral-overlay p:first-child {
+        margin-top: 0;
+        margin-bottom: 8px;
+      }
+
+      body.home-detail-page .detail-referral-overlay h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+        line-height: 1.3;
+      }
+
+      body.home-detail-page .detail-referral-overlay p:nth-of-type(2) {
+        margin-top: 0;
+        line-height: 1.65;
+      }
+
+      body.home-detail-page .detail-referral-tags {
+        margin-top: 14px;
+      }
+
+      body.home-detail-page .detail-process-grid-wrap {
+        margin-top: 24px;
+      }
+
+      body.home-detail-page .detail-process-card {
+        padding: 18px 16px;
+        border-radius: 18px;
+      }
+
+      body.home-detail-page .detail-process-top {
+        gap: 12px;
+      }
+
+      body.home-detail-page .detail-process-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+      }
+
+      body.home-detail-page .detail-process-step-label {
+        margin-top: 18px;
+      }
+
+      body.home-detail-page .detail-trust-stat strong {
+        font-size: 1.8rem;
+      }
+
+      body.home-detail-page .detail-review-user {
+        gap: 12px;
+      }
+
+      body.home-detail-page .detail-review-avatar {
+        width: 52px;
+        height: 52px;
+      }
+
+      body.home-detail-page .detail-review-card,
+      body.home-detail-page .detail-process-card,
+      body.home-detail-page .detail-referral-item,
+      body.home-detail-page .detail-trust-stat,
+      body.home-detail-page .detail-trust-tags div {
+        overflow-wrap: anywhere;
+      }
+
+      body.home-detail-page .detail-main table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      body.home-detail-page .detail-main img,
+      body.home-detail-page .detail-main iframe,
+      body.home-detail-page .detail-main video {
+        max-width: 100%;
+        height: auto;
+      }
+    }
+
+    /* Small mobile only for Home/Detail */
+    @@media (max-width: 480px) {
+      body.home-detail-page .detail-shell {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      body.home-detail-page .detail-main {
+        padding-top: 0;
+      }
+
+      body.home-detail-page .detail-page-banner {
+        padding: 54px 0 96px;
+      }
+
+      body.home-detail-page .detail-page-banner-title {
+        font-size: 1.7rem;
+      }
+
+      body.home-detail-page .detail-page-banner-summary {
+        font-size: 0.92rem;
+        line-height: 1.65;
+      }
+
+      body.home-detail-page .detail-section,
+      body.home-detail-page .detail-soft-section,
+      body.home-detail-page .detail-process-section,
+      body.home-detail-page .detail-trust-section {
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
+
+      body.home-detail-page .detail-hero-main {
+        height: clamp(220px, 70vw, 300px);
+        border-radius: 18px;
+      }
+
+      body.home-detail-page .detail-hero-overlay {
+        padding: 12px;
+      }
+
+      body.home-detail-page .detail-thumb-grid {
+        gap: 6px;
+      }
+
+      body.home-detail-page .detail-thumb {
+        border-radius: 12px;
+      }
+
+      body.home-detail-page .detail-heading-block h1,
+      body.home-detail-page .detail-section-head h2,
+      body.home-detail-page .detail-process-head h2,
+      body.home-detail-page .detail-trust-highlight h2,
+      body.home-detail-page .detail-referral-card h2,
+      body.home-detail-page .detail-referral-title {
+        font-size: clamp(1.25rem, 6.5vw, 1.6rem);
+      }
+
+      body.home-detail-page .detail-heading-block p,
+      body.home-detail-page .detail-process-head p,
+      body.home-detail-page .detail-referral-card p,
+      body.home-detail-page .detail-trust-highlight p,
+      body.home-detail-page .detail-review-text,
+      body.home-detail-page .detail-process-card p,
+      body.home-detail-page .detail-hero-desc {
+        font-size: 0.92rem;
+      }
+
+      body.home-detail-page .detail-price-box,
+      body.home-detail-page .detail-soft-panel,
+      body.home-detail-page .detail-referral-card,
+      body.home-detail-page .detail-process-panel,
+      body.home-detail-page .detail-trust-highlight,
+      body.home-detail-page .detail-review-card {
+        padding: 16px 14px;
+      }
+
+      body.home-detail-page .detail-price-box {
+        padding: 14px 12px;
+      }
+
+      body.home-detail-page .detail-price-value {
+        font-size: clamp(1.35rem, 7.5vw, 1.7rem);
+      }
+
+      body.home-detail-page .detail-price-note,
+      body.home-detail-page .detail-trend-pill {
+        font-size: 0.84rem;
+        line-height: 1.55;
+      }
+
+      body.home-detail-page .detail-action-grid {
+        grid-template-columns: 1fr;
+      }
+
+
+      body.home-detail-page .detail-btn-hotline,
+      body.home-detail-page .detail-btn-zalo,
+      body.home-detail-page .detail-btn-primary,
+      body.home-detail-page .detail-btn-contact {
+        width: 100%;
+        min-height: 50px;
+        gap: 7px;
+        font-size: 0.92rem;
+        white-space: normal;
+      }
+
+      body.home-detail-page .detail-feature-item,
+      body.home-detail-page .detail-referral-item,
+      body.home-detail-page .detail-process-card {
+        padding: 14px;
+      }
+
+      body.home-detail-page .detail-referral-visual {
+        min-height: 250px;
+      }
+
+      body.home-detail-page .detail-referral-overlay {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        padding: 18px 14px 14px;
+      }
+
+      body.home-detail-page .detail-referral-overlay h3 {
+        font-size: 1.05rem;
+      }
+    }
+  </style>
 }
 @section Scripts {
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     (() => {
     const mainImage = document.getElementById('hero-main-image');
@@ -234,9 +904,9 @@
 }
 
 
-<main class="detail-main detail-page-shell">
+<main class=" detail-page-shell">
   <section class="detail-section">
-    <div class="detail-shell container-fluid">
+    <div class="detail-shell">
       <div class="detail-grid-hero">
         <div class="detail-gallery-stack">
           <div class="detail-hero-main">
@@ -346,7 +1016,7 @@
           </section>
 
           <section class="detail-soft-section" id="materials-section">
-            <div class="detail-shell container-fluid">
+         <div class="detail-shell">
               <div class="detail-soft-panel">
                 <div class="detail-amber-glow"></div>
                 <div class="detail-section-head-row">
@@ -378,7 +1048,7 @@
               </section>
 
                                   <section class="detail-section">
-            <div class="detail-shell container-fluid">
+           <div class="detail-shell">
               <div class="detail-two-col">
                 <div class="detail-referral-card">
                   <div class="detail-referral-badge">
@@ -441,7 +1111,7 @@
                                     @await Component.InvokeAsync("RecentNewsSectionComponent")
 
                                     <section class="detail-process-section">
-              <div class="detail-shell container-fluid">
+              <div class="detail-shell">
                 <div class="detail-process-panel">
                   <div class="detail-process-head">
                     <div class="detail-pill justify-content-center mx-auto">
@@ -508,7 +1178,7 @@
                                 @await Component.InvokeAsync("ScrapPurchaseServicesSectionComponent")
  
                                                     <section class="detail-trust-section">
-                              <div class="detail-shell container-fluid">
+                            <div class="detail-shell">
                                 <div class="detail-trust-grid">
                                   <div class="detail-trust-highlight">
                                     <div class="detail-trust-highlight-inner">

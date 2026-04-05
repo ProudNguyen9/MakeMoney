@@ -1,4 +1,4 @@
-﻿@model WebThuMuaPheLieu.ViewModels.HomeIndexViewModel
+﻿ @model WebThuMuaPheLieu.ViewModels.HomeIndexViewModel
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Trang chủ";
@@ -39,17 +39,17 @@
         <div class="row align-items-center gy-5">
             <div class="col-lg-5 hero-content" data-aos="fade-right" data-aos-delay="100">
                 <h2 class="hero-title"><span class="hero-title-line">@heroLine1</span><span>@heroLine2</span><span class="hero-title-line">@heroLine3</span><span class="hero-title-tail">@heroLine4</span></h2>
-                    <div class="hero-actions">
-                        <a href="@heroButtonPrimaryLink" class="hero-btn-primary"><i class="bi bi-telephone-fill"></i> @heroButtonPrimaryText</a>
-                            <a href="@heroButtonSecondaryLink" class="hero-btn-secondary"><i class="bi bi-arrow-down-circle"></i> @heroButtonSecondaryText</a>
-                            </div>
-                        </div>
-                        <div class="col-lg-7" data-aos="fade-left" data-aos-delay="180">
-                            <div class="hero-visual-wrap">
-                                <div class="hero-illustration">
-                                    <div class="hero-illustration-mask">
-                                        <div class="slides-1 swiper hero-banner-slider">
-                                            <div class="swiper-wrapper">
+                <div class="hero-actions">
+                    <a href="@heroButtonPrimaryLink" class="hero-btn-primary"><i class="bi bi-telephone-fill"></i> @heroButtonPrimaryText</a>
+                    <a href="@heroButtonSecondaryLink" class="hero-btn-secondary"><i class="bi bi-arrow-down-circle"></i> @heroButtonSecondaryText</a>
+                </div>
+            </div> 
+            <div class="col-lg-7 mt-mobile-2" data-aos="fade-left" data-aos-delay="180">
+                <div class="hero-visual-wrap">
+                    <div class="hero-illustration">
+                        <div class="hero-illustration-mask">
+                            <div class="slides-1 swiper hero-banner-slider">
+                                <div class="swiper-wrapper">
                                                 @if (heroImages.Any())
                                                 {
                                                     @foreach (var image in heroImages)
