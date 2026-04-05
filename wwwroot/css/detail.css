@@ -174,7 +174,7 @@
     }
 
     .detail-main {
-      padding-top: 96px;
+      padding-top: 0px;
     }
 
     .detail-section {
@@ -2113,7 +2113,7 @@
 
     @media (max-width: 991.98px) {
       .detail-main {
-        padding-top: 88px;
+        padding-top: 0px;
       }
 
       .detail-grid-hero,

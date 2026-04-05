@@ -62,7 +62,7 @@ using WebThuMuaPheLieu.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Cho app lắng nghe toàn bộ mạng LAN ở port 5000
-builder.WebHost.UseUrls("http://192.168.2.9:5000");
+builder.WebHost.UseUrls("http://192.168.30.1:5000");
 
 // Add services to the container.
 builder.Services.AddDistributedMemoryCache();

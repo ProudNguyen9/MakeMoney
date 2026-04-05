@@ -4,6 +4,7 @@
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = Model.Post.Title;
+    ViewData["BodyClass"] = "blog-detail-page blog-detail-mobile-page";
 
     string StripHtml(string? html)
     {
@@ -103,7 +104,10 @@
             color: #6b7280;
             font-size: 0.94rem;
         }
-
+.section-header h2:before,
+            .section-header h2:after {
+                display: none;
+            }
         .blog-detail-breadcrumb a {
             color: #15803d;
             text-decoration: none;
@@ -1385,6 +1389,293 @@
             .blog-detail-sidebar .mini-thumb {
                 width: 84px;
                 height: 64px;
+            }
+        }
+
+        /* Mobile only for Blog/Detail */
+        @@media (max-width: 768px) {
+            body.blog-detail-mobile-page {
+                overflow-x: hidden;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-main {
+                padding: 16px 0 32px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-shell {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-breadcrumb {
+                margin-bottom: 18px;
+                padding-bottom: 12px;
+                gap: 8px;
+                font-size: 0.84rem;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-primary,
+            body.blog-detail-mobile-page .blog-detail-sidebar .sidebar-card {
+                padding: 18px 16px;
+                border-radius: 18px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-head {
+                margin-bottom: 18px;
+                padding: 20px 16px 16px 18px;
+                border-radius: 20px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-head::before {
+                width: 4px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-head::after {
+                top: 10px;
+                right: 10px;
+                width: 72px;
+                height: 72px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-title {
+                margin-bottom: 10px;
+                font-size: clamp(1.4rem, 6.3vw, 1.95rem);
+                line-height: 1.22;
+                letter-spacing: -0.03em;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-lead {
+                margin-top: 12px;
+                padding-left: 12px;
+                font-size: 0.94rem;
+                line-height: 1.72;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-top-meta {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                margin-top: 14px;
+                padding-top: 0;
+                align-items: stretch;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-top-meta-item {
+                width: 100%;
+                min-height: 46px;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 12px;
+                border-radius: 12px;
+                font-size: 0.84rem;
+                line-height: 1.35;
+                text-align: center;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-top-meta-item i {
+                flex: 0 0 auto;
+                width: 24px;
+                height: 24px;
+                font-size: 0.8rem;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-top-meta-item span {
+                display: inline-flex;
+                align-items: center;
+                min-width: 0;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-content-card {
+                padding: 0;
+                border-radius: 0;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body {
+                font-size: 0.98rem;
+                line-height: 1.82;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body p {
+                margin-bottom: 1.15rem;
+                line-height: 1.8;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body > p:first-of-type {
+                font-size: 1rem;
+                line-height: 1.82;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body h1,
+            body.blog-detail-mobile-page .blog-detail-body h2,
+            body.blog-detail-mobile-page .blog-detail-body h3,
+            body.blog-detail-mobile-page .blog-detail-body h4 {
+                margin-top: 1.65rem;
+                margin-bottom: 0.75rem;
+                line-height: 1.32;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body h1 {
+                font-size: clamp(1.38rem, 6vw, 1.75rem);
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body h2 {
+                font-size: clamp(1.24rem, 5.4vw, 1.55rem);
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body h3 {
+                font-size: clamp(1.12rem, 4.8vw, 1.32rem);
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body h4 {
+                font-size: 1rem;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body ul,
+            body.blog-detail-mobile-page .blog-detail-body ol {
+                margin-bottom: 1.1rem;
+                padding-left: 1.15rem;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body li {
+                margin-bottom: 0.5rem;
+                line-height: 1.75;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body img {
+                width: 100%;
+                max-width: 100%;
+                margin: 1.25rem auto;
+                border-radius: 12px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body figure {
+                margin: 1.35rem 0;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body figcaption {
+                font-size: 0.84rem;
+                line-height: 1.6;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body blockquote {
+                margin: 1.35rem 0;
+                padding-left: 14px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body table {
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                white-space: nowrap;
+                border-radius: 14px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body th,
+            body.blog-detail-mobile-page .blog-detail-body td {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-sidebar {
+                gap: 16px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-sidebar .mini-post {
+                display: grid;
+                grid-template-columns: 84px minmax(0, 1fr);
+                gap: 12px;
+                margin-bottom: 14px;
+                padding-bottom: 14px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-sidebar .mini-thumb {
+                width: 84px;
+                height: 64px;
+                border-radius: 12px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-sidebar .mini-post h5 {
+                font-size: 0.92rem;
+                line-height: 1.45;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-sidebar .mini-post p {
+                font-size: 0.82rem;
+                line-height: 1.5;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body,
+            body.blog-detail-mobile-page .blog-detail-head,
+            body.blog-detail-mobile-page .blog-detail-primary,
+            body.blog-detail-mobile-page .blog-detail-sidebar,
+            body.blog-detail-mobile-page .blog-detail-top-meta-item {
+                min-width: 0;
+            }
+        }
+
+        /* Mobile only for Blog/Detail */
+        @@media (max-width: 480px) {
+            body.blog-detail-mobile-page .blog-detail-shell {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-primary,
+            body.blog-detail-mobile-page .blog-detail-sidebar .sidebar-card {
+                padding: 16px 14px;
+                border-radius: 16px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-head {
+                padding: 18px 14px 14px 16px;
+                margin-bottom: 16px;
+                border-radius: 18px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-title {
+                font-size: clamp(1.28rem, 6.8vw, 1.68rem);
+            }
+
+            body.blog-detail-mobile-page .blog-detail-top-meta {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-top-meta-item {
+                min-height: 44px;
+                justify-content: flex-start;
+                text-align: left;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-lead {
+                font-size: 0.92rem;
+                line-height: 1.68;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body {
+                font-size: 0.95rem;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body h1 {
+                font-size: 1.3rem;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body h2 {
+                font-size: 1.18rem;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body h3 {
+                font-size: 1.06rem;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body table {
+                font-size: 0.88rem;
             }
         }
     </style>
