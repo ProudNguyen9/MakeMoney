@@ -134,6 +134,21 @@
             height: 100%;
             object-fit: cover;
         }
+
+        @@media (max-width: 767.98px) {
+            body.blog-page .blog-sidebar-wrap {
+                padding-bottom: 170px;
+            }
+
+            body.blog-page .blog-sidebar-wrap .sidebar-card:first-child {
+                margin-bottom: 32px;
+            }
+
+            body.blog-page .blog-sidebar-wrap .search-box {
+                position: relative;
+                z-index: 1;
+            }
+        }
     </style>
 }
 

@@ -1,5 +1,7 @@
+@using Microsoft.EntityFrameworkCore
 @using WebThuMuaPheLieu.helpper
 @inject IContactInfoHelper ContactInfoHelper
+@inject WebThuMuaPheLieu.Models.AppDbContext DbContext
 @{
     var contact = await ContactInfoHelper.GetContactInfoAsync();
     var footerPhone = !string.IsNullOrWhiteSpace(contact.Phone) ? contact.Phone : "0909 686 889";
@@ -9,6 +11,51 @@
     var footerAddress = !string.IsNullOrWhiteSpace(contact.Address) ? contact.Address : "88 Quốc lộ 1A, P. An Phú Đông, Quận 12, TP. Hồ Chí Minh";
     var facebookLink = string.IsNullOrWhiteSpace(contact.Facebook) ? "#" : (contact.Facebook.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Facebook.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Facebook : $"https://{contact.Facebook.TrimStart('/')}");
     var zaloLink = string.IsNullOrWhiteSpace(contact.Zalo) ? "#" : (contact.Zalo.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Zalo.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Zalo : $"https://zalo.me/{contact.Zalo.TrimStart('/')}");
+    var featuredProducts = await DbContext.Products
+        .AsNoTracking()
+        .Where(p => p.Status == "active")
+        .OrderByDescending(p => p.IsFeatured)
+        .ThenByDescending(p => p.CreatedAt)
+        .Take(5)
+        .Select(p => new
+        {
+            p.Name,
+            p.Slug,
+            p.Id
+        })
+        .ToListAsync();
+
+    var topServicePosts = await DbContext.BlogPostCategories
+        .AsNoTracking()
+        .Where(mapping => mapping.Post != null
+            && mapping.Category != null
+            && mapping.Post.Status == "published"
+            && ((mapping.Category.Name ?? string.Empty) == "Dịch vụ"
+                || (mapping.Category.Slug ?? string.Empty) == "dich-vu"
+                || (mapping.Category.Slug ?? string.Empty) == "service"))
+        .Select(mapping => mapping.Post!)
+        .Distinct()
+        .OrderByDescending(post => post.LikeCount ?? 0)
+        .ThenByDescending(post => post.PublishedAt ?? post.CreatedAt)
+        .Take(5)
+        .Select(post => new
+        {
+            post.Title,
+            post.Slug,
+            post.Id
+        })
+        .ToListAsync();
+
+    string BuildProductUrl(string? slug, int id)
+    {
+        return Url.Action("Detail", "Home", new { slug, id }) ?? "/";
+    }
+
+    string BuildBlogUrl(string? slug, int id)
+    {
+        var normalizedSlug = !string.IsNullOrWhiteSpace(slug) ? slug.Trim() : id.ToString();
+        return Url.Action("Detail", "Blog", new { slug = normalizedSlug }) ?? "/Blog";
+    }
 }
 
 <footer id="footer" class="footer">
@@ -48,27 +95,25 @@
                                     </ul>
                                 </div>
 
-                                <div class="col-lg-2 col-md-3 footer-links">
-                                    <h4>Mặt hàng</h4>
-                                    <ul>
-                                        <li><a href="~/projects.html">Sắt thép phế liệu</a></li>
-                                        <li><a href="~/projects.html">Đồng, nhôm, inox</a></li>
-                                        <li><a href="~/projects.html">Giấy carton</a></li>
-                                        <li><a href="~/projects.html">Nhựa công nghiệp</a></li>
-                                        <li><a href="~/projects.html">Máy móc cũ</a></li>
-                                    </ul>
-                                </div>
+                                 <div class="col-lg-2 col-md-3 footer-links">
+                                     <h4>Mặt hàng</h4>
+                                     <ul>
+                                         @foreach (var product in featuredProducts)
+                                         {
+                                             <li><a href="@BuildProductUrl(product.Slug, product.Id)">@product.Name</a></li>
+                                         }
+                                     </ul>
+                                 </div>
 
-                                <div class="col-lg-2 col-md-3 footer-links">
-                                    <h4>Dịch vụ</h4>
-                                    <ul>
-                                        <li><a href="~/services.html">Khảo sát tận nơi</a></li>
-                                        <li><a href="~/services.html">Thu mua số lượng lớn</a></li>
-                                        <li><a href="~/services.html">Bốc xếp, vận chuyển</a></li>
-                                        <li><a href="~/services.html">Dọn kho thanh lý</a></li>
-                                        <li><a href="~/services.html">Thu gom định kỳ</a></li>
-                                    </ul>
-                                </div>
+                                 <div class="col-lg-2 col-md-3 footer-links">
+                                     <h4>Dịch vụ</h4>
+                                     <ul>
+                                         @foreach (var post in topServicePosts)
+                                         {
+                                             <li><a href="@BuildBlogUrl(post.Slug, post.Id)">@post.Title</a></li>
+                                         }
+                                     </ul>
+                                 </div>
 
                                 <div class="col-lg-2 col-md-3 footer-links">
                                     <h4>Khu vực phục vụ</h4>
