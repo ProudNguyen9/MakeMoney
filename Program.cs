@@ -1,5 +1,3 @@
-
-
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebThuMuaPheLieu.helpper;
@@ -7,11 +5,8 @@ using WebThuMuaPheLieu.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://192.168.30.1:5000");
-
-// ================== SERVICES ==================
+// Add services to the container.
 builder.Services.AddDistributedMemoryCache();
-
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -39,7 +34,7 @@ builder.Services.AddScoped<IBannerInjectHelper, BannerInjectHelper>();
 
 var app = builder.Build();
 
-// ================== PIPELINE ==================
+// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -47,20 +42,17 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// 🔥 QUAN TRỌNG: phải có dòng này
-app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Route mặc định
+app.MapStaticAssets();
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
 
 app.Run();
