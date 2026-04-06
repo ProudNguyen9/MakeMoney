@@ -3,6 +3,7 @@
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Tin tức";
+    ViewData["BodyClass"] = "blog-page";
 }
 
 @section Styles {
@@ -134,10 +135,246 @@
             height: 100%;
             object-fit: cover;
         }
+
+        body.blog-page .blog-mobile-search-btn,
+        body.blog-page .blog-mobile-search-popup,
+        body.blog-page .blog-mobile-search-backdrop,
+        body.blog-page .blog-mobile-search-head {
+            display: none;
+        }
+
+        @@media (max-width: 767.98px) {
+            body.blog-page.blog-mobile-search-open {
+                overflow: hidden;
+            }
+
+            body.blog-page #blog-list>[class*="col-"] {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            body.blog-page #blog-list {
+                row-gap: 14px !important;
+            }
+
+            body.blog-page #blog-list .post-visual,
+            body.blog-page #blog-list .materials-card-media {
+                aspect-ratio: 16 / 9;
+                min-height: 180px;
+            }
+
+            body.blog-page #blog-list .post-card {
+                border-radius: 18px;
+                overflow: hidden;
+                box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+            }
+
+            body.blog-page #blog-list .post-body {
+                padding: 14px 14px 16px;
+            }
+
+            body.blog-page #blog-list .post-meta {
+                gap: 6px;
+                margin-bottom: 8px;
+                font-size: 0.76rem;
+                line-height: 1.35;
+            }
+
+            body.blog-page #blog-list .post-meta span {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            body.blog-page #blog-list h3 {
+                margin-bottom: 8px;
+                font-size: 1rem;
+                line-height: 1.4;
+            }
+
+            body.blog-page #blog-list .post-excerpt {
+                margin-bottom: 10px;
+                font-size: 0.88rem;
+                line-height: 1.55;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            body.blog-page #blog-list .post-actions {
+                align-items: stretch;
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 4px;
+            }
+
+            body.blog-page #blog-list .post-useful-btn,
+            body.blog-page #blog-list .post-like-count {
+                width: 100%;
+                justify-content: center;
+                min-height: 42px;
+                font-size: 0.88rem;
+            }
+
+            body.blog-page #blog-list .post-link {
+                margin-top: 10px;
+                font-size: 0.88rem;
+            }
+
+            body.blog-page .blog-mobile-search-btn {
+                position: fixed;
+                right: 12px;
+                bottom: 278px;
+                z-index: 10002;
+                width: 52px;
+                height: 52px;
+                border: 0;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #15803d, #166534);
+                color: #fff;
+                box-shadow: 0 16px 34px rgba(21, 128, 61, 0.28);
+            }
+
+            body.blog-page .blog-mobile-search-btn i {
+                font-size: 1rem;
+                line-height: 1;
+            }
+
+            body.blog-page .blog-mobile-search-backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 10010;
+                display: block;
+                background: rgba(15, 23, 42, 0.52);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease;
+            }
+
+            body.blog-page .blog-mobile-search-popup {
+                position: fixed;
+                left: 12px;
+                right: 12px;
+                top: 50%;
+                z-index: 10011;
+                display: block;
+                padding: 18px 16px 16px;
+                border-radius: 22px;
+                background: #fff;
+                box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+                transform: translateY(calc(-50% + 24px)) scale(0.96);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.25s ease, transform 0.25s ease;
+            }
+
+            body.blog-page .blog-mobile-search-popup.is-open,
+            body.blog-page .blog-mobile-search-backdrop.is-open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            body.blog-page .blog-mobile-search-popup.is-open {
+                transform: translateY(-50%) scale(1);
+            }
+
+            body.blog-page .blog-mobile-search-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+
+            body.blog-page .blog-mobile-search-head h3 {
+                margin: 0;
+                font-size: 1rem;
+                font-weight: 800;
+                color: #0f172a;
+            }
+
+            body.blog-page .blog-mobile-search-close {
+                width: 38px;
+                height: 38px;
+                border: 0;
+                border-radius: 50%;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: #f1f5f9;
+                color: #0f172a;
+            }
+
+            body.blog-page .blog-mobile-search-popup .search-box {
+                margin-bottom: 14px;
+            }
+
+            body.blog-page .blog-mobile-search-popup .tag-cloud {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            body.blog-page .blog-mobile-search-popup .tag {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 36px;
+                padding: 8px 12px;
+                border-radius: 999px;
+            }
+
+            body.blog-page .blog-sidebar-wrap .sidebar-card:first-child,
+            body.blog-page .blog-sidebar-wrap .sidebar-card:last-child {
+                display: none;
+            }
+        }
+
+        @@media (min-width: 768px) {
+            body.blog-page .blog-mobile-search-btn,
+            body.blog-page .blog-mobile-search-popup,
+            body.blog-page .blog-mobile-search-backdrop {
+                display: none !important;
+            }
+        }
     </style>
 }
 
 <main id="main" class="blog-page-main">
+    <button type="button" class="blog-mobile-search-btn" id="blogMobileSearchBtn" aria-label="Mở tìm kiếm nhanh tin tức">
+        <i class="bi bi-search"></i>
+    </button>
+    <div class="blog-mobile-search-backdrop" id="blogMobileSearchBackdrop"></div>
+    <div class="blog-mobile-search-popup" id="blogMobileSearchPopup" aria-label="Tìm kiếm nhanh tin tức">
+        <div class="blog-mobile-search-head">
+            <h3>Tìm kiếm nhanh</h3>
+            <button type="button" class="blog-mobile-search-close" id="blogMobileSearchCloseBtn" aria-label="Đóng tìm kiếm nhanh">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <form method="get" class="search-box" id="blogMobileSearchForm">
+            <input type="hidden" name="categoryName" value="@Model.SelectedCategoryName">
+            <input type="text" name="searchTerm" value="@Model.SearchTerm" placeholder="Nhập từ khóa...">
+            <button type="submit"><i class="bi bi-search"></i></button>
+        </form>
+        <div>
+            <h4>Từ khóa phổ biến</h4>
+            <div class="tag-cloud">
+                <a href="#" class="tag js-mobile-popular-tag" data-keyword="giá phế liệu">giá phế liệu</a>
+                <a href="#" class="tag js-mobile-popular-tag" data-keyword="đồng đỏ">đồng đỏ</a>
+                <a href="#" class="tag js-mobile-popular-tag" data-keyword="sắt thép">sắt thép</a>
+                <a href="#" class="tag js-mobile-popular-tag" data-keyword="thanh lý kho">thanh lý kho</a>
+                <a href="#" class="tag js-mobile-popular-tag" data-keyword="máy móc cũ">máy móc cũ</a>
+                <a href="#" class="tag js-mobile-popular-tag" data-keyword="giấy carton">giấy carton</a>
+                <a href="#" class="tag js-mobile-popular-tag" data-keyword="nhựa công nghiệp">nhựa công nghiệp</a>
+                <a href="#" class="tag js-mobile-popular-tag" data-keyword="inox">inox</a>
+            </div>
+        </div>
+    </div>
     <section id="blog-posts" class="blog-layout home-card-section">
         <div class="container-fluid home-section-shell" data-aos="fade-up">
             <div class="section-header blog-section-header">
@@ -153,7 +390,7 @@
                                 var post = Model.Posts[index];
                                 var animationDelay = 100 + (index % 6) * 50;
 
-                                <div class="col-md-6" data-aos="fade-up" data-aos-delay="@animationDelay">
+                                <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="@animationDelay">
                                     <article class="post-card h-100 js-post-card"
                                              data-detail-url="@Url.Action("Detail", "Blog", new { slug = post.Slug })">
                                         <div class="post-visual materials-card-media">
@@ -181,7 +418,8 @@
                                                         <span class="js-post-like-count">@post.LikeCount</span> lượt hữu ích
                                                     </span>
                                                 </div>
-                                       
+                                                <p class="post-useful-feedback js-post-useful-feedback" aria-live="polite"></p>
+
                                                 <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@post.Slug"
                                                    class="post-link"><i class="bi bi-arrow-right-circle-fill"></i> Xem chi tiết</a>
                                             </div>
@@ -196,12 +434,11 @@
                                  data-category-name="@Model.SelectedCategoryName">
                                 <div class="col-12 text-center py-4">
                                     <p class="text-muted mb-0">
-                                        @if (!string.IsNullOrWhiteSpace(Model.SearchTerm) &&
-                                                                                    !string.IsNullOrWhiteSpace(Model.SelectedCategoryName))
+                                        @if (!string.IsNullOrWhiteSpace(Model.SearchTerm)
+                                            && !string.IsNullOrWhiteSpace(Model.SelectedCategoryName))
                                         {
-                                            <text>Không tìm thấy bài viết nào phù hợp với từ khóa "@Model.SearchTerm" trong chuyên
-                                                mục "@Model.SelectedCategoryName".</text>
-                                            }
+                                            @:Không tìm thấy bài viết nào phù hợp với từ khóa "@Model.SearchTerm" trong chuyên mục "@Model.SelectedCategoryName".
+                                        }
                                         else if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
                                             {
                                                 @:Không tìm thấy bài viết nào phù hợp với từ khóa "@Model.SearchTerm".
@@ -358,19 +595,25 @@
 
         @section Scripts {
             <script>
-                document.body.classList.add('blog-page');
-    
                 (() => {
                     document.addEventListener('click', handlePostCardClick);
                     const blogList = document.getElementById('blog-list');
                     const pagination = document.getElementById('blog-pagination');
                     const paginationNav = pagination?.closest('nav');
-                    const searchForm = document.querySelector('.search-box');
-                    const searchInput = document.querySelector('input[name="searchTerm"]');
-                    const categoryInput = document.querySelector('input[name="categoryName"]');
+                    const searchForm = document.querySelector('.blog-sidebar-wrap .search-box');
+                    const searchInput = searchForm?.querySelector('input[name="searchTerm"]');
+                    const categoryInput = searchForm?.querySelector('input[name="categoryName"]');
                     const popularTagLinks = document.querySelectorAll('.js-popular-tag');
-                    let lastSearchTerm = searchInput?.value?.trim() ?? '';
-                    let lastCategoryName = categoryInput?.value?.trim() ?? blogList?.dataset.categoryName?.trim() ?? '';
+                    const mobileSearchButton = document.getElementById('blogMobileSearchBtn');
+                    const mobileSearchPopup = document.getElementById('blogMobileSearchPopup');
+                    const mobileSearchBackdrop = document.getElementById('blogMobileSearchBackdrop');
+                    const mobileSearchCloseButton = document.getElementById('blogMobileSearchCloseBtn');
+                    const mobileSearchForm = document.getElementById('blogMobileSearchForm');
+                    const mobileSearchInput = mobileSearchForm?.querySelector('input[name="searchTerm"]');
+                    const mobileCategoryInput = mobileSearchForm?.querySelector('input[name="categoryName"]');
+                    const mobilePopularTagLinks = document.querySelectorAll('.js-mobile-popular-tag');
+                    let lastSearchTerm = searchInput?.value?.trim() ?? mobileSearchInput?.value?.trim() ?? '';
+                    let lastCategoryName = categoryInput?.value?.trim() ?? mobileCategoryInput?.value?.trim() ?? blogList?.dataset.categoryName?.trim() ?? '';
 
                     function getCurrentSearchTerm() {
                         return searchInput?.value?.trim() ?? '';
@@ -385,6 +628,10 @@
 
                         if (categoryInput) {
                             categoryInput.value = normalizedCategoryName;
+                        }
+
+                        if (mobileCategoryInput) {
+                            mobileCategoryInput.value = normalizedCategoryName;
                         }
 
                         if (blogList) {
@@ -549,6 +796,38 @@
 
                         window.location.href = detailUrl;
                     }
+
+                    function isMobileViewport() {
+                        return window.matchMedia('(max-width: 767.98px)').matches;
+                    }
+
+                    function closeMobileSearchPopup() {
+                        if (!mobileSearchPopup || !mobileSearchBackdrop) {
+                            return;
+                        }
+
+                        mobileSearchPopup.classList.remove('is-open');
+                        mobileSearchBackdrop.classList.remove('is-open');
+                        document.body.classList.remove('blog-mobile-search-open');
+                    }
+
+                    function openMobileSearchPopup() {
+                        if (!mobileSearchPopup || !mobileSearchBackdrop || !isMobileViewport()) {
+                            return;
+                        }
+
+                        if (mobileSearchInput) {
+                            mobileSearchInput.value = getCurrentSearchTerm();
+                        }
+
+                        if (mobileCategoryInput) {
+                            mobileCategoryInput.value = getCurrentCategoryName();
+                        }
+
+                        mobileSearchPopup.classList.add('is-open');
+                        mobileSearchBackdrop.classList.add('is-open');
+                        document.body.classList.add('blog-mobile-search-open');
+                    }
  
                     function renderPosts(posts) {
                         if (!blogList) return;
@@ -573,7 +852,7 @@
                                                         const resolvedImageSequence = imageSequence.length > 0 ? imageSequence : [coverImage];
 
                                                         return `
-                                                        <div class="col-md-6" data-aos="fade-up" data-aos-delay="${100 + (index % 6) * 50}">
+                                                        <div class="col-12 col-md-6" data-aos="fade-up" data-aos-delay="${100 + (index % 6) * 50}">
                                                             <article class="post-card h-100 js-post-card" data-detail-url="${post.detailUrl ?? '/Blog'}">
                                                                 <div class="post-visual materials-card-media">
                                                                     <img src="${coverImage}" alt="${post.title ?? 'Tin tức'}" class="img-fluid w-100 h-100 materials-hover-image js-blog-card-image" data-image-sequence="${resolvedImageSequence.join('|')}" data-default-image="${coverImage}" loading="lazy" style="object-fit: cover;">
@@ -657,7 +936,7 @@
                         bindPaginationAjax();
                     }
 
-                    async function loadPage(page) {
+                    async function loadPage(page, shouldPushHistory = true) {
                         if (page < 1) return;
 
                         const keyword = getCurrentSearchTerm();
@@ -689,6 +968,10 @@
                             searchInput.value = data.searchTerm ?? '';
                         }
 
+                        if (mobileSearchInput) {
+                            mobileSearchInput.value = data.searchTerm ?? '';
+                        }
+
                         setCurrentCategoryName(data.selectedCategoryName ?? '');
                         lastSearchTerm = (data.searchTerm ?? '').trim();
                         lastCategoryName = (data.selectedCategoryName ?? '').trim();
@@ -708,7 +991,9 @@
                             historyParams.set('categoryName', data.selectedCategoryName);
                         }
 
-                        window.history.pushState({}, '', `/Blog?${historyParams.toString()}`);
+                        if (shouldPushHistory) {
+                            window.history.pushState({}, '', `/Blog?${historyParams.toString()}`);
+                        }
                     }
 
                     function initializeBlogCardImageRotation() {
@@ -794,9 +1079,42 @@
                                     return;
                                 }
 
-                                searchInput.value = keyword;
+                                if (searchInput) {
+                                    searchInput.value = keyword;
+                                }
+
+                                if (mobileSearchInput) {
+                                    mobileSearchInput.value = keyword;
+                                }
+
                                 lastSearchTerm = keyword;
                                 loadPage(1);
+                                closeMobileSearchPopup();
+                            });
+                        });
+                    }
+
+                    function bindMobilePopularTagSearch() {
+                        mobilePopularTagLinks.forEach(link => {
+                            link.addEventListener('click', event => {
+                                event.preventDefault();
+
+                                const keyword = link.dataset.keyword?.trim() ?? '';
+                                if (!keyword) {
+                                    return;
+                                }
+
+                                if (searchInput) {
+                                    searchInput.value = keyword;
+                                }
+
+                                if (mobileSearchInput) {
+                                    mobileSearchInput.value = keyword;
+                                }
+
+                                lastSearchTerm = keyword;
+                                loadPage(1);
+                                closeMobileSearchPopup();
                             });
                         });
                     }
@@ -830,13 +1148,44 @@
                     initializeBlogCardImageRotation();
                     bindPaginationAjax();
                     bindPopularTagSearch();
+                    bindMobilePopularTagSearch();
                     bindCategoryFilter();
                     updateCategorySelection(lastCategoryName);
+
+                    if (mobileSearchButton) {
+                        mobileSearchButton.addEventListener('click', openMobileSearchPopup);
+                    }
+
+                    if (mobileSearchCloseButton) {
+                        mobileSearchCloseButton.addEventListener('click', closeMobileSearchPopup);
+                    }
+
+                    if (mobileSearchBackdrop) {
+                        mobileSearchBackdrop.addEventListener('click', closeMobileSearchPopup);
+                    }
 
                     if (searchForm) {
                         searchForm.addEventListener('submit', event => {
                             event.preventDefault();
+
+                            if (mobileSearchInput && searchInput) {
+                                mobileSearchInput.value = searchInput.value;
+                            }
+
                             loadPage(1);
+                        });
+                    }
+
+                    if (mobileSearchForm) {
+                        mobileSearchForm.addEventListener('submit', event => {
+                            event.preventDefault();
+
+                            if (searchInput && mobileSearchInput) {
+                                searchInput.value = mobileSearchInput.value;
+                            }
+
+                            loadPage(1);
+                            closeMobileSearchPopup();
                         });
                     }
 
@@ -860,12 +1209,18 @@
                             searchInput.value = params.get('searchTerm') ?? '';
                         }
 
+                        if (mobileSearchInput) {
+                            mobileSearchInput.value = params.get('searchTerm') ?? '';
+                        }
+
                         setCurrentCategoryName(params.get('categoryName') ?? '');
                         lastSearchTerm = getCurrentSearchTerm();
                         lastCategoryName = getCurrentCategoryName();
                         updateCategorySelection(lastCategoryName);
-                        loadPage(page);
+                        closeMobileSearchPopup();
+                        loadPage(page, false);
                     });
                 })();
             </script>
         }
+

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tổng quan hệ thống | Phế Liệu Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="../css/admin-dashboard.css" />
+</head>
+
+<body>
+    <div class="admin-shell">
+        <aside class="sidebar">
+            <div class="sidebar__brand">
+                <div class="sidebar__logo">PL</div>
+                <div>
+                    <p class="eyebrow">Admin</p>
+                    <h1>Phế Liệu Pro</h1>
+                </div>
+            </div>
+
+            <nav class="sidebar__nav">
+                <a class="sidebar__item is-active" href="./admin-overview.html">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M4 11.5 12 4l8 7.5v7A1.5 1.5 0 0 1 18.5 20H14v-4h-4v4H5.5A1.5 1.5 0 0 1 4 18.5v-7Z"
+                                stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                    <span>Tổng quan</span>
+                </a>
+
+                <a class="sidebar__item" href="./admin-dashboard.html">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M6 7h12M6 12h12M6 17h8M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"
+                                stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                    <span>Sản phẩm</span>
+                </a>
+
+                <a class="sidebar__item" href="./admin-prices.html">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 3v18M16.5 7.5h-6a2.5 2.5 0 0 0 0 5h3a2.5 2.5 0 0 1 0 5h-6"
+                                stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                    <span>Bảng giá</span>
+                </a>
+
+                <a class="sidebar__item" href="./admin-posts.html">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M7 5.5h10A1.5 1.5 0 0 1 18.5 7v10A1.5 1.5 0 0 1 17 18.5H7A1.5 1.5 0 0 1 5.5 17V7A1.5 1.5 0 0 1 7 5.5Z"
+                                stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M8.5 9.5h7M8.5 12h7M8.5 14.5h4.5" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" />
+                        </svg>
+                    </span>
+                    <span>Bài viết</span>
+                </a>
+
+                <a class="sidebar__item" href="./admin-marketing.html">
+                    <span class="sidebar__icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M4 18.5V9.8a1.3 1.3 0 0 1 .82-1.2l8-3.2a1.3 1.3 0 0 1 1.76 1.2v10.8a1.3 1.3 0 0 1-.82 1.2l-8 3.2A1.3 1.3 0 0 1 4 20.6Z"
+                                stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <path d="M14.5 8.5c2.6.5 4.5 2.8 4.5 5.5s-1.9 5-4.5 5.5" stroke="currentColor"
+                                stroke-width="1.8" stroke-linecap="round" />
+                        </svg>
+                    </span>
+                    <span>Banner & SEO</span>
+                </a>
+            </nav>
+
+            <div class="sidebar__footer">
+                <strong>Đồng bộ ổn định</strong>
+                <span>Last sync 3 phút trước</span>
+            </div>
+        </aside>
+
+        <main class="main-content overview-page">
+            <header class="topbar" id="overview-page">
+                <div class="topbar__title-wrap">
+                    <button class="sidebar-toggle" type="button" aria-label="Mở menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div>
+                        <p class="eyebrow">Daily analytics</p>
+                        <h2>Trung tâm số liệu hôm nay được làm nổi bật hơn</h2>
+                        <p class="topbar__subtitle">Màn tổng quan được tinh chỉnh để nhìn đẳng cấp hơn, nhấn mạnh lưu
+                            lượng truy cập, lượt liên hệ và các chỉ số vận hành quan trọng ngay từ phần đầu trang.</p>
+                        <div class="overview-hero__chips">
+                            <span class="overview-chip">4.280 lượt truy cập hôm nay</span>
+                            <span class="overview-chip">126 lượt liên hệ mới</span>
+                            <span class="overview-chip">82% tiến độ xử lý ổn định</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="overview-hero">
+                <article class="overview-hero__main">
+                    <div class="overview-hero__content">
+                        <p class="eyebrow">Lưu lượng hôm nay</p>
+                        <h3>Lượt truy cập và số lượt liên hệ đang tăng ổn định</h3>
+                        <p>Theo dõi nhanh hiệu quả tiếp cận khách hàng trong ngày thông qua lượng truy cập, số lượt liên
+                            hệ và yêu cầu đang chờ xử lý.</p>
+                    </div>
+                    <div class="overview-hero__chips">
+                        <span class="overview-chip">4.280 lượt truy cập hôm nay</span>
+                        <span class="overview-chip">126 lượt liên hệ</span>
+                        <span class="overview-chip">38 yêu cầu chờ phản hồi</span>
+                    </div>
+                </article>
+
+                <article class="overview-hero__score">
+                    <span class="overview-hero__score-label">Số lượt liên hệ hôm nay</span>
+                    <strong>126</strong>
+                    <p>Tăng 24 khách so với hôm qua</p>
+                </article>
+            </section>
+
+            <section class="stats-grid overview-stats" aria-label="Thống kê nhanh">
+                <article class="stat-card stat-card--featured">
+                    <span class="stat-card__label">Tổng sản phẩm</span>
+                    <strong>48</strong>
+                    <p>Đang hiển thị trên hệ thống</p>
+                </article>
+                <article class="stat-card stat-card--featured">
+                    <span class="stat-card__label">Bảng giá hoạt động</span>
+                    <strong>18</strong>
+                    <p>Đang áp dụng realtime</p>
+                </article>
+                <article class="stat-card stat-card--featured">
+                    <span class="stat-card__label">Cập nhật hôm nay</span>
+                    <strong>15</strong>
+                    <p>Sản phẩm và giá đã đổi</p>
+                </article>
+                <article class="stat-card stat-card--featured">
+                    <span class="stat-card__label">Yêu cầu mới</span>
+                    <strong>126</strong>
+                    <p>Lead mới trong ngày</p>
+                </article>
+            </section>
+
+            <section class="overview-grid">
+                <article class="panel overview-panel overview-panel--wide">
+                    <div class="panel__head panel__head--tight">
+                        <div>
+                            <p class="eyebrow">Hiệu suất vận hành</p>
+                            <h3>Chỉ số trọng tâm</h3>
+                        </div>
+                    </div>
+
+                    <div class="progress-metrics">
+                        <div class="progress-metric">
+                            <div class="progress-metric__head">
+                                <span>Tỉ lệ chốt đơn</span>
+                                <strong>82%</strong>
+                            </div>
+                            <div class="progress-bar progress-bar--blue"><span style="width: 82%"></span></div>
+                        </div>
+
+                        <div class="progress-metric">
+                            <div class="progress-metric__head">
+                                <span>Tốc độ xử lý yêu cầu</span>
+                                <strong>74%</strong>
+                            </div>
+                            <div class="progress-bar progress-bar--green"><span style="width: 74%"></span></div>
+                        </div>
+
+                        <div class="progress-metric">
+                            <div class="progress-metric__head">
+                                <span>Độ chính xác bảng giá</span>
+                                <strong>91%</strong>
+                            </div>
+                            <div class="progress-bar progress-bar--violet"><span style="width: 91%"></span></div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="panel overview-panel">
+                    <div class="panel__head panel__head--tight">
+                        <div>
+                            <p class="eyebrow">Điểm nhấn</p>
+                            <h3>Snapshot nhanh</h3>
+                        </div>
+                    </div>
+
+                    <div class="metric-stack">
+                        <div class="metric-stack__item">
+                            <span>Đơn đã xử lý</span>
+                            <strong>39</strong>
+                        </div>
+                        <div class="metric-stack__item">
+                            <span>Sản phẩm nổi bật</span>
+                            <strong>12</strong>
+                        </div>
+                        <div class="metric-stack__item">
+                            <span>Mức giá cao nhất</span>
+                            <strong>68K</strong>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="overview-grid overview-grid--bottom">
+                <article class="panel overview-panel">
+                    <div class="panel__head panel__head--tight">
+                        <div>
+                            <p class="eyebrow">Phân tích nhanh</p>
+                            <h3>Nhóm cần chú ý</h3>
+                        </div>
+                    </div>
+
+                    <div class="insight-cards">
+                        <div class="insight-card insight-card--blue">
+                            <span>Nhóm tăng tốt</span>
+                            <strong>Đồng đỏ · Inox</strong>
+                            <p>Hiệu suất tiếp cận và tỷ lệ hỏi giá đang cao.</p>
+                        </div>
+                        <div class="insight-card insight-card--orange">
+                            <span>Cần rà lại</span>
+                            <strong>03 bảng giá</strong>
+                            <p>Một số mức giá sắp hết chu kỳ cập nhật.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="panel overview-panel">
+                    <div class="panel__head panel__head--tight">
+                        <div>
+                            <p class="eyebrow">Tóm tắt quản trị</p>
+                            <h3>Số liệu nổi bật</h3>
+                        </div>
+                    </div>
+
+                    <div class="summary-list">
+                        <div class="summary-list__item">
+                            <span>Mặt hàng cao nhất</span>
+                            <strong>Đồng đỏ · 68.000 đ/kg</strong>
+                        </div>
+                        <div class="summary-list__item">
+                            <span>Đồng bộ gần nhất</span>
+                            <strong>10:24 AM · 22/03/2026</strong>
+                        </div>
+                        <div class="summary-list__item">
+                            <span>Hiệu suất đội ngũ</span>
+                            <strong>82% hoàn thành đúng hạn</strong>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>
