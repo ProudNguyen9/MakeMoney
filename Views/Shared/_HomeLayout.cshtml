@@ -1,3 +1,30 @@
+@inject WebThuMuaPheLieu.helpper.ISeoSettingHelper SeoSettingHelper
+@{
+    var seoSettings = await SeoSettingHelper.GetSeoSettingsAsync();
+
+    var metaTitle = seoSettings.TryGetValue("MetaTitle", out var storedMetaTitle) && !string.IsNullOrWhiteSpace(storedMetaTitle)
+        ? storedMetaTitle
+        : $"{ViewData["Title"]} - Phế Liệu Thành Trung";
+
+    var metaDescription = seoSettings.TryGetValue("MetaDescription", out var storedMetaDescription) && !string.IsNullOrWhiteSpace(storedMetaDescription)
+        ? storedMetaDescription
+        : "Phế Liệu Hoàng Doanh chuyên thu mua phế liệu giá cao tận nơi tại TP.HCM, Bình Dương, Đồng Nai. Nhận thu mua sắt, đồng, nhôm, inox, giấy carton, nhựa và máy móc cũ.";
+
+    var seoKeywords = seoSettings.TryGetValue("SeoKeywords", out var storedSeoKeywords) && !string.IsNullOrWhiteSpace(storedSeoKeywords)
+        ? storedSeoKeywords
+        : "thu mua phế liệu, phế liệu giá cao, thu mua sắt vụn, thu mua đồng, thu mua nhôm, thu mua inox";
+
+    var ogTitle = seoSettings.TryGetValue("OgTitle", out var storedOgTitle) && !string.IsNullOrWhiteSpace(storedOgTitle)
+        ? storedOgTitle
+        : metaTitle;
+
+    var ogImage = seoSettings.TryGetValue("OgImage", out var storedOgImage) && !string.IsNullOrWhiteSpace(storedOgImage)
+        ? storedOgImage
+        : "/assets/img/satthep.png";
+
+    var faviconUrl = Url.Content(ogImage);
+}
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -5,14 +32,16 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>@ViewData["Title"] - Phế Liệu Hoàng Doanh</title>
-    <meta name="description"
-          content="Phế Liệu Hoàng Doanh chuyên thu mua phế liệu giá cao tận nơi tại TP.HCM, Bình Dương, Đồng Nai. Nhận thu mua sắt, đồng, nhôm, inox, giấy carton, nhựa và máy móc cũ." />
-    <meta name="keywords"
-          content="thu mua phế liệu, phế liệu giá cao, thu mua sắt vụn, thu mua đồng, thu mua nhôm, thu mua inox" />
+    <title>@metaTitle</title>
+    <meta name="description" content="@metaDescription" />
+    <meta name="keywords" content="@seoKeywords" />
+    <meta property="og:title" content="@ogTitle" />
+    <meta property="og:description" content="@metaDescription" />
+    <meta property="og:image" content="@faviconUrl" />
+    <meta property="og:type" content="website" />
 
-    <link href="~/assets/img/favicon.png" rel="icon" />
-    <link href="~/assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+    <link href="@faviconUrl" rel="icon" />
+    <link href="@faviconUrl" rel="apple-touch-icon" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

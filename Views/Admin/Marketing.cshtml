@@ -1,9 +1,10 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    var bannerImage1Url = Url.Content(Model.BannerImage1 ?? "~/assets/img/satthep.png");
-    var bannerImage2Url = Url.Content(Model.BannerImage2 ?? "~/assets/img/dongnhom.jpg");
-    var bannerImage3Url = Url.Content(Model.BannerImage3 ?? "~/assets/img/maymoc.jpg");
-    var seoOgImageUrl = Url.Content(Model.OgImage ?? "~/assets/img/satthep.png");
+    var bannerCacheVersion = DateTime.UtcNow.Ticks;
+    var bannerImage1Url = $"{Url.Content(Model.BannerImage1 ?? "~/assets/img/satthep.png")}?v={bannerCacheVersion}";
+    var bannerImage2Url = $"{Url.Content(Model.BannerImage2 ?? "~/assets/img/dongnhom.jpg")}?v={bannerCacheVersion}";
+    var bannerImage3Url = $"{Url.Content(Model.BannerImage3 ?? "~/assets/img/maymoc.jpg")}?v={bannerCacheVersion}";
+    var seoOgImageUrl = $"{Url.Content(Model.OgImage ?? "~/assets/img/satthep.png")}?v={bannerCacheVersion}";
 }
 
 @model WebThuMuaPheLieu.ViewModels.AdminMarketingViewModel
@@ -435,6 +436,15 @@
                 return url.startsWith('~/') ? url.substring(1) : url;
             };
 
+            const appendCacheBuster = function (url) {
+                if (!url) {
+                    return url;
+                }
+
+                const separator = url.includes('?') ? '&' : '?';
+                return `${url}${separator}v=${Date.now()}`;
+            };
+
             const marketingRoot = document.querySelector('.marketing-section-group--banner');
             if (marketingRoot) {
                 marketingRoot.addEventListener('submit', function (event) {
@@ -604,7 +614,7 @@
                     formData.append('file', file);
 
                     try {
-                        const response = await fetch('/admin/marketing/upload-active-image', {
+                        const response = await fetch('/admin/marketing/upload-seo-image', {
                             method: 'POST',
                             body: formData
                         });
@@ -666,10 +676,10 @@
                 const imageInputs = Array.from(document.querySelectorAll('[data-image-path-input]'));
 
                 previewImages.forEach(function (image, index) {
-                    if (imageValues[index]) {
-                        image.src = imageValues[index];
-                    }
-                });
+                        if (imageValues[index]) {
+                            image.src = appendCacheBuster(toClientUrl(imageValues[index]));
+                        }
+                    });
 
                 imageInputs.forEach(function (input, index) {
                     if (imageValues[index]) {
@@ -680,9 +690,9 @@
                 if (adminBannerSwiper) {
                     adminBannerSwiper.removeAllSlides();
                     adminBannerSwiper.appendSlide([
-                        `<div class="swiper-slide"><img src="${imageValues[0]}" data-banner-slider-image="1" alt="Banner 1" class="img-fluid w-100"></div>`,
-                        `<div class="swiper-slide"><img src="${imageValues[1]}" data-banner-slider-image="2" alt="Banner 2" class="img-fluid w-100"></div>`,
-                        `<div class="swiper-slide"><img src="${imageValues[2]}" data-banner-slider-image="3" alt="Banner 3" class="img-fluid w-100"></div>`
+                        `<div class="swiper-slide"><img src="${appendCacheBuster(toClientUrl(imageValues[0]))}" data-banner-slider-image="1" alt="Banner 1" class="img-fluid w-100"></div>`,
+                        `<div class="swiper-slide"><img src="${appendCacheBuster(toClientUrl(imageValues[1]))}" data-banner-slider-image="2" alt="Banner 2" class="img-fluid w-100"></div>`,
+                        `<div class="swiper-slide"><img src="${appendCacheBuster(toClientUrl(imageValues[2]))}" data-banner-slider-image="3" alt="Banner 3" class="img-fluid w-100"></div>`
                     ]);
                     adminBannerSwiper.update();
                     adminBannerSwiper.slideToLoop(0, 0, false);
@@ -745,6 +755,7 @@
 
                     const formData = new FormData();
                     formData.append('file', file);
+                    formData.append('bannerIndex', String(bannerIndex + 1));
 
                     if (statusText) {
                             statusText.textContent = 'Đang tải ảnh...';
@@ -765,7 +776,7 @@
                             throw new Error('Không nhận được đường dẫn ảnh banner');
                         }
 
-                        previewImage.src = toClientUrl(result.url);
+                        previewImage.src = appendCacheBuster(toClientUrl(result.url));
                         pathInput.value = result.url;
 
                         if (adminBannerSwiper) {
@@ -775,9 +786,9 @@
 
                             adminBannerSwiper.removeAllSlides();
                             adminBannerSwiper.appendSlide([
-                                `<div class="swiper-slide"><img src="${toClientUrl(currentBannerValues[0] || '@Model.BannerImage1')}" data-banner-slider-image="1" alt="Banner 1" class="img-fluid w-100"></div>`,
-                                `<div class="swiper-slide"><img src="${toClientUrl(currentBannerValues[1] || '@Model.BannerImage2')}" data-banner-slider-image="2" alt="Banner 2" class="img-fluid w-100"></div>`,
-                                `<div class="swiper-slide"><img src="${toClientUrl(currentBannerValues[2] || '@Model.BannerImage3')}" data-banner-slider-image="3" alt="Banner 3" class="img-fluid w-100"></div>`
+                                `<div class="swiper-slide"><img src="${appendCacheBuster(toClientUrl(currentBannerValues[0] || '@Model.BannerImage1'))}" data-banner-slider-image="1" alt="Banner 1" class="img-fluid w-100"></div>`,
+                                `<div class="swiper-slide"><img src="${appendCacheBuster(toClientUrl(currentBannerValues[1] || '@Model.BannerImage2'))}" data-banner-slider-image="2" alt="Banner 2" class="img-fluid w-100"></div>`,
+                                `<div class="swiper-slide"><img src="${appendCacheBuster(toClientUrl(currentBannerValues[2] || '@Model.BannerImage3'))}" data-banner-slider-image="3" alt="Banner 3" class="img-fluid w-100"></div>`
                             ]);
                             adminBannerSwiper.update();
                             adminBannerSwiper.slideToLoop(bannerIndex, 0, false);

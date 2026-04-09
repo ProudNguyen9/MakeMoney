@@ -1,4 +1,5 @@
-﻿ @model WebThuMuaPheLieu.ViewModels.HomeIndexViewModel
+﻿ @using System.IO
+@model WebThuMuaPheLieu.ViewModels.HomeIndexViewModel
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Trang chủ";
@@ -32,6 +33,53 @@
         new { Url = Url.Content("~/assets/img/dongnhom.jpg"), Alt = "Thu mua đồng nhôm và kim loại màu" },
         new { Url = Url.Content("~/assets/img/maymoc.jpg"), Alt = "Thu mua máy móc công nghiệp và phế liệu cơ khí" }
     };
+
+    string ResolveBannerImageUrl(string? imageUrl)
+    {
+        var normalizedUrl = NormalizeAssetPath(imageUrl);
+
+        if (string.IsNullOrWhiteSpace(normalizedUrl))
+        {
+            return Url.Content(normalizedUrl);
+        }
+
+        var relativePath = normalizedUrl.Replace("~/", string.Empty).TrimStart('/').Replace('/', System.IO.Path.DirectorySeparatorChar);
+        var physicalPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
+
+        if (!System.IO.File.Exists(physicalPath))
+        {
+            var fileNameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(relativePath);
+            var directoryPath = System.IO.Path.GetDirectoryName(physicalPath);
+
+            if (!string.IsNullOrWhiteSpace(fileNameWithoutExtension) && !string.IsNullOrWhiteSpace(directoryPath) && Directory.Exists(directoryPath))
+            {
+                var matchedFile = Directory.GetFiles(directoryPath, $"{fileNameWithoutExtension}.*")
+                    .OrderBy(path => path)
+                    .FirstOrDefault();
+
+                if (!string.IsNullOrWhiteSpace(matchedFile))
+                {
+                    var relativeDirectory = normalizedUrl.Replace("~/", string.Empty).TrimStart('/');
+                    relativeDirectory = relativeDirectory[..relativeDirectory.LastIndexOf('/')];
+                    var fileName = System.IO.Path.GetFileName(matchedFile);
+                    normalizedUrl = $"~/{relativeDirectory}/{fileName}";
+                    relativePath = normalizedUrl.Replace("~/", string.Empty).TrimStart('/').Replace('/', System.IO.Path.DirectorySeparatorChar);
+                    physicalPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", relativePath);
+                }
+            }
+        }
+
+        var contentUrl = Url.Content(normalizedUrl);
+
+        if (!System.IO.File.Exists(physicalPath))
+        {
+            return contentUrl;
+        }
+
+        var version = System.IO.File.GetLastWriteTimeUtc(physicalPath).Ticks;
+        var separator = contentUrl.Contains('?') ? '&' : '?';
+        return $"{contentUrl}{separator}v={version}";
+    }
 }
 
 <section id="hero" class="hero scrap-hero d-flex align-items-center">
@@ -55,8 +103,8 @@
                                                     @foreach (var image in heroImages)
                                                     {
                                                         <div class="swiper-slide">
-                                                            <img src="@Url.Content(NormalizeAssetPath(image.ImageUrl))" alt="@(string.IsNullOrWhiteSpace(image.Caption) ? heroLine1 : image.Caption)"
-                                                                 class="img-fluid w-100">
+                                                            <img src="@ResolveBannerImageUrl(image.ImageUrl)" alt="@(string.IsNullOrWhiteSpace(image.Caption) ? heroLine1 : image.Caption)"
+                                                                  class="img-fluid w-100">
                                                         </div>
                                                     }
                                                 }

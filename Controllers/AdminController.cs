@@ -984,7 +984,7 @@ public class AdminController : Controller
 
     [HttpPost("marketing/upload-active-image")]
     [RequestSizeLimit(10_000_000)]
-    public async Task<IActionResult> UploadMarketingActiveImage(IFormFile? file)
+    public async Task<IActionResult> UploadMarketingActiveImage(IFormFile? file, [FromForm] int? bannerIndex)
     {
         if (file is null || file.Length == 0)
         {
@@ -1001,10 +1001,66 @@ public class AdminController : Controller
         var folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "bannersandseos");
         Directory.CreateDirectory(folderPath);
 
-        var fileName = $"active-{DateTime.UtcNow:yyyyMMddHHmmssfff}-{Guid.NewGuid():N}{extension}";
+        var normalizedBannerIndex = bannerIndex.GetValueOrDefault();
+        if (normalizedBannerIndex < 1 || normalizedBannerIndex > 3)
+        {
+            return BadRequest(new { message = "Vị trí banner không hợp lệ." });
+        }
+
+        foreach (var staleFile in Directory.GetFiles(folderPath, $"banner-{normalizedBannerIndex}.*"))
+        {
+            var staleExtension = Path.GetExtension(staleFile);
+            if (!string.Equals(staleExtension, extension, StringComparison.OrdinalIgnoreCase))
+            {
+                System.IO.File.Delete(staleFile);
+            }
+        }
+
+        var fileName = $"banner-{normalizedBannerIndex}{extension}";
         var filePath = Path.Combine(folderPath, fileName);
 
-        await using (var stream = System.IO.File.Create(filePath))
+        await using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        var relativeUrl = $"~/{BannerActiveFolderRelative}/{fileName}";
+        return Json(new
+        {
+            success = true,
+            url = relativeUrl,
+            fileName
+        });
+    }
+
+    [HttpPost("marketing/upload-seo-image")]
+    [RequestSizeLimit(10_000_000)]
+    public async Task<IActionResult> UploadMarketingSeoImage(IFormFile? file)
+    {
+        if (file is null || file.Length == 0)
+        {
+            return BadRequest(new { message = "Chưa có file ảnh được chọn." });
+        }
+
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
+        if (!allowedExtensions.Contains(extension))
+        {
+            return BadRequest(new { message = "Chỉ hỗ trợ file jpg, jpeg, png, webp hoặc gif." });
+        }
+
+        var folderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "bannersandseos");
+        Directory.CreateDirectory(folderPath);
+
+        foreach (var staleFile in Directory.GetFiles(folderPath, "seo-og-image.*"))
+        {
+            System.IO.File.Delete(staleFile);
+        }
+
+        var fileName = $"seo-og-image{extension}";
+        var filePath = Path.Combine(folderPath, fileName);
+
+        await using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
         {
             await file.CopyToAsync(stream);
         }
@@ -1023,7 +1079,9 @@ public class AdminController : Controller
     {
         var banner = await _context.Banners
             .Include(item => item.BannerImages)
-            .OrderBy(item => item.OrderIndex ?? int.MaxValue)
+            .OrderByDescending(item => item.Status != null && item.Status.ToLower() == "active")
+            .ThenBy(item => item.OrderIndex ?? int.MaxValue)
+            .ThenBy(item => item.Id)
             .FirstOrDefaultAsync();
 
         if (banner is null)
@@ -1036,6 +1094,9 @@ public class AdminController : Controller
             };
             _context.Banners.Add(banner);
         }
+
+        banner.Status = "active";
+        banner.OrderIndex ??= 1;
 
         banner.Title = string.Join(BannerTitleSeparator, new[]
         {
@@ -1154,6 +1215,8 @@ public class AdminController : Controller
     [HttpPost("marketing/save-seo")]
     public async Task<IActionResult> SaveSeo([FromBody] AdminMarketingViewModel model)
     {
+        model.OgImage = await NormalizeSeoImageAsync(model.OgImage);
+
         await UpsertSiteSettingAsync("seo.meta_title", model.MetaTitle, "Meta title trang chủ");
         await UpsertSiteSettingAsync("seo.meta_description", model.MetaDescription, "Meta description trang chủ");
         await UpsertSiteSettingAsync("seo.keywords", model.SeoKeywords, "Từ khóa SEO trang chủ");
@@ -1194,7 +1257,9 @@ public class AdminController : Controller
 
         var banner = await _context.Banners
             .Include(item => item.BannerImages)
-            .OrderBy(item => item.OrderIndex ?? int.MaxValue)
+            .OrderByDescending(item => item.Status != null && item.Status.ToLower() == "active")
+            .ThenBy(item => item.OrderIndex ?? int.MaxValue)
+            .ThenBy(item => item.Id)
             .FirstOrDefaultAsync();
 
         if (banner is null)
@@ -1217,9 +1282,9 @@ public class AdminController : Controller
             .OrderBy(item => item.OrderIndex ?? int.MaxValue)
             .ToList();
 
-        if (orderedImages.Count > 0 && !string.IsNullOrWhiteSpace(orderedImages[0].ImageUrl)) model.BannerImage1 = orderedImages[0].ImageUrl!;
-        if (orderedImages.Count > 1 && !string.IsNullOrWhiteSpace(orderedImages[1].ImageUrl)) model.BannerImage2 = orderedImages[1].ImageUrl!;
-        if (orderedImages.Count > 2 && !string.IsNullOrWhiteSpace(orderedImages[2].ImageUrl)) model.BannerImage3 = orderedImages[2].ImageUrl!;
+        if (orderedImages.Count > 0 && !string.IsNullOrWhiteSpace(orderedImages[0].ImageUrl)) model.BannerImage1 = ResolveExistingBannerActiveImageUrl(orderedImages[0].ImageUrl!, 1);
+        if (orderedImages.Count > 1 && !string.IsNullOrWhiteSpace(orderedImages[1].ImageUrl)) model.BannerImage2 = ResolveExistingBannerActiveImageUrl(orderedImages[1].ImageUrl!, 2);
+        if (orderedImages.Count > 2 && !string.IsNullOrWhiteSpace(orderedImages[2].ImageUrl)) model.BannerImage3 = ResolveExistingBannerActiveImageUrl(orderedImages[2].ImageUrl!, 3);
 
         var settings = await _context.SiteSettings
             .Where(item => item.SettingGroup == MarketingSettingGroup)
@@ -1268,9 +1333,9 @@ public class AdminController : Controller
 
     private async Task<string> NormalizeBannerActiveImageAsync(string? imageUrl, int orderIndex)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl) || !imageUrl.Contains(BannerActiveFolderRelative, StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(imageUrl))
         {
-            return imageUrl ?? string.Empty;
+            return string.Empty;
         }
 
         var normalizedImageUrl = imageUrl.Trim().Replace("\\", "/");
@@ -1283,15 +1348,28 @@ public class AdminController : Controller
             normalizedImageUrl = normalizedImageUrl[1..];
         }
 
-        var extension = Path.GetExtension(normalizedImageUrl);
-        var activeFileName = $"banner-{orderIndex}{extension}";
         var sourcePath = Path.Combine(_environment.WebRootPath, normalizedImageUrl.Replace('/', Path.DirectorySeparatorChar));
+        if (!System.IO.File.Exists(sourcePath))
+        {
+            return ResolveExistingBannerActiveImageUrl(imageUrl.Trim(), orderIndex);
+        }
+
+        var extension = Path.GetExtension(normalizedImageUrl);
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            extension = ".jpg";
+        }
+
+        var activeFileName = $"banner-{orderIndex}{extension.ToLowerInvariant()}";
         var activeFolderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "bannersandseos");
         Directory.CreateDirectory(activeFolderPath);
 
         var destinationPath = Path.Combine(activeFolderPath, activeFileName);
 
-        if (System.IO.File.Exists(sourcePath))
+        var normalizedDestinationPath = Path.GetFullPath(destinationPath);
+        var normalizedSourcePath = Path.GetFullPath(sourcePath);
+
+        if (!string.Equals(normalizedSourcePath, normalizedDestinationPath, StringComparison.OrdinalIgnoreCase))
         {
             if (System.IO.File.Exists(destinationPath))
             {
@@ -1300,6 +1378,105 @@ public class AdminController : Controller
 
             await using var sourceStream = System.IO.File.OpenRead(sourcePath);
             await using var destinationStream = System.IO.File.Create(destinationPath);
+            await sourceStream.CopyToAsync(destinationStream);
+        }
+
+        return $"~/{BannerActiveFolderRelative}/{activeFileName}";
+    }
+
+    private string ResolveExistingBannerActiveImageUrl(string imageUrl, int orderIndex)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return string.Empty;
+        }
+
+        var normalizedImageUrl = imageUrl.Trim().Replace("\\", "/");
+        if (normalizedImageUrl.StartsWith("~/", StringComparison.Ordinal))
+        {
+            normalizedImageUrl = normalizedImageUrl[2..];
+        }
+        else if (normalizedImageUrl.StartsWith("/", StringComparison.Ordinal))
+        {
+            normalizedImageUrl = normalizedImageUrl[1..];
+        }
+
+        var sourcePath = Path.Combine(_environment.WebRootPath, normalizedImageUrl.Replace('/', Path.DirectorySeparatorChar));
+        if (System.IO.File.Exists(sourcePath))
+        {
+            return imageUrl.Trim();
+        }
+
+        var activeFolderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "bannersandseos");
+        if (!Directory.Exists(activeFolderPath))
+        {
+            return imageUrl.Trim();
+        }
+
+        var matchedFile = Directory.GetFiles(activeFolderPath, $"banner-{orderIndex}.*")
+            .OrderBy(path => path)
+            .FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(matchedFile))
+        {
+            return imageUrl.Trim();
+        }
+
+        var extension = Path.GetExtension(matchedFile).ToLowerInvariant();
+        return $"~/{BannerActiveFolderRelative}/banner-{orderIndex}{extension}";
+    }
+
+    private async Task<string> NormalizeSeoImageAsync(string? imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return string.Empty;
+        }
+
+        var normalizedImageUrl = imageUrl.Trim().Replace("\\", "/");
+        if (normalizedImageUrl.StartsWith("~/", StringComparison.Ordinal))
+        {
+            normalizedImageUrl = normalizedImageUrl[2..];
+        }
+        else if (normalizedImageUrl.StartsWith("/", StringComparison.Ordinal))
+        {
+            normalizedImageUrl = normalizedImageUrl[1..];
+        }
+
+        var sourcePath = Path.Combine(_environment.WebRootPath, normalizedImageUrl.Replace('/', Path.DirectorySeparatorChar));
+        if (!System.IO.File.Exists(sourcePath))
+        {
+            return imageUrl.Trim();
+        }
+
+        var extension = Path.GetExtension(normalizedImageUrl);
+        if (string.IsNullOrWhiteSpace(extension))
+        {
+            extension = ".jpg";
+        }
+
+        var activeFolderPath = Path.Combine(_environment.WebRootPath, "assets", "images", "bannersandseos");
+        Directory.CreateDirectory(activeFolderPath);
+
+        foreach (var staleFile in Directory.GetFiles(activeFolderPath, "seo-og-image.*"))
+        {
+            var staleExtension = Path.GetExtension(staleFile);
+            if (!string.Equals(staleExtension, extension, StringComparison.OrdinalIgnoreCase))
+            {
+                System.IO.File.Delete(staleFile);
+            }
+        }
+
+        var activeFileName = $"seo-og-image{extension.ToLowerInvariant()}";
+        var destinationPath = Path.Combine(activeFolderPath, activeFileName);
+
+        var normalizedDestinationPath = Path.GetFullPath(destinationPath);
+        var normalizedSourcePath = Path.GetFullPath(sourcePath);
+
+        if (!string.Equals(normalizedSourcePath, normalizedDestinationPath, StringComparison.OrdinalIgnoreCase))
+        {
+            await using var sourceStream = System.IO.File.OpenRead(sourcePath);
+            await using var destinationStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
             await sourceStream.CopyToAsync(destinationStream);
         }
 
