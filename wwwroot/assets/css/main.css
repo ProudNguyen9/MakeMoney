@@ -3163,6 +3163,30 @@ body {
   z-index: 6;
 }
 
+@media (min-width: 768px) {
+  .hero-content,
+  .hero-title,
+  .hero-description,
+  .hero-actions {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-title {
+    overflow: hidden;
+  }
+
+  .hero-title span,
+  .hero-description {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .hero-actions {
   display: flex;
   flex-wrap: nowrap;
@@ -7464,6 +7488,55 @@ body {
   font-size: 14px;
   line-height: 1.25;
   white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .header-top-content {
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+
+  .header-top-left {
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .header-top-item {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .header-top-item a,
+  .header-top-item span {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-social {
+    flex: 0 0 auto;
+  }
+
+  .header-main-actions,
+  .header-main-actions .navbar,
+  .header-main-actions .navbar ul,
+  .navbar li,
+  .navbar a,
+  .navbar a:focus {
+    min-width: 0;
+  }
+
+  .navbar a,
+  .navbar a:focus,
+  .header-cta {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .header-social {
