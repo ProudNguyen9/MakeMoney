@@ -1,6 +1,8 @@
 @model WebThuMuaPheLieu.ViewModels.ScrapPurchaseServicesSectionComponentViewModel
+@using System.Net
+@using System.Text.RegularExpressions
 @{
-    var serviceBlogPosts = Model?.Posts?.ToList() ?? new List<WebThuMuaPheLieu.Models.BlogPost>();
+    var serviceBlogPosts = Model?.Posts?.ToList() ?? new List<WebThuMuaPheLieu.Models.BlogCardViewModel>();
 }
 
 @functions {
@@ -26,18 +28,24 @@
         return $"/{normalized.TrimStart('/')}";
     }
 
-    string BuildBlogSummary(WebThuMuaPheLieu.Models.BlogPost post)
+    string BuildBlogSummary(WebThuMuaPheLieu.Models.BlogCardViewModel post)
     {
-        var summary = !string.IsNullOrWhiteSpace(post.Excerpt)
-            ? post.Excerpt
-            : post.Content;
+        var summary = post.Summary;
 
         if (string.IsNullOrWhiteSpace(summary))
         {
             return "Nội dung bài viết đang được cập nhật.";
         }
 
-        summary = summary.Trim();
+        summary = WebUtility.HtmlDecode(summary);
+        summary = Regex.Replace(summary, "<.*?>", string.Empty);
+        summary = Regex.Replace(summary, @"\s+", " ").Trim();
+
+        if (string.IsNullOrWhiteSpace(summary))
+        {
+            return "Nội dung bài viết đang được cập nhật.";
+        }
+
         return summary.Length > 160 ? $"{summary[..157]}..." : summary;
     }
 }
@@ -65,7 +73,10 @@
                                 <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(post.Slug) ? post.Slug : post.Id.ToString())" class="service-card-media"
                                        aria-label="@(post.Title ?? "Xem chi tiết dịch vụ thu mua phế liệu")">
                                     <img src="@NormalizeBlogImagePath(post.CoverImage)"
-                                         alt="@(post.Title ?? "Dịch vụ thu mua phế liệu")" class="img-fluid w-100" loading="lazy">
+                                         alt="@(post.Title ?? "Dịch vụ thu mua phế liệu")" class="img-fluid w-100 materials-hover-image js-service-card-image"
+                                         data-image-sequence="@string.Join("|", post.ImageSequence ?? new List<string>())"
+                                         data-default-image="@NormalizeBlogImagePath(post.CoverImage)"
+                                         loading="lazy">
                                     <span class="service-badge"><i class="bi bi-briefcase-fill"></i> Dịch vụ</span>
                                 </a>
                                 <div class="service-card-body">
@@ -86,3 +97,48 @@
             }
         </div>
     </section>
+
+<script>
+    (() => {
+        document.querySelectorAll('#services .js-service-card-image').forEach((imageElement) => {
+            const sequence = (imageElement.dataset.imageSequence || '')
+                .split('|')
+                .map((item) => item.trim())
+                .filter((item) => item.length > 0);
+
+            if (sequence.length <= 1 || imageElement.dataset.rotationInitialized === 'true') {
+                return;
+            }
+
+            const defaultImage = imageElement.dataset.defaultImage || sequence[0];
+            let currentIndex = 0;
+            let intervalId = null;
+
+            const startHoverRotation = () => {
+                if (intervalId !== null) {
+                    return;
+                }
+
+                intervalId = window.setInterval(() => {
+                    currentIndex = (currentIndex + 1) % sequence.length;
+                    imageElement.src = sequence[currentIndex];
+                }, 850);
+            };
+
+            const stopHoverRotation = () => {
+                if (intervalId !== null) {
+                    window.clearInterval(intervalId);
+                    intervalId = null;
+                }
+
+                currentIndex = 0;
+                imageElement.src = defaultImage;
+            };
+
+            imageElement.dataset.rotationInitialized = 'true';
+            const mediaElement = imageElement.closest('.service-card-media');
+            mediaElement?.addEventListener('mouseenter', startHoverRotation);
+            mediaElement?.addEventListener('mouseleave', stopHoverRotation);
+        });
+    })();
+</script>

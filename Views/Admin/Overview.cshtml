@@ -4,6 +4,18 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var latestPriceUpdateText = Model.LatestPriceUpdateDate?.ToString("dd/MM/yyyy") ?? "Chưa có dữ liệu";
     var totalAlerts = Model.ProductsWithoutImages + Model.BlogsWithoutImages + Model.NewContactRequests;
+    var overviewSuccessMessage = TempData["AdminOverviewSuccess"] as string;
+    var overviewErrorMessage = TempData["AdminOverviewError"] as string;
+}
+
+@if (!string.IsNullOrWhiteSpace(overviewSuccessMessage))
+{
+    <div class="admin-overview-message admin-overview-message--success">@overviewSuccessMessage</div>
+}
+
+@if (!string.IsNullOrWhiteSpace(overviewErrorMessage))
+{
+    <div class="admin-overview-message admin-overview-message--error">@overviewErrorMessage</div>
 }
 
 <!-- Simple Page Title -->
@@ -73,7 +85,10 @@
     </div>
 
     <!-- Card 3: Yêu cầu liên hệ mới -->
-    <div class="admin-stat-card admin-stat-card--orange">
+    <button type="button"
+            class="admin-stat-card admin-stat-card--orange admin-stat-card--button"
+            data-open-contact-modal="true"
+            @(Model.NewContactRequestItems.Count == 0 ? "disabled" : null)>
         <div class="admin-stat-card__icon">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -84,9 +99,11 @@
         <div class="admin-stat-card__content">
             <p class="admin-stat-card__label">Liên hệ mới</p>
             <h2 class="admin-stat-card__value">@Model.NewContactRequests</h2>
-            <p class="admin-stat-card__desc">Chưa xử lý</p>
+            <p class="admin-stat-card__desc">
+                @(Model.NewContactRequestItems.Count > 0 ? "Bấm để xem chi tiết" : "Chưa xử lý")
+            </p>
         </div>
-    </div>
+    </button>
 
     <!-- Card 4: Lần cập nhật giá gần nhất -->
     <div class="admin-stat-card admin-stat-card--purple">
@@ -191,7 +208,7 @@
             }
             @if (Model.NewContactRequests > 0)
             {
-                <div class="admin-alert-item admin-alert-item--info">
+                <button type="button" class="admin-alert-item admin-alert-item--info admin-alert-item--button" data-open-contact-modal="true">
                     <div class="admin-alert-item__icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10" />
@@ -201,10 +218,10 @@
                     </div>
                     <div class="admin-alert-item__content">
                         <h4>Yêu cầu liên hệ mới</h4>
-                        <p>@Model.NewContactRequests yêu cầu đang chờ xử lý</p>
+                        <p>@Model.NewContactRequests yêu cầu đang chờ xử lý, bấm để xem popup chi tiết</p>
                     </div>
                     <span class="admin-alert-item__count">@Model.NewContactRequests</span>
-                </div>
+                </button>
             }
             @if (totalAlerts == 0)
             {
@@ -285,3 +302,308 @@
         </div>
     </div>
 </div>
+
+<div class="admin-contact-modal" id="adminContactModal" hidden>
+    <div class="admin-contact-modal__backdrop" data-close-contact-modal="true"></div>
+    <div class="admin-contact-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="adminContactModalTitle">
+        <div class="admin-contact-modal__header">
+            <div>
+                <h3 id="adminContactModalTitle">Liên hệ mới đang chờ xử lý</h3>
+                <p>Nhấn xác nhận để đánh dấu từng liên hệ đã tiếp nhận.</p>
+            </div>
+            <button type="button" class="admin-contact-modal__close" aria-label="Đóng" data-close-contact-modal="true">×</button>
+        </div>
+
+        <div class="admin-contact-modal__body">
+            @if (Model.NewContactRequestItems.Count == 0)
+            {
+                <div class="admin-contact-empty-state">Hiện chưa có liên hệ mới.</div>
+            }
+            else
+            {
+                foreach (var contact in Model.NewContactRequestItems)
+                {
+                    var createdText = contact.CreatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Không rõ thời gian";
+
+                    <div class="admin-contact-card">
+                        <div class="admin-contact-card__top">
+                            <div>
+                                <h4>@contact.Name</h4>
+                                <p>Gửi lúc @createdText</p>
+                            </div>
+                            <form asp-action="ConfirmContactRequest" asp-controller="Admin" asp-route-id="@contact.Id" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="admin-contact-card__confirm">Xác nhận</button>
+                            </form>
+                        </div>
+
+                        <div class="admin-contact-card__grid">
+                            <div>
+                                <span>Số điện thoại</span>
+                                <strong>@(string.IsNullOrWhiteSpace(contact.Phone) ? "Chưa có" : contact.Phone)</strong>
+                            </div>
+                            <div>
+                                <span>Email</span>
+                                <strong>@(string.IsNullOrWhiteSpace(contact.Email) ? "Chưa có" : contact.Email)</strong>
+                            </div>
+                            <div>
+                                <span>Loại yêu cầu</span>
+                                <strong>@(string.IsNullOrWhiteSpace(contact.RequestTypeDisplayName) ? "Chưa có" : contact.RequestTypeDisplayName)</strong>
+                            </div>
+                            <div>
+                                <span>Khu vực</span>
+                                <strong>@(string.IsNullOrWhiteSpace(contact.Area) ? "Chưa có" : contact.Area)</strong>
+                            </div>
+                        </div>
+
+                        <div class="admin-contact-card__message">
+                            <span>Nội dung liên hệ</span>
+                            <p>@(string.IsNullOrWhiteSpace(contact.Message) ? "Khách hàng chưa để lại nội dung." : contact.Message)</p>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-overview-message {
+        margin-bottom: 1rem;
+        padding: 0.875rem 1rem;
+        border-radius: 14px;
+        font-weight: 600;
+    }
+
+    .admin-overview-message--success {
+        color: #166534;
+        background: #dcfce7;
+        border: 1px solid #86efac;
+    }
+
+    .admin-overview-message--error {
+        color: #991b1b;
+        background: #fee2e2;
+        border: 1px solid #fca5a5;
+    }
+
+    .admin-stat-card--button,
+    .admin-alert-item--button {
+        width: 100%;
+        border: 0;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .admin-stat-card--button:disabled {
+        cursor: default;
+        opacity: 0.85;
+    }
+
+    .admin-contact-modal[hidden] {
+        display: none;
+    }
+
+    .admin-contact-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1200;
+    }
+
+    .admin-contact-modal__backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+    }
+
+    .admin-contact-modal__dialog {
+        position: relative;
+        width: min(920px, calc(100% - 2rem));
+        max-height: calc(100vh - 4rem);
+        margin: 2rem auto;
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 24px 80px rgba(15, 23, 42, 0.28);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-contact-modal__header {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .admin-contact-modal__header h3 {
+        margin: 0 0 0.35rem;
+    }
+
+    .admin-contact-modal__header p {
+        margin: 0;
+        color: #64748b;
+    }
+
+    .admin-contact-modal__close {
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .admin-contact-modal__body {
+        padding: 1.5rem;
+        overflow: auto;
+        display: grid;
+        gap: 1rem;
+    }
+
+    .admin-contact-empty-state {
+        padding: 2rem;
+        text-align: center;
+        border-radius: 18px;
+        background: #f8fafc;
+        color: #64748b;
+    }
+
+    .admin-contact-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 1.25rem;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+    }
+
+    .admin-contact-card__top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .admin-contact-card__top h4 {
+        margin: 0 0 0.35rem;
+    }
+
+    .admin-contact-card__top p {
+        margin: 0;
+        color: #64748b;
+    }
+
+    .admin-contact-card__confirm {
+        border: 0;
+        border-radius: 12px;
+        background: #0f766e;
+        color: #fff;
+        padding: 0.8rem 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .admin-contact-card__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .admin-contact-card__grid div,
+    .admin-contact-card__message {
+        padding: 0.9rem 1rem;
+        border-radius: 14px;
+        background: #f8fafc;
+    }
+
+    .admin-contact-card__grid span,
+    .admin-contact-card__message span {
+        display: block;
+        margin-bottom: 0.35rem;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: #64748b;
+    }
+
+    .admin-contact-card__grid strong {
+        color: #0f172a;
+    }
+
+    .admin-contact-card__message p {
+        margin: 0;
+        white-space: pre-wrap;
+        color: #334155;
+        line-height: 1.6;
+    }
+
+    body.admin-contact-modal-open {
+        overflow: hidden;
+    }
+
+    @@media (max-width: 768px) {
+        .admin-contact-modal__dialog {
+            width: calc(100% - 1rem);
+            max-height: calc(100vh - 1rem);
+            margin: 0.5rem auto;
+            border-radius: 18px;
+        }
+
+        .admin-contact-modal__header,
+        .admin-contact-modal__body {
+            padding: 1rem;
+        }
+
+        .admin-contact-card__top {
+            flex-direction: column;
+        }
+
+        .admin-contact-card__confirm {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    (() => {
+        const modal = document.getElementById('adminContactModal');
+        if (!modal) {
+            return;
+        }
+
+        const openButtons = document.querySelectorAll('[data-open-contact-modal="true"]');
+        const closeButtons = modal.querySelectorAll('[data-close-contact-modal="true"]');
+
+        const openModal = () => {
+            modal.hidden = false;
+            document.body.classList.add('admin-contact-modal-open');
+        };
+
+        const closeModal = () => {
+            modal.hidden = true;
+            document.body.classList.remove('admin-contact-modal-open');
+        };
+
+        openButtons.forEach(button => {
+            if (button.hasAttribute('disabled')) {
+                return;
+            }
+
+            button.addEventListener('click', openModal);
+        });
+
+        closeButtons.forEach(button => button.addEventListener('click', closeModal));
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && !modal.hidden) {
+                closeModal();
+            }
+        });
+    })();
+</script>

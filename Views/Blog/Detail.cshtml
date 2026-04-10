@@ -528,10 +528,10 @@
             border-top: 1px solid rgba(203, 213, 225, 0.8);
         }
 
-        .blog-detail-body img {
+        .blog-detail-body img,
+        .post-content img {
             display: block;
             max-width: 100%;
-            width: auto;
             height: auto;
             margin: 1.9rem auto;
             border-radius: 14px;
@@ -539,12 +539,70 @@
             box-shadow: none;
         }
 
-        .blog-detail-body figure {
-            margin: 2rem 0;
+        .blog-detail-body figure,
+        .post-content figure {
+            display: block;
+            width: fit-content;
+            max-width: 100%;
+            margin: 2rem auto;
         }
 
-        .blog-detail-body figure img {
+        .blog-detail-body figure.image,
+        .blog-detail-body figure.image_resized,
+        .post-content figure.image,
+        .post-content figure.image_resized {
+            width: fit-content;
+            max-width: 100% !important;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .blog-detail-body figure.image.image-style-align-left,
+        .blog-detail-body figure.image_resized.image-style-align-left,
+        .post-content figure.image.image-style-align-left,
+        .post-content figure.image_resized.image-style-align-left {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        .blog-detail-body figure.image.image-style-align-right,
+        .blog-detail-body figure.image_resized.image-style-align-right,
+        .post-content figure.image.image-style-align-right,
+        .post-content figure.image_resized.image-style-align-right {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        .blog-detail-body figure img,
+        .post-content figure img {
             margin: 0;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .blog-detail-body figure:not(.image):not(.image_resized) img,
+        .post-content figure:not(.image):not(.image_resized) img {
+            width: auto;
+        }
+
+        .blog-detail-body figure[style*="width"],
+        .post-content figure[style*="width"] {
+            width: min(100%, fit-content) !important;
+            max-width: 100% !important;
+        }
+
+        .blog-detail-body img[style*="width"],
+        .post-content img[style*="width"] {
+            width: auto;
+            max-width: 100% !important;
+            height: auto !important;
+        }
+
+        .blog-detail-body figure.image img[style*="width"],
+        .blog-detail-body figure.image_resized img[style*="width"],
+        .post-content figure.image img[style*="width"],
+        .post-content figure.image_resized img[style*="width"] {
+            width: 100% !important;
         }
 
         .blog-detail-body figcaption {
@@ -1551,14 +1609,24 @@
             }
 
             body.blog-detail-mobile-page .blog-detail-body img {
-                width: 100%;
                 max-width: 100%;
+                height: auto;
                 margin: 1.25rem auto;
                 border-radius: 12px;
             }
 
             body.blog-detail-mobile-page .blog-detail-body figure {
-                margin: 1.35rem 0;
+                max-width: 100% !important;
+                margin: 1.35rem auto;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body figure img {
+                width: 100%;
+            }
+
+            body.blog-detail-mobile-page .blog-detail-body figure:not(.image):not(.image_resized) img {
+                width: auto;
+                max-width: 100%;
             }
 
             body.blog-detail-mobile-page .blog-detail-body figcaption {
@@ -1708,7 +1776,7 @@
                 </div>
 
                 <article class="blog-detail-card blog-detail-content-card">
-                    <div class="blog-detail-body">
+                    <div class="blog-detail-body post-content">
                         @if (string.IsNullOrWhiteSpace(Model.Post.Content))
                         {
                             <p>@plainSummary</p>

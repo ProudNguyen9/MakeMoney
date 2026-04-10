@@ -46,7 +46,7 @@ public class ContactController : Controller
             Name = model.Name.Trim(),
             Phone = model.PhoneInput.Trim(),
             Email = string.IsNullOrWhiteSpace(model.EmailInput) ? null : model.EmailInput.Trim(),
-            RequestType = string.IsNullOrWhiteSpace(model.RequestType) ? "Thu mua phế liệu tận nơi" : model.RequestType.Trim(),
+            RequestType = NormalizeRequestType(model.RequestType),
             Area = string.IsNullOrWhiteSpace(model.Area) ? null : model.Area.Trim(),
             Message = string.IsNullOrWhiteSpace(model.Message) ? null : model.Message.Trim(),
             SourcePage = HttpContext?.Request?.Path.Value ?? "/contact",
@@ -109,5 +109,19 @@ public class ContactController : Controller
         }
 
         return $"https://{trimmed.TrimStart('/')}";
+    }
+
+    private static string NormalizeRequestType(string? value)
+    {
+        var normalizedValue = value?.Trim().ToLowerInvariant();
+
+        return normalizedValue switch
+        {
+            "khao-sat-kho-xuong" => "khao-sat-kho-xuong",
+            "don-kho-thanh-ly" => "don-kho-thanh-ly",
+            "thu-gom-dinh-ky" => "thu-gom-dinh-ky",
+            "thu-mua-phe-lieu-tan-noi" => "thu-mua-phe-lieu-tan-noi",
+            _ => "thu-mua-phe-lieu-tan-noi"
+        };
     }
 }

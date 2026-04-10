@@ -1,6 +1,8 @@
 @model WebThuMuaPheLieu.ViewModels.RecentNewsSectionComponentViewModel
+@using System.Net
+@using System.Text.RegularExpressions
 @{
-    var recentBlogPosts = Model?.Posts?.ToList() ?? new List<WebThuMuaPheLieu.Models.BlogPost>();
+    var recentBlogPosts = Model?.Posts?.ToList() ?? new List<WebThuMuaPheLieu.Models.BlogCardViewModel>();
 }
 
 @functions {
@@ -26,18 +28,24 @@
         return $"/{normalized.TrimStart('/')}";
     }
 
-    string BuildBlogSummary(WebThuMuaPheLieu.Models.BlogPost post)
+    string BuildBlogSummary(WebThuMuaPheLieu.Models.BlogCardViewModel post)
     {
-        var summary = !string.IsNullOrWhiteSpace(post.Excerpt)
-            ? post.Excerpt
-            : post.Content;
+        var summary = post.Summary;
 
         if (string.IsNullOrWhiteSpace(summary))
         {
             return "Nội dung bài viết đang được cập nhật.";
         }
 
-        summary = summary.Trim();
+        summary = WebUtility.HtmlDecode(summary);
+        summary = Regex.Replace(summary, "<.*?>", string.Empty);
+        summary = Regex.Replace(summary, @"\s+", " ").Trim();
+
+        if (string.IsNullOrWhiteSpace(summary))
+        {
+            return "Nội dung bài viết đang được cập nhật.";
+        }
+
         return summary.Length > 160 ? $"{summary[..157]}..." : summary;
     }
 }
@@ -58,16 +66,19 @@
                     @for (var index = 0; index < recentBlogPosts.Count; index++)
                     {
                         var post = recentBlogPosts[index];
-                        var publishDate = post.PublishedAt ?? post.CreatedAt;
+                        var publishDate = post.PublishedAt;
                         var animationDelay = 100 + (index % 4) * 100;
 
                         <div data-aos="fade-up" data-aos-delay="@animationDelay">
                             <article class="news-card-v2">
-                                <div class="news-card-media">
+                                <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(post.Slug) ? post.Slug : post.Id.ToString())" class="news-card-media">
                                     <img src="@NormalizeBlogImagePath(post.CoverImage)" alt="@(post.Title ?? "Tin tức phế liệu")"
-                                         class="img-fluid w-100" loading="lazy">
+                                         class="img-fluid w-100 materials-hover-image js-blog-card-image"
+                                         data-image-sequence="@string.Join("|", post.ImageSequence ?? new List<string>())"
+                                         data-default-image="@NormalizeBlogImagePath(post.CoverImage)"
+                                         loading="lazy">
                                     <span class="news-badge"><i class="bi bi-newspaper"></i> Tin tức</span>
-                                </div>
+                                </a>
                                 <div class="news-card-body">
                                     <div class="news-card-meta">
                                         <span><i class="bi bi-calendar3"></i> @(publishDate?.ToString("dd/MM/yyyy") ?? "Đang cập nhật")</span>
@@ -90,3 +101,48 @@
             }
         </div>
     </section>
+
+<script>
+    (() => {
+        document.querySelectorAll('#recent-news .js-blog-card-image').forEach((imageElement) => {
+            const sequence = (imageElement.dataset.imageSequence || '')
+                .split('|')
+                .map((item) => item.trim())
+                .filter((item) => item.length > 0);
+
+            if (sequence.length <= 1 || imageElement.dataset.rotationInitialized === 'true') {
+                return;
+            }
+
+            const defaultImage = imageElement.dataset.defaultImage || sequence[0];
+            let currentIndex = 0;
+            let intervalId = null;
+
+            const startHoverRotation = () => {
+                if (intervalId !== null) {
+                    return;
+                }
+
+                intervalId = window.setInterval(() => {
+                    currentIndex = (currentIndex + 1) % sequence.length;
+                    imageElement.src = sequence[currentIndex];
+                }, 850);
+            };
+
+            const stopHoverRotation = () => {
+                if (intervalId !== null) {
+                    window.clearInterval(intervalId);
+                    intervalId = null;
+                }
+
+                currentIndex = 0;
+                imageElement.src = defaultImage;
+            };
+
+            imageElement.dataset.rotationInitialized = 'true';
+            const mediaElement = imageElement.closest('.news-card-media');
+            mediaElement?.addEventListener('mouseenter', startHoverRotation);
+            mediaElement?.addEventListener('mouseleave', stopHoverRotation);
+        });
+    })();
+</script>

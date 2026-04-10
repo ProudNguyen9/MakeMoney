@@ -45,12 +45,14 @@ public class AdminController : Controller
     [HttpGet("overview")]
     public async Task<IActionResult> Overview()
     {
+        var newContactQuery = _context.ContactRequests
+            .Where(request => request.Status == null || request.Status == "new" || request.Status == "moi");
+
         var model = new AdminOverviewViewModel
         {
             TotalProducts = await _context.Products.CountAsync(),
             TotalPublishedPosts = await _context.BlogPosts.CountAsync(post => post.PublishedAt != null),
-            NewContactRequests = await _context.ContactRequests.CountAsync(request =>
-                request.Status == null || request.Status == "new" || request.Status == "moi"),
+            NewContactRequests = await newContactQuery.CountAsync(),
             LatestPriceUpdateDate = await _context.PriceHistories
                 .OrderByDescending(price => price.EffectiveDate)
                 .Select(price => price.EffectiveDate)
@@ -58,12 +60,48 @@ public class AdminController : Controller
             ProductsWithoutImages = await _context.Products.CountAsync(product =>
                 (product.PrimaryImage == null || product.PrimaryImage == string.Empty) && !product.ProductImages.Any()),
             BlogsWithoutImages = await _context.BlogPosts.CountAsync(post =>
-                (post.CoverImage == null || post.CoverImage == string.Empty) && !post.BlogImages.Any())
+                (post.CoverImage == null || post.CoverImage == string.Empty) && !post.BlogImages.Any()),
+            NewContactRequestItems = await newContactQuery
+                .OrderByDescending(request => request.CreatedAt)
+                .Take(10)
+                .Select(request => new AdminContactRequestOverviewItemViewModel
+                {
+                    Id = request.Id,
+                    Name = request.Name ?? string.Empty,
+                    Phone = request.Phone ?? string.Empty,
+                    Email = request.Email ?? string.Empty,
+                    RequestType = request.RequestType ?? string.Empty,
+                    Area = request.Area ?? string.Empty,
+                    Message = request.Message ?? string.Empty,
+                    SourcePage = request.SourcePage ?? string.Empty,
+                    CreatedAt = request.CreatedAt
+                })
+                .ToListAsync()
         };
 
         ViewData["Title"] = "Tổng quan";
         ViewData["AdminSection"] = "Overview";
         return View(model);
+    }
+
+    [HttpPost("contacts/{id:int}/confirm")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmContactRequest(int id)
+    {
+        var contactRequest = await _context.ContactRequests.FirstOrDefaultAsync(request => request.Id == id);
+
+        if (contactRequest is null)
+        {
+            TempData["AdminOverviewError"] = "Không tìm thấy liên hệ cần xác nhận.";
+            return RedirectToAction(nameof(Overview));
+        }
+
+        contactRequest.Status = "confirmed";
+        contactRequest.UpdatedAt = DateTime.Now;
+        await _context.SaveChangesAsync();
+
+        TempData["AdminOverviewSuccess"] = $"Đã xác nhận liên hệ của {contactRequest.Name ?? "khách hàng"}.";
+        return RedirectToAction(nameof(Overview));
     }
 
     [HttpGet("products")]
@@ -755,14 +793,13 @@ public class AdminController : Controller
                 ? "Đã tạo bài viết mới thành công."
                 : "Đã cập nhật bài viết thành công.";
 
-            return RedirectToAction(nameof(Posts), new
-            {
-                searchTerm = input.SearchTerm,
-                status = string.IsNullOrWhiteSpace(input.ReturnStatus) ? null : input.ReturnStatus,
-                categoryId = input.ReturnCategoryId,
-                editId = post.Id,
-                page = input.ReturnPage > 1 ? input.ReturnPage : null
-            });
+            return RedirectToPostsSection(
+                input.SearchTerm,
+                input.ReturnStatus,
+                input.ReturnCategoryId,
+                null,
+                "posts-panel",
+                input.ReturnPage > 1 ? input.ReturnPage : null);
         }
         catch (Exception exception)
         {
