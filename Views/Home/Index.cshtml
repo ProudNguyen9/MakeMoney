@@ -17,7 +17,7 @@
         || referralZaloValue.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
         ? referralZaloValue
         : $"https://zalo.me/{referralZaloValue.TrimStart('/')}";
-    var referralContactLink = Url.Content("~/contact.html");
+    var referralContactLink = Url.Action("Index", "Contact") ?? "/Contact";
     var heroButtonPrimaryText = !string.IsNullOrWhiteSpace(heroBanner?.ButtonPrimaryText) ? heroBanner.ButtonPrimaryText : "Nhận báo giá ngay";
     var heroButtonPrimaryLink = referralPhoneHref;
     var heroButtonSecondaryText = !string.IsNullOrWhiteSpace(heroBanner?.ButtonSecondaryText) ? heroBanner.ButtonSecondaryText : "Xem mặt hàng thu mua";

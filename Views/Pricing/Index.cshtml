@@ -1,7 +1,56 @@
 @model WebThuMuaPheLieu.ViewModels.PricingIndexViewModel
+@using WebThuMuaPheLieu.helpper
+@inject IContactInfoHelper ContactInfoHelper
+@inject IBannerInjectHelper BannerInjectHelper
 
-@{
+@{ 
     ViewData["Title"] = "Bảng giá phế liệu";
+    var contact = await ContactInfoHelper.GetContactInfoAsync();
+    var pricingPhone = !string.IsNullOrWhiteSpace(contact.Phone) ? contact.Phone : "0909 123 456";
+    var pricingPhoneDigits = new string(pricingPhone.Where(char.IsDigit).ToArray());
+    var pricingPhoneHref = string.IsNullOrWhiteSpace(pricingPhoneDigits) ? "tel:0909123456" : $"tel:{pricingPhoneDigits}";
+    var pricingZaloValue = string.IsNullOrWhiteSpace(contact.Zalo) ? "0888037777" : contact.Zalo.Trim();
+    var pricingZaloLink = pricingZaloValue.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+        || pricingZaloValue.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+        ? pricingZaloValue
+        : $"https://zalo.me/{pricingZaloValue.TrimStart('/')}";
+    var heroBanner = (await BannerInjectHelper.GetActiveBannersAsync()).FirstOrDefault();
+    var pricingQuoteButtonText = !string.IsNullOrWhiteSpace(heroBanner?.ButtonPrimaryText)
+        ? heroBanner.ButtonPrimaryText
+        : "Nhận báo giá ngay";
+    var pricingQuoteButtonLink = ResolveHeroActionLink(
+        heroBanner?.ButtonPrimaryLink,
+        pricingPhoneHref,
+        pricingZaloLink,
+        pricingPhoneHref);
+
+    static string ResolveHeroActionLink(string? configuredLink, string phoneHref, string zaloHref, string fallback)
+    {
+        if (string.IsNullOrWhiteSpace(configuredLink))
+        {
+            return fallback;
+        }
+
+        var normalized = configuredLink.Trim();
+        var normalizedLower = normalized.ToLowerInvariant();
+
+        if (normalizedLower.StartsWith("tel:")
+            || normalizedLower.Contains("gọi")
+            || normalizedLower.Contains("hotline")
+            || normalizedLower.Contains("phone"))
+        {
+            return phoneHref;
+        }
+
+        if (normalizedLower.Contains("zalo")
+            || normalizedLower.StartsWith("http://zalo.me")
+            || normalizedLower.StartsWith("https://zalo.me"))
+        {
+            return zaloHref;
+        }
+
+        return normalized;
+    }
 }
 
 @section Styles {
@@ -635,9 +684,10 @@
                         </div>
                         <div class="col-md-3 col-lg-2">
                             <a class="btn btn-secondary-yellow w-100 d-flex align-items-center justify-content-center px-3 py-2 text-nowrap"
-                                   href="tel:0888.03.7777">
+                                   href="@pricingQuoteButtonLink"
+                                   aria-label="@pricingQuoteButtonText">
                                 <span class="material-symbols-outlined fs-5">request_quote</span>
-                                Liên hệ báo giá
+                                @pricingQuoteButtonText
                             </a>
                         </div>
                     </div>

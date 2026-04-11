@@ -89,8 +89,8 @@
                                     <ul>
                                         <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
                                         <li><a asp-controller="Home" asp-action="About">Giới thiệu</a></li>
-                                        <li><a href="~/services.html">Dịch vụ</a></li>
-                                        <li><a href="~/projects.html">Mặt hàng</a></li>
+                                        <li><a asp-controller="Blog" asp-action="Index" asp-route-categoryName="Dịch vụ">Dịch vụ</a></li>
+                                        <li><a asp-controller="Product" asp-action="Index">Mặt hàng</a></li>
                                         <li><a asp-controller="Contact" asp-action="Index">Liên hệ</a></li>
                                     </ul>
                                 </div>
@@ -108,10 +108,11 @@
                                  <div class="col-lg-2 col-md-3 footer-links">
                                      <h4>Dịch vụ</h4>
                                      <ul>
-                                         @foreach (var post in topServicePosts)
-                                         {
-                                             <li><a href="@BuildBlogUrl(post.Slug, post.Id)">@post.Title</a></li>
-                                         }
+                                          <li><a asp-controller="Blog" asp-action="Index" asp-route-categoryName="Dịch vụ">Xem tất cả dịch vụ</a></li>
+                                          @foreach (var post in topServicePosts)
+                                          {
+                                              <li><a href="@BuildBlogUrl(post.Slug, post.Id)">@post.Title</a></li>
+                                          }
                                      </ul>
                                  </div>
 
