@@ -1,9 +1,31 @@
+@inject WebThuMuaPheLieu.helpper.IContactInfoHelper ContactInfoHelper
 @model WebThuMuaPheLieu.ViewModels.ScrapPurchaseServicesSectionComponentViewModel
 @using System.Net
 @using System.Text.RegularExpressions
 @{
     var serviceBlogPosts = Model?.Posts?.ToList() ?? new List<WebThuMuaPheLieu.Models.BlogCardViewModel>();
+    var contactInfo = await ContactInfoHelper.GetContactInfoAsync();
 }
+
+<style>
+    #services .service-card-media {
+        position: relative;
+        overflow: hidden;
+    }
+
+    #services .materials-phone-overlay {
+        position: absolute;
+        right: 10px;
+        bottom: 12px;
+        z-index: 2;
+        color: #ffd54a;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+        pointer-events: none;
+    }
+</style>
 
 @functions {
     string NormalizeBlogImagePath(string? coverImage)
@@ -72,13 +94,14 @@
                             <div class="service-card-v2">
                                 <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(post.Slug) ? post.Slug : post.Id.ToString())" class="service-card-media"
                                        aria-label="@(post.Title ?? "Xem chi tiết dịch vụ thu mua phế liệu")">
-                                    <img src="@NormalizeBlogImagePath(post.CoverImage)"
-                                         alt="@(post.Title ?? "Dịch vụ thu mua phế liệu")" class="img-fluid w-100 materials-hover-image js-service-card-image"
-                                         data-image-sequence="@string.Join("|", post.ImageSequence ?? new List<string>())"
-                                         data-default-image="@NormalizeBlogImagePath(post.CoverImage)"
-                                         loading="lazy">
-                                    <span class="service-badge"><i class="bi bi-briefcase-fill"></i> Dịch vụ</span>
-                                </a>
+                                     <img src="@NormalizeBlogImagePath(post.CoverImage)"
+                                          alt="@(post.Title ?? "Dịch vụ thu mua phế liệu")" class="img-fluid w-100 materials-hover-image js-service-card-image"
+                                          data-image-sequence="@string.Join("|", post.ImageSequence ?? new List<string>())"
+                                          data-default-image="@NormalizeBlogImagePath(post.CoverImage)"
+                                          loading="lazy">
+                                    <span class="materials-phone-overlay">@contactInfo.Phone</span>
+                                     <span class="service-badge"><i class="bi bi-briefcase-fill"></i> Dịch vụ</span>
+                                 </a>
                                 <div class="service-card-body">
                                     <h3><a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(post.Slug) ? post.Slug : post.Id.ToString())">@(post.Title ?? "Dịch vụ thu mua phế liệu")</a></h3>
                                     <p>@BuildBlogSummary(post)</p>

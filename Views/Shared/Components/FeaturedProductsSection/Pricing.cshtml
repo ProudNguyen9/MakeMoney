@@ -1,9 +1,31 @@
+@inject WebThuMuaPheLieu.helpper.IContactInfoHelper ContactInfoHelper
 @model WebThuMuaPheLieu.ViewModels.FeaturedProductsSectionViewModel
 @{
     var products = Model?.Products?.ToList() ?? new List<WebThuMuaPheLieu.Models.Product>();
     var swiperClass = "featured-products-swiper-pricing";
     var paginationClass = "featured-products-pagination-pricing";
+    var contactInfo = await ContactInfoHelper.GetContactInfoAsync();
 }
+
+<style>
+    .@swiperClass .materials-card-media {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .@swiperClass .materials-phone-overlay {
+        position: absolute;
+        right: 30px;
+        bottom: 12px;
+        z-index: 2;
+        color: #ffd54a;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+        pointer-events: none;
+    }
+</style>
 
 @functions {
     string GetCategoryIcon(string? categoryName)
@@ -94,6 +116,7 @@
                                          alt="@(product.Name ?? "Sản phẩm phế liệu")"
                                          class="img-fluid w-100 materials-hover-image"
                                          loading="lazy">
+                                    <span class="materials-phone-overlay">@contactInfo.Phone</span>
                                     <span class="materials-badge">
                                         <i class="bi bi-@(GetCategoryIcon(product.Category?.Name))"></i>
                                         @(product.Category?.Name ?? "Phế liệu")
