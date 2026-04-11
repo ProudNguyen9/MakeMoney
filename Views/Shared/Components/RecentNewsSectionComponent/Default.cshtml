@@ -1,9 +1,31 @@
+@inject WebThuMuaPheLieu.helpper.IContactInfoHelper ContactInfoHelper
 @model WebThuMuaPheLieu.ViewModels.RecentNewsSectionComponentViewModel
 @using System.Net
 @using System.Text.RegularExpressions
 @{
     var recentBlogPosts = Model?.Posts?.ToList() ?? new List<WebThuMuaPheLieu.Models.BlogCardViewModel>();
+    var contactInfo = await ContactInfoHelper.GetContactInfoAsync();
 }
+
+<style>
+    #recent-news .news-card-media {
+        position: relative;
+        overflow: hidden;
+    }
+
+    #recent-news .materials-phone-overlay {
+        position: absolute;
+        right: 10px;
+        bottom: 12px;
+        z-index: 2;
+        color: #ffd54a;
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+        pointer-events: none;
+    }
+</style>
 
 @functions {
     string NormalizeBlogImagePath(string? coverImage)
@@ -72,13 +94,14 @@
                         <div data-aos="fade-up" data-aos-delay="@animationDelay">
                             <article class="news-card-v2">
                                 <a asp-controller="Blog" asp-action="Detail" asp-route-slug="@(!string.IsNullOrWhiteSpace(post.Slug) ? post.Slug : post.Id.ToString())" class="news-card-media">
-                                    <img src="@NormalizeBlogImagePath(post.CoverImage)" alt="@(post.Title ?? "Tin tức phế liệu")"
-                                         class="img-fluid w-100 materials-hover-image js-blog-card-image"
-                                         data-image-sequence="@string.Join("|", post.ImageSequence ?? new List<string>())"
-                                         data-default-image="@NormalizeBlogImagePath(post.CoverImage)"
-                                         loading="lazy">
-                                    <span class="news-badge"><i class="bi bi-newspaper"></i> Tin tức</span>
-                                </a>
+                                 <img src="@NormalizeBlogImagePath(post.CoverImage)" alt="@(post.Title ?? "Tin tức phế liệu")"
+                                      class="img-fluid w-100 materials-hover-image js-blog-card-image"
+                                      data-image-sequence="@string.Join("|", post.ImageSequence ?? new List<string>())"
+                                      data-default-image="@NormalizeBlogImagePath(post.CoverImage)"
+                                      loading="lazy">
+                                    <span class="materials-phone-overlay">@contactInfo.Phone</span>
+                                     <span class="news-badge"><i class="bi bi-newspaper"></i> Tin tức</span>
+                                 </a>
                                 <div class="news-card-body">
                                     <div class="news-card-meta">
                                         <span><i class="bi bi-calendar3"></i> @(publishDate?.ToString("dd/MM/yyyy") ?? "Đang cập nhật")</span>

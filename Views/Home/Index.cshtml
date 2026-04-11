@@ -159,11 +159,26 @@
                                                 height: 100%;
                                             }
 
-                                            #materials .materials-grid-swiper .materials-card-media {
-                                                aspect-ratio: 16 / 10;
-                                                height: auto;
-                                                min-height: 220px;
-                                            }
+                                             #materials .materials-grid-swiper .materials-card-media {
+                                                 aspect-ratio: 16 / 10;
+                                                 height: auto;
+                                                 min-height: 220px;
+                                                 position: relative;
+                                                 overflow: hidden;
+                                             }
+
+                                             #materials .materials-phone-overlay {
+                                                 position: absolute;
+                                                 right: 30px;
+                                                 bottom: 12px;
+                                                 z-index: 2;
+                                                 color: #ffd54a;
+                                                 font-size: 20px;
+                                                 font-weight: 800;
+                                                 letter-spacing: 0.04em;
+                                                 text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+                                                 pointer-events: none;
+                                             }
 
                                             #materials .materials-products-pagination {
                                                 bottom: 0 !important;
@@ -216,18 +231,19 @@
                                                         <div class="swiper-slide">
                                                             <a asp-controller="Home" asp-action="Detail" asp-route-slug="@product.Slug" asp-route-id="@product.Id"
                                                                class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
-                                                                <div class="materials-card-media">
-                                                                    <img src="@imageSequence[0]"
-                                                                         data-image-sequence="@string.Join("|", imageSequence)"
-                                                                         data-default-image="@imageSequence[0]"
-                                                                         alt="@product.Name"
-                                                                         class="img-fluid w-100 materials-hover-image"
-                                                                         loading="lazy">
-                                                                    <span class="materials-badge">
-                                                                        <i class="bi bi-@(GetCategoryIcon(product.Category?.Name))"></i>
-                                                                        @(product.Category?.Name ?? "Phế liệu")
-                                                                    </span>
-                                                                </div>
+                                                                 <div class="materials-card-media">
+                                                                     <img src="@imageSequence[0]"
+                                                                          data-image-sequence="@string.Join("|", imageSequence)"
+                                                                          data-default-image="@imageSequence[0]"
+                                                                          alt="@product.Name"
+                                                                          class="img-fluid w-100 materials-hover-image"
+                                                                          loading="lazy">
+                                                                     <span class="materials-phone-overlay">@contactInfo.Phone</span>
+                                                                     <span class="materials-badge">
+                                                                         <i class="bi bi-@(GetCategoryIcon(product.Category?.Name))"></i>
+                                                                         @(product.Category?.Name ?? "Phế liệu")
+                                                                     </span>
+                                                                 </div>
                                                                 <div class="materials-card-body">
                                                                     <h4 class="card-title">@product.Name</h4>
                                                                     <p>@(product.ShortDescription ?? product.Description ?? "Đang cập nhật thông tin sản phẩm.")</p>

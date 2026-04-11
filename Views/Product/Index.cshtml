@@ -1,8 +1,10 @@
+@inject WebThuMuaPheLieu.helpper.IContactInfoHelper ContactInfoHelper
 @model WebThuMuaPheLieu.Models.ProductIndexViewModel
 
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Mặt hàng";
+    var contactInfo = await ContactInfoHelper.GetContactInfoAsync();
 }
 
 < <section id="materials" class="services home-card-section">
@@ -37,11 +39,26 @@
                         height: 100%;
                     }
 
-                    #materials .materials-grid-swiper .materials-card-media {
-                        aspect-ratio: 16 / 10;
-                        height: auto;
-                        min-height: 220px;
-                    }
+                     #materials .materials-grid-swiper .materials-card-media {
+                         aspect-ratio: 16 / 10;
+                         height: auto;
+                         min-height: 220px;
+                         position: relative;
+                         overflow: hidden;
+                     }
+
+                     #materials .materials-phone-overlay {
+                         position: absolute;
+                         right: 30px;
+                         bottom: 12px;
+                         z-index: 2;
+                         color: #ffd54a;
+                         font-size: 20px;
+                         font-weight: 800;
+                         letter-spacing: 0.04em;
+                         text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+                         pointer-events: none;
+                     }
 
                     #materials .materials-products-pagination {
                         bottom: 0 !important;
@@ -89,6 +106,7 @@
                             <img src="@product.PrimaryImage" data-image-sequence="@string.Join("|", product.Images)"
                                  data-default-image="@product.PrimaryImage" alt="@product.Name"
                                  class="img-fluid w-100 materials-hover-image" loading="lazy">
+                            <span class="materials-phone-overlay">@contactInfo.Phone</span>
                             <span class="materials-badge">
                                 <i class="bi bi-@product.CategoryIcon"></i>
                                 @(product.CategoryName ?? "Phế liệu")
@@ -138,6 +156,7 @@
         (() => {
             const productList = document.getElementById('product-list');
             const pagination = document.getElementById('product-pagination');
+            const contactPhone = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(contactInfo.Phone));
 
             function renderProducts(products) {
                 if (!productList) return;
@@ -157,6 +176,7 @@
                                      alt="${product.name}"
                                      class="img-fluid w-100 materials-hover-image"
                                      loading="lazy">
+                                <span class="materials-phone-overlay">${contactPhone}</span>
                                 <span class="materials-badge">
                                     <i class="bi bi-${product.categoryIcon ?? 'box-seam'}"></i>
                                     ${product.categoryName ?? 'Phế liệu'}

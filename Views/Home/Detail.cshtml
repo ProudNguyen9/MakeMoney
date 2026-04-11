@@ -1,3 +1,4 @@
+@inject WebThuMuaPheLieu.helpper.IContactInfoHelper ContactInfoHelper
 @model WebThuMuaPheLieu.ViewModels.ProductDetailViewModel
 @{
   Layout = "_HomeLayout";
@@ -6,6 +7,7 @@
 
 @{
   ViewData["Title"] = Model.Product.Name;
+  var contactInfo = await ContactInfoHelper.GetContactInfoAsync();
 
   string NormalizeAssetUrl(string? url)
   {
@@ -354,9 +356,26 @@
       }
 
       body.home-detail-page .detail-hero-desc {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
         font-size: 0.84rem;
         line-height: 1.55;
         max-width: 100%;
+      }
+
+      body.home-detail-page .detail-hero-desc-text {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      body.home-detail-page .detail-hero-desc-phone {
+        flex: 0 0 auto;
+        margin-left: auto;
+        color: #ffd54a;
+        font-weight: 800;
+        white-space: nowrap;
       }
 
       body.home-detail-page .detail-thumb-grid {
@@ -808,7 +827,25 @@
     if (image) mainImage.src = image;
     if (alt) mainImage.alt = alt;
     if (title) mainTitle.textContent = title;
-    if (desc) mainDesc.textContent = desc;
+   if (desc) {
+    mainDesc.innerHTML = `
+        <span style="display:block; padding-right:180px;">
+            ${desc}
+        </span>
+        <span style="
+            position:absolute;
+            right:0;
+            bottom:0;
+            font-weight:bold;
+            margin-right:-250px;
+            color:#ffd700;
+            font-size:40px;
+            white-space:nowrap;
+        ">
+            @contactInfo.Phone
+        </span>
+    `;
+}
     if (kicker) mainKicker.textContent = kicker;
 
     setActiveThumb(thumb);
@@ -919,7 +956,27 @@
                 <div>
                   <p id="hero-main-kicker" class="detail-hero-kicker">@(Model.Category?.Name ?? "Sản phẩm nổi bật")</p>
                   <h2 id="hero-main-title" class="detail-hero-title">@heroTitle</h2>
-                  <p id="hero-main-desc" class="detail-hero-desc">@shortDescription</p>
+                 
+              <p id="hero-main-desc" class="detail-hero-desc" style="position:relative;">
+
+                                <span style="display:block; padding-right:180px;">
+                                    @shortDescription
+                                </span>
+
+                                <span style="
+                                    position:absolute;
+                                    right:0;
+                                    bottom:0;
+                                    font-weight:bold;
+                                    color:#ffd700;
+                                    font-size:40px;
+                                    margin-right:-250px;
+                                    white-space:nowrap;
+                                ">
+                                    @contactInfo.Phone
+                                </span>
+
+                            </p>
                 </div>
               </div>
             </div>
