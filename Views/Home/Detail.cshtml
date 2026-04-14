@@ -342,6 +342,19 @@
         object-fit: cover;
       }
 
+      body.home-detail-page #hero-main-desc span:last-child {
+        position: static !important;
+        display: block;
+        margin: 8px 0 0 0 !important;
+        font-size: 16px !important;
+        text-align: left;
+        white-space: nowrap !important;
+      }
+
+      body.home-detail-page #hero-main-desc span:first-child {
+        padding-right: 0 !important;
+      }
+
       body.home-detail-page .detail-hero-overlay {
         padding: 14px;
       }
@@ -670,8 +683,10 @@
         height: auto;
       }
     }
+    
 
     /* Small mobile only for Home/Detail */
+    
     @@media (max-width: 480px) {
       body.home-detail-page .detail-shell {
         padding-left: 12px;

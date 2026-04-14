@@ -23,6 +23,19 @@
         text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
         pointer-events: none;
     }
+
+    @@media (max-width: 768px) {
+        .detail-related-products-swiper .materials-phone-overlay {
+            left: 12px;
+            right: auto;
+            bottom: 10px;
+            font-size: 16px;
+            max-width: calc(100% - 24px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
 </style>
 
 @functions {

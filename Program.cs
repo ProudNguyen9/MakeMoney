@@ -32,6 +32,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IContactInfoHelper, ContactInfoHelper>();
 builder.Services.AddScoped<IBannerInjectHelper, BannerInjectHelper>();
 builder.Services.AddScoped<ISeoSettingHelper, SeoSettingHelper>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -55,4 +56,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
 app.Run();

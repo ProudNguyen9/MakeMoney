@@ -3163,6 +3163,32 @@ body {
   z-index: 6;
 }
 
+@media (min-width: 769px) {
+  .hero-content {
+    padding-right: clamp(0px, 0.3vw, 10px);
+    container-type: inline-size;
+  }
+
+  .hero-title {
+    font-size: clamp(28px, 3.55vw, 65px);
+    margin-left: clamp(0px, 0.55vw, 12px);
+    letter-spacing: clamp(-0.8px, -0.04vw, -0.2px);
+    max-width: 100%;
+    gap: clamp(6px, 0.65vw, 12px);
+  }
+
+  .hero-title span {
+    margin: clamp(3px, 0.24vw, 5px) 0 clamp(4px, 0.35vw, 7px);
+    padding: clamp(3px, 0.2vw, 4px) clamp(8px, 0.6vw, 14px) clamp(5px, 0.34vw, 7px);
+  }
+
+  @supports (font-size: 1cqw) {
+    .hero-title {
+      font-size: clamp(28px, 11.2cqw, 65px);
+    }
+  }
+}
+
 @media (min-width: 768px) {
   .hero-content,
   .hero-title,
@@ -4296,26 +4322,34 @@ body {
   .hero-title {
     margin-left: 0;
     margin-bottom: 14px;
-    font-size: clamp(41px, 11.3vw, 52px);
-    line-height: 1.03;
+    font-size: clamp(18px, 7.2vw, 30px);
+    line-height: 1.08;
     gap: 6px;
-    letter-spacing: -1px;
+    letter-spacing: -0.6px;
     max-width: 100%;
+    flex-wrap: nowrap;
+    overflow: visible;
   }
 
   .hero-title span {
-    display: block;
-    width: 100%;
+    display: inline-block;
+    width: auto;
     max-width: 100%;
     margin: 0;
-    padding: 9px 12px;
-    white-space: normal;
-    word-break: break-word;
+    padding: 8px 9px;
+    white-space: nowrap;
+    word-break: normal;
     border-radius: 13px;
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .hero-title .hero-title-tail {
-    white-space: normal;
+    white-space: nowrap;
+    font-size: 0.9em;
+    letter-spacing: -0.8px;
   }
 
   .hero-actions {
@@ -4577,6 +4611,14 @@ body {
     width: 100%;
     padding: 8px 10px;
     border-radius: 11px;
+  }
+
+  .hero-title span:not(.hero-title-line):not(.hero-title-tail)::after {
+    top: -10%;
+    left: -10%;
+    width: 14%;
+    height: 120%;
+    opacity: 0.4;
   }
 
   .hero-description {
@@ -7940,14 +7982,18 @@ body {
   }
 
   .social-button-content {
-    gap: 8px;
+    gap: 10px;
   }
 
   .social-button i,
   .social-button .social-button-zalo-text {
-    width: 36px;
-    height: 36px;
-    font-size: 15px;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .social-button .social-button-zalo-text {
+    font-size: 14px;
   }
 }
 
