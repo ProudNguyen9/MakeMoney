@@ -4331,10 +4331,10 @@ body {
     width: 100%;
     max-width: 100%;
     margin: 0 0 12px;
-    font-size: clamp(24px, 8.1vw, 42px);
-    line-height: 1.08;
-    gap: clamp(6px, 1.4vw, 10px);
-    letter-spacing: clamp(-0.9px, -0.18vw, -0.2px);
+    font-size: clamp(29px, 10vw, 52px);
+    line-height: 1.06;
+    gap: clamp(5px, 1.1vw, 8px);
+    letter-spacing: clamp(-1.2px, -0.26vw, -0.3px);
     flex-wrap: nowrap;
     overflow: visible;
     align-items: stretch;
@@ -4346,7 +4346,7 @@ body {
     width: 100%;
     max-width: 100%;
     margin: 0;
-    padding: clamp(8px, 1.8vw, 11px) clamp(10px, 2.6vw, 16px);
+    padding: clamp(7px, 1.3vw, 10px) clamp(4px, 1.2vw, 8px);
     white-space: nowrap;
     word-break: keep-all;
     border-radius: 13px;
@@ -4618,11 +4618,11 @@ body {
   .hero-title {
     width: 100%;
     max-width: 100%;
-    font-size: clamp(20px, 7.2vw, 30px);
+    font-size: clamp(25px, 8.9vw, 39px);
     margin: 0 0 12px;
-    line-height: 1.08;
-    gap: 5px;
-    letter-spacing: clamp(-0.7px, -0.16vw, -0.2px);
+    line-height: 1.05;
+    gap: 4px;
+    letter-spacing: clamp(-1px, -0.24vw, -0.25px);
     align-items: stretch;
     text-align: center;
   }
@@ -4631,7 +4631,7 @@ body {
     display: block;
     width: 100%;
     max-width: 100%;
-    padding: clamp(7px, 1.6vw, 9px) clamp(9px, 2.4vw, 14px);
+    padding: clamp(7px, 1.4vw, 9px) clamp(3px, 1vw, 6px);
     border-radius: 11px;
     white-space: nowrap;
     word-break: keep-all;
@@ -6818,14 +6818,14 @@ body {
 
 @media (max-width: 768px) {
   .social-button {
-    right: 12px;
+    right: clamp(12px, 2.4vw, 18px);
     left: auto;
-    bottom: 96px;
-    gap: 24px;
+    bottom: clamp(92px, 11vw, 112px);
+    gap: clamp(24px, 4vw, 32px);
   }
 
   .social-button-content {
-    gap: 24px;
+    gap: clamp(24px, 4vw, 32px);
   }
 
   .scroll-top {
@@ -6838,28 +6838,28 @@ body {
   .social-button a,
   .social-button i,
   .social-button .social-button-zalo-text {
-    width: 56px;
-    height: 56px;
-    font-size: 24px;
-    line-height: 56px;
+    width: clamp(72px, 10.4vw, 90px);
+    height: clamp(72px, 10.4vw, 90px);
+    font-size: clamp(30px, 4.6vw, 38px);
+    line-height: clamp(72px, 10.4vw, 90px);
   }
 
   .social-button .social-button-zalo-text {
-    font-size: 14px;
+    font-size: clamp(17px, 2.8vw, 22px);
   }
 
   .social-button .alo-circle {
-    width: 70px;
-    height: 70px;
-    top: -7px;
-    left: -7px;
+    width: clamp(90px, 13vw, 108px);
+    height: clamp(90px, 13vw, 108px);
+    top: clamp(-10px, -1.3vw, -8px);
+    left: clamp(-10px, -1.3vw, -8px);
   }
 
   .social-button .alo-circle-fill {
-    width: 82px;
-    height: 82px;
-    top: -13px;
-    left: -13px;
+    width: clamp(108px, 15.2vw, 126px);
+    height: clamp(108px, 15.2vw, 126px);
+    top: clamp(-18px, -2.2vw, -14px);
+    left: clamp(-18px, -2.2vw, -14px);
   }
 
   .social-button a span:not(.alo-circle):not(.alo-circle-fill):not(.social-button-zalo-text) {
@@ -6873,9 +6873,9 @@ body {
 
 @media (max-width: 575px) {
   .social-button {
-    right: 12px;
+    right: 10px;
     left: auto;
-    bottom: 92px;
+    bottom: clamp(86px, 12vw, 98px);
     gap: 22px;
   }
 
@@ -7992,35 +7992,36 @@ body {
   }
 
   .social-button {
-    right: 10px;
-    bottom: 84px;
+    right: clamp(12px, 2.4vw, 18px);
+    bottom: clamp(92px, 11vw, 112px);
     z-index: 990;
   }
 
   .social-button-content {
-    gap: 8px;
+    gap: clamp(24px, 4vw, 32px);
   }
 }
 
 @media (max-width: 575px) {
   .social-button {
-    right: 8px;
-    bottom: 80px;
+    right: 10px;
+    bottom: clamp(84px, 11vw, 96px);
   }
 
   .social-button-content {
-    gap: 10px;
+    gap: clamp(18px, 3.4vw, 24px);
   }
 
   .social-button i,
   .social-button .social-button-zalo-text {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
+    width: clamp(64px, 15.2vw, 76px);
+    height: clamp(64px, 15.2vw, 76px);
+    font-size: clamp(26px, 6.2vw, 31px);
+    line-height: clamp(64px, 15.2vw, 76px);
   }
 
   .social-button .social-button-zalo-text {
-    font-size: 14px;
+    font-size: clamp(16px, 4.2vw, 18px);
   }
 }
 
