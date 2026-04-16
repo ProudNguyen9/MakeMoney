@@ -2845,7 +2845,7 @@ body {
   color: #fff;
   text-decoration: none;
   transition: color 0.3s ease;
-  font-size: 14px;
+  font-size: 5px;
   line-height: 1.25;
   white-space: nowrap;
 }
@@ -3170,7 +3170,7 @@ body {
   }
 
   .hero-title {
-    font-size: clamp(28px, 3.55vw, 65px);
+    font-size: clamp(26px, 3.2vw, 58px);
     margin-left: clamp(0px, 0.55vw, 12px);
     letter-spacing: clamp(-0.8px, -0.04vw, -0.2px);
     max-width: 100%;
@@ -3184,7 +3184,7 @@ body {
 
   @supports (font-size: 1cqw) {
     .hero-title {
-      font-size: clamp(28px, 11.2cqw, 65px);
+      font-size: clamp(26px, 10.2cqw, 58px);
     }
   }
 }
@@ -5522,6 +5522,12 @@ body {
     justify-content: flex-start;
   }
 
+  .header-top-item a,
+  .header-top-item span {
+    font-size: 28px;
+    line-height: 1.3;
+  }
+
   .header .logo {
     flex-basis: 250px;
     width: min(100%, 250px);
@@ -7554,7 +7560,7 @@ body {
 .header-top-item span {
   color: #fff;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 23px;
   line-height: 1.25;
   white-space: nowrap;
 }
@@ -7570,20 +7576,24 @@ body {
     flex-wrap: nowrap;
     min-width: 0;
     overflow: hidden;
+    gap: 6px 8px;
   }
 
   .header-top-item {
-    flex: 1 1 0;
+    flex: 0 1 auto;
     min-width: 0;
     max-width: 100%;
+    padding: 6px 8px;
+    gap: 6px;
   }
 
   .header-top-item a,
   .header-top-item span {
     display: block;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 13px;
+    overflow: visible;
+    text-overflow: clip;
   }
 
   .header-social {
@@ -7937,7 +7947,7 @@ body {
 
   .header-top-item a,
   .header-top-item span {
-    font-size: 12.5px;
+    font-size: 22px;
     line-height: 1.35;
     white-space: nowrap;
     overflow: hidden;
@@ -7998,7 +8008,7 @@ body {
   }
 
   .social-button-content {
-    gap: clamp(24px, 4vw, 32px);
+    gap: clamp(36px, 5.9vw, 44px);
   }
 }
 
@@ -8009,7 +8019,7 @@ body {
   }
 
   .social-button-content {
-    gap: clamp(18px, 3.4vw, 24px);
+    gap: clamp(30px, 5.3vw, 36px);
   }
 
   .social-button i,
