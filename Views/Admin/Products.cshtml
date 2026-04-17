@@ -490,18 +490,18 @@
                         <p>Tạo mới, cập nhật hoặc xóa loại sản phẩm riêng biệt mà không trộn vào form sản phẩm.</p>
                     </div>
 
-                    <form asp-controller="Admin" asp-action="SaveCategory" method="post" class="admin-products-category-form">
+                    <form asp-controller="Admin" asp-action="SaveProductCategory" method="post" class="admin-products-category-form">
                         @Html.AntiForgeryToken()
-                        <input asp-for="CategoryEditor.Id" type="hidden" />
+                        <input name="Id" value="@Model.CategoryEditor.Id" type="hidden" />
 
                         <label class="admin-field">
                             <span>Tên loại sản phẩm *</span>
-                            <input asp-for="CategoryEditor.Name" type="text" placeholder="Ví dụ: Phế liệu nhôm" />
+                            <input name="Name" value="@Model.CategoryEditor.Name" type="text" placeholder="Ví dụ: Phế liệu nhôm" />
                         </label>
 
                         <label class="admin-field">
                             <span>Mô tả</span>
-                            <textarea asp-for="CategoryEditor.Description" rows="4" placeholder="Mô tả ngắn gọn cho loại sản phẩm"></textarea>
+                            <textarea name="Description" rows="4" placeholder="Mô tả ngắn gọn cho loại sản phẩm">@Model.CategoryEditor.Description</textarea>
                         </label>
 
                         <div class="admin-form-actions admin-form-actions--product-editor">

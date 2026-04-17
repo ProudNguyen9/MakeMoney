@@ -270,9 +270,10 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Products), new { categoryId = category.Id, categoryEditId = category.Id, manageCategories = true });
     }
 
+    [ActionName("SaveProductCategory")]
     [HttpPost("product-categories/save")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SaveCategory(WebThuMuaPheLieu.ViewModels.AdminCategoryEditorViewModel editor)
+    public async Task<IActionResult> SaveProductCategory(WebThuMuaPheLieu.ViewModels.AdminCategoryEditorViewModel editor)
     {
         if (string.IsNullOrWhiteSpace(editor.Name))
         {
