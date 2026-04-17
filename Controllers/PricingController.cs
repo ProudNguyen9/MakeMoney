@@ -33,7 +33,7 @@ public class PricingController : Controller
                 ProductName = product.Name ?? "Chưa có tên",
                 CategoryName = product.Category?.Name ?? "Chưa phân loại",
                 PriceValue = product.PriceValue,
-                PriceText = FormatPrice(product.PriceValue, product.PriceLabel),
+                PriceText = BuildPriceText(product.PriceLabel, product.PriceValue),
                 UnitText = BuildUnitText(product.Unit),
                 StatusText = "Đang thu",
                 StatusCssClass = ResolveStatusCssClass(product.Status, product.PriceLabel),
@@ -50,12 +50,11 @@ public class PricingController : Controller
         return View(viewModel);
     }
 
-    private static string FormatPrice(decimal? priceValue, string? priceLabel)
+    private static string BuildPriceText(string? priceLabel, decimal? priceValue)
     {
         var normalizedLabel = priceLabel?.Trim();
 
-        if (priceValue.GetValueOrDefault() == 0
-            && string.Equals(normalizedLabel, "Liên hệ báo giá", StringComparison.OrdinalIgnoreCase))
+        if (!string.IsNullOrWhiteSpace(normalizedLabel))
         {
             return normalizedLabel;
         }

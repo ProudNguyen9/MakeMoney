@@ -81,20 +81,16 @@ namespace WebThuMuaPheLieu.Controllers
                 return NotFound();
             }
 
-            var query = _context.Products.AsQueryable();
-
             Product? product = null;
 
-            // Ưu tiên slug
-            if (!string.IsNullOrWhiteSpace(slug))
+            if (id != null)
             {
-                product = query.FirstOrDefault(p => p.Slug == slug && p.Status == "active");
+                product = _context.Products.FirstOrDefault(p => p.Id == id && p.Status == "active");
             }
 
-            // Nếu không tìm thấy bằng slug thì dùng id
-            if (product == null && id != null)
+            if (product == null && !string.IsNullOrWhiteSpace(slug))
             {
-                product = query.FirstOrDefault(p => p.Id == id && p.Status == "active");
+                product = _context.Products.FirstOrDefault(p => p.Slug == slug && p.Status == "active");
             }
 
             if (product == null)
@@ -102,8 +98,12 @@ namespace WebThuMuaPheLieu.Controllers
                 return NotFound();
             }
 
-            // Nếu truy cập bằng id hoặc slug sai thì redirect về URL chuẩn
-            if (string.IsNullOrWhiteSpace(slug) || slug != product.Slug)
+            if (string.IsNullOrWhiteSpace(product.Slug))
+            {
+                return NotFound();
+            }
+
+            if (string.IsNullOrWhiteSpace(slug) || !string.Equals(slug, product.Slug, StringComparison.OrdinalIgnoreCase))
             {
                 return RedirectToAction("Detail", new { slug = product.Slug, id = product.Id });
             }

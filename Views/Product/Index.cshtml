@@ -101,6 +101,8 @@
             {
                 <div data-aos="fade-up" data-aos-delay="100">
                     <a asp-controller="Home" asp-action="Detail" asp-route-slug="@product.Slug" asp-route-id="@product.Id"
+                           data-product-id="@product.Id"
+                           data-product-slug="@product.Slug"
                            class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
                         <div class="materials-card-media">
                             <img src="@product.PrimaryImage" data-image-sequence="@string.Join("|", product.Images)"
@@ -158,39 +160,73 @@
             const pagination = document.getElementById('product-pagination');
             const contactPhone = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(contactInfo.Phone));
 
+            function escapeHtml(value) {
+                return String(value ?? '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function buildDetailUrl(slugValue, idValue) {
+                const id = Number(idValue);
+                if (!Number.isFinite(id) || id <= 0) {
+                    return '#';
+                }
+
+                const normalizedSlug = encodeURIComponent((slugValue ?? '').toString().trim());
+                return `/Home/Detail/${normalizedSlug}/${id}`;
+            }
+
+            function normalizeDetailLinks(scope) {
+                (scope ?? document).querySelectorAll('a[data-product-id]').forEach(link => {
+                    link.href = buildDetailUrl(link.dataset.productSlug, link.dataset.productId);
+                });
+            }
+
             function renderProducts(products) {
                 if (!productList) return;
 
                 productList.innerHTML = products.map((product, index) => {
                     const imageSequence = (product.images ?? []).filter(Boolean);
                     const primaryImage = product.primaryImage ?? imageSequence[0] ?? '/assets/images/no-image.png';
-                    const detailUrl = `/Home/Detail/${product.slug ?? ''}/${product.id}`;
+                    const detailUrl = buildDetailUrl(product.slug, product.id);
+                    const safeName = escapeHtml(product.name ?? 'Sản phẩm phế liệu');
+                    const safeDescription = escapeHtml(product.shortDescription ?? product.description ?? 'Đang cập nhật thông tin sản phẩm.');
+                    const safePrimaryImage = escapeHtml(primaryImage);
+                    const safeImageSequence = imageSequence.map(image => escapeHtml(image)).join('|');
+                    const safeCategoryIcon = escapeHtml(product.categoryIcon ?? 'box-seam');
+                    const safeCategoryName = escapeHtml(product.categoryName ?? 'Phế liệu');
+                    const safePhone = escapeHtml(contactPhone ?? '');
+                    const safeSlug = escapeHtml(product.slug ?? '');
 
                     return `
                     <div data-aos="fade-up" data-aos-delay="${100 + (index * 50)}">
-                        <a href="${detailUrl}" class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
+                        <a href="${detailUrl}" data-product-id="${product.id}" data-product-slug="${safeSlug}" class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
                             <div class="materials-card-media">
-                                <img src="${primaryImage}"
-                                     data-image-sequence="${imageSequence.join('|')}"
-                                     data-default-image="${primaryImage}"
-                                     alt="${product.name}"
+                                <img src="${safePrimaryImage}"
+                                     data-image-sequence="${safeImageSequence}"
+                                     data-default-image="${safePrimaryImage}"
+                                     alt="${safeName}"
                                      class="img-fluid w-100 materials-hover-image"
                                      loading="lazy">
-                                <span class="materials-phone-overlay">${contactPhone}</span>
+                                <span class="materials-phone-overlay">${safePhone}</span>
                                 <span class="materials-badge">
-                                    <i class="bi bi-${product.categoryIcon ?? 'box-seam'}"></i>
-                                    ${product.categoryName ?? 'Phế liệu'}
+                                    <i class="bi bi-${safeCategoryIcon}"></i>
+                                    ${safeCategoryName}
                                 </span>
                             </div>
                             <div class="materials-card-body">
-                                <h4 class="card-title">${product.name}</h4>
-                                <p>${product.shortDescription ?? product.description ?? 'Đang cập nhật thông tin sản phẩm.'}</p>
+                                <h4 class="card-title">${safeName}</h4>
+                                <p>${safeDescription}</p>
                                 <span class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></span>
                             </div>
                         </a>
                     </div>`;
                 }).join('');
 
+                normalizeDetailLinks(productList);
                 bindProductHoverRotation();
             }
 
@@ -297,6 +333,16 @@
                 });
             }
 
+            document.addEventListener('click', event => {
+                const detailLink = event.target.closest('a[data-product-id]');
+                if (!detailLink) {
+                    return;
+                }
+
+                detailLink.href = buildDetailUrl(detailLink.dataset.productSlug, detailLink.dataset.productId);
+            }, true);
+
+            normalizeDetailLinks(productList);
             bindPaginationAjax();
             bindProductHoverRotation();
 

@@ -198,53 +198,229 @@
             padding: 0 2rem 2rem 2rem;
         }
 
-        .pricing-page .custom-table th {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--pricing-text-muted);
-            border-top: none;
-            padding: 1.5rem 1rem;
-            font-weight: 700;
+        .pricing-page .pricing-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
         }
 
-        .pricing-page .custom-table td {
-            padding: 1.25rem 1rem;
-            vertical-align: middle;
-            border-bottom: 1px solid #f1f5f9;
+        .pricing-page .category-group-row {
+            margin-top: 0.5rem;
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 12px;
+            padding-left: 0.15rem;
+        }
+
+        .pricing-page .category-group-label {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.95rem 1rem;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1d4ed8;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-bottom: 1px solid #bfdbfe;
+            background: transparent;
+            border-radius: 12px;
+        }
+
+        .pricing-page .category-group-header {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            width: 100%;
+        }
+
+        .pricing-page .category-group-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1.8 1 0;
+            min-width: 0;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .pricing-page .category-group-name {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            min-width: 0;
+        }
+
+        .pricing-page .category-group-name::before {
+            content: '';
+            display: inline-block;
+            width: 40px;
+            min-width: 40px;
+            height: 1px;
+        }
+
+        .pricing-page .category-column-label {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            text-transform: none;
+            letter-spacing: normal;
+            padding-left: 0;
+        }
+
+        .pricing-page .category-column-label--price {
+            flex: 1 1 0;
+            min-width: 180px;
+            text-align: center;
+            padding-left: 0;
+        }
+
+        .pricing-page .category-column-meta {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            align-items: center;
+            gap: 0.55rem;
+            flex: 1.35 1 0;
+        }
+
+        .pricing-page .category-column-label--unit,
+        .pricing-page .category-column-label--status,
+        .pricing-page .category-column-label--date {
+            min-width: 0;
+        }
+
+        .pricing-page .category-group-name::after {
+            content: '';
+            width: 10px;
+            min-width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background-color: #3b82f6;
+            box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.14);
+            order: -1;
         }
 
         .pricing-page .pricing-row {
             transition: all 0.2s ease;
         }
 
-        .pricing-page .pricing-row:hover {
-            background-color: #f0fdf4;
+        .pricing-page .price-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+            transition: 0.2s;
+            border: 1px solid #ecfdf3;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .pricing-page .price-text {
-            color: var(--pricing-primary-green);
+        .pricing-page .price-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .pricing-page .price-main {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1.8 1 0;
+            min-width: 0;
+        }
+
+        .pricing-page .price-unit,
+        .pricing-page .price-status,
+        .pricing-page .price-date {
+            flex: 0 0 auto;
+            min-width: 96px;
+        }
+
+        .pricing-page .price-value {
+            flex: 1 1 0;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .pricing-page .price-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #111;
+            line-height: 1.35;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            flex: 1 1 auto;
+        }
+
+        .pricing-page .price-text,
+        .pricing-page .price-value {
+            color: #111;
+            font-weight: 600;
+            font-size: 18px;
+            white-space: nowrap;
+        }
+
+        .pricing-page .price-meta {
+            font-size: 18px;
+            color: #475569;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.55rem;
+            align-items: center;
+            margin-left: 0;
+            flex: 1.35 1 0;
+        }
+
+        .pricing-page .date {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .pricing-page .price-order {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            padding: 0.28rem 0.55rem;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.75rem;
             font-weight: 800;
-            font-size: 1.5rem;
+            letter-spacing: 0.04em;
         }
 
         .pricing-page .badge-status {
-            padding: 0.5rem 0.75rem;
-            font-size: 0.7rem;
-            font-weight: 800;
-            border-radius: 0.5rem;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 6px;
             text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            max-width: max-content;
         }
 
         .pricing-page .badge-success-light,
         .pricing-page .badge-info-light {
-            background-color: #e0f2fe;
-            color: #075985;
+            background-color: #dcfce7;
+            color: #166534;
         }
 
         .pricing-page .badge-warning-light {
             background-color: #fee2e2;
             color: #b91c1c;
+        }
+
+        .pricing-page .empty-row {
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            color: #64748b;
         }
 
         .pricing-page .benefit-card {
@@ -547,62 +723,87 @@
                 padding: 0 0.9rem 1.25rem;
             }
 
-            .pricing-page .custom-table {
-                table-layout: fixed;
+            .pricing-page .pricing-list {
+                gap: 1rem;
             }
 
-            .pricing-page .custom-table th,
-            .pricing-page .custom-table td {
-                padding: 0.9rem 0.55rem;
+            .pricing-page .price-card {
+                padding: 14px;
+                margin-bottom: 10px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
             }
 
-            .pricing-page .custom-table th:nth-child(3),
-            .pricing-page .custom-table th:nth-child(5),
-            .pricing-page .custom-table th:nth-child(6),
-            .pricing-page .custom-table th:nth-child(7),
-            .pricing-page .custom-table td:nth-child(3),
-            .pricing-page .custom-table td:nth-child(5),
-            .pricing-page .custom-table td:nth-child(6),
-            .pricing-page .custom-table td:nth-child(7) {
+            .pricing-page .category-group-label {
+                font-size: 0.96rem;
+                padding: 0.85rem 0.9rem;
+            }
+
+            .pricing-page .category-group-header {
+                display: block;
+            }
+
+            .pricing-page .category-group-name::before {
                 display: none;
             }
 
-            .pricing-page .custom-table th:nth-child(1),
-            .pricing-page .custom-table td:nth-child(1) {
-                width: 56px;
-                white-space: nowrap;
+            .pricing-page .category-column-label {
+                display: none;
             }
 
-            .pricing-page .custom-table th:nth-child(2),
-            .pricing-page .custom-table td:nth-child(2) {
-                width: auto;
+            .pricing-page .price-main {
+                align-items: flex-start;
+                gap: 0.65rem;
+                flex: unset;
+                width: 100%;
             }
 
-            .pricing-page .custom-table th:nth-child(4),
-            .pricing-page .custom-table td:nth-child(4) {
-                width: 118px;
-                text-align: right;
-                white-space: nowrap;
+            .pricing-page .price-card {
+                gap: 0.7rem;
             }
 
-            .pricing-page .custom-table td:nth-child(2) {
-                font-size: 0.94rem;
-                line-height: 1.45;
+            .pricing-page .price-text,
+            .pricing-page .price-value {
+                font-size: 1rem;
+                white-space: normal;
             }
 
-            .pricing-page .custom-table td:nth-child(4) .price-text,
-            .pricing-page .custom-table .price-text {
-                font-size: 1rem !important;
+            .pricing-page .price-value {
+                order: 2;
+                text-align: left;
+                flex: 0 0 auto;
             }
 
-            .pricing-page .custom-table .empty-row td {
-                display: table-cell;
-                width: auto;
-                text-align: center;
+            .pricing-page .price-name {
+                font-size: 1rem;
+                white-space: normal;
             }
 
-            .pricing-page .price-text {
-                font-size: 1.25rem;
+            .pricing-page .price-meta {
+                display: flex;
+                gap: 0.6rem;
+                font-size: 1rem;
+                margin-left: auto;
+                flex: 1 1 auto;
+                flex-wrap: nowrap;
+                align-items: center;
+                justify-content: flex-end;
+                order: 2;
+            }
+
+            .pricing-page .price-value,
+            .pricing-page .price-unit,
+            .pricing-page .price-status,
+            .pricing-page .price-date {
+                min-width: unset;
+                flex: unset;
+                text-align: left;
+            }
+
+            .pricing-page .price-unit,
+            .pricing-page .price-date {
+                display: none;
             }
 
             .pricing-page .hero-title {
@@ -694,45 +895,60 @@
                 </div>
 
                 <div class="table-container">
-                    <div class="table-responsive">
-                        <table class="table custom-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th>STT</th>
-                                    <th>Tên Phế Liệu</th>
-                                    <th>Danh Mục</th>
-                                    <th>Giá Thu Mua</th>
-                                    <th>Đơn Vị</th>
-                                    <th>Tình Trạng</th>
-                                    <th>Cập Nhật</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (Model?.Prices != null && Model.Prices.Any())
+                    <div class="pricing-list">
+                        @if (Model?.Prices != null && Model.Prices.Any())
+                        {
+                            string? currentCategoryName = null;
+                            var categoryOrderNumber = 0;
+
+                            foreach (var item in Model.Prices)
+                            {
+                                if (!string.Equals(currentCategoryName, item.CategoryName, StringComparison.OrdinalIgnoreCase))
                                 {
-                                    foreach (var item in Model.Prices)
-                                    {
-                                        <tr class="pricing-row" data-product-name="@item.ProductName"
-                                            data-category-name="@item.CategoryName">
-                                            <td class="text-muted fw-bold">@item.OrderNumber.ToString("D2")</td>
-                                            <td class="fw-bold text-dark">@item.ProductName</td>
-                                            <td><span class="badge bg-light text-secondary px-2 py-1">@item.CategoryName</span>
-                                            </td>
-                                            <td class="price-text " style="font-size: 0.8rem;">@item.PriceText</td>
-                                            <td class="text-muted">@item.UnitText</td>
-                                            <td><span class="badge-status @item.StatusCssClass">@item.StatusText</span></td>
-                                            <td class="text-muted fst-italic small">@item.UpdatedText</td>
-                                        </tr>
-                                    }
+                                    currentCategoryName = item.CategoryName;
+                                    categoryOrderNumber = 0;
+
+                                    <div class="category-group-row" data-category-group="@item.CategoryName">
+                                        <div class="category-group-label">
+                                            <div class="category-group-header">
+                                                <span class="category-group-title">
+                                                    <span class="category-group-name">@item.CategoryName</span>
+                                                </span>
+                                                <span class="category-column-label category-column-label--price">Giá</span>
+                                                <span class="category-column-meta">
+                                                    <span class="category-column-label category-column-label--unit">Đơn vị</span>
+                                                    <span class="category-column-label category-column-label--status">Tình trạng</span>
+                                                    <span class="category-column-label category-column-label--date">Cập nhật</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 }
-                                else
-                                {
-                                    <tr>
-                                        <td class="text-center text-muted py-4" colspan="7">Chưa có dữ liệu bảng giá.</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+
+                                categoryOrderNumber++;
+
+                                <div class="pricing-row"
+                                     data-product-name="@item.ProductName"
+                                     data-category-name="@item.CategoryName">
+                                    <div class="price-card">
+                                        <div class="price-main">
+                                            <span class="price-order">@categoryOrderNumber.ToString("D2")</span>
+                                            <span class="price-name">@item.ProductName</span>
+                                        </div>
+                                        <span class="price-value">@item.PriceText</span>
+                                        <div class="price-meta">
+                                            <span class="price-unit">@item.UnitText</span>
+                                            <span class="price-status badge-status @item.StatusCssClass">@item.StatusText</span>
+                                            <span class="price-date date">@item.UpdatedText</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="empty-row text-center text-muted py-4">Chưa có dữ liệu bảng giá.</div>
+                        }
                     </div>
                 </div>
 
@@ -752,6 +968,7 @@
                         const searchInput = document.getElementById('pricingSearchInput');
                         const categoryFilter = document.getElementById('pricingCategoryFilter');
                         const rows = Array.from(document.querySelectorAll('.pricing-page .pricing-row'));
+                        const categoryGroupRows = Array.from(document.querySelectorAll('.pricing-page .category-group-row'));
 
                         if (!searchInput || !categoryFilter || rows.length === 0) {
                             return;
@@ -775,20 +992,22 @@
                             categoryFilter.appendChild(option);
                         });
 
-                        const emptyRow = document.createElement('tr');
+                        const emptyRow = document.createElement('div');
                         emptyRow.id = 'pricingEmptyState';
                         emptyRow.hidden = true;
-                        emptyRow.innerHTML = '<td class="text-center text-muted py-4" colspan="7">Không tìm thấy dữ liệu phù hợp.</td>';
+                        emptyRow.className = 'empty-row text-center text-muted py-4';
+                        emptyRow.textContent = 'Không tìm thấy dữ liệu phù hợp.';
 
-                        const tbody = rows[0].closest('tbody');
-                        if (tbody) {
-                            tbody.appendChild(emptyRow);
+                        const list = rows[0].closest('.pricing-list');
+                        if (list) {
+                            list.appendChild(emptyRow);
                         }
 
                         const applyFilters = () => {
                             const keyword = normalizeText(searchInput.value);
                             const selectedCategory = normalizeText(categoryFilter.value);
                             let visibleCount = 0;
+                            const visibleCategories = new Set();
 
                             rows.forEach((row) => {
                                 const productName = normalizeText(row.dataset.productName);
@@ -800,7 +1019,13 @@
                                 row.hidden = !isVisible;
                                 if (isVisible) {
                                     visibleCount += 1;
+                                    visibleCategories.add(categoryName);
                                 }
+                            });
+
+                            categoryGroupRows.forEach((row) => {
+                                const categoryName = normalizeText(row.dataset.categoryGroup);
+                                row.hidden = !visibleCategories.has(categoryName);
                             });
 
                             if (emptyRow) {
@@ -810,6 +1035,7 @@
 
                         searchInput.addEventListener('input', applyFilters);
                         categoryFilter.addEventListener('change', applyFilters);
+                        applyFilters();
                     })();
         </script>
             
