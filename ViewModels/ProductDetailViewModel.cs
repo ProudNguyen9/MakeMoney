@@ -6,7 +6,7 @@ namespace WebThuMuaPheLieu.ViewModels
     public class ProductDetailViewModel
     {
         // Sản phẩm chính
-        public Product Product { get; set; }
+        public Product Product { get; set; } = null!;
 
         // Danh mục
         public ProductCategory? Category { get; set; }

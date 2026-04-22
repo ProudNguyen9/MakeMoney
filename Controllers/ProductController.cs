@@ -20,19 +20,21 @@ public class ProductController : Controller
         _environment = environment;
     }
 
-    public async Task<IActionResult> Index(int page = 1)
+    public async Task<IActionResult> Index(int page = 1, string? category = null)
     {
-        var viewModel = await BuildProductIndexViewModelAsync(page);
+        var viewModel = await BuildProductIndexViewModelAsync(page, category);
         return View(viewModel);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetPagedProducts(int page = 1)
+    public async Task<IActionResult> GetPagedProducts(int page = 1, string? category = null)
     {
-        var viewModel = await BuildProductIndexViewModelAsync(page);
+        var viewModel = await BuildProductIndexViewModelAsync(page, category);
 
         return Json(new
         {
+            selectedCategory = viewModel.SelectedCategory,
+            categoryNames = viewModel.CategoryNames,
             currentPage = viewModel.CurrentPage,
             totalPages = viewModel.TotalPages,
             pageSize = viewModel.PageSize,
@@ -54,16 +56,34 @@ public class ProductController : Controller
         });
     }
 
-    private async Task<ProductIndexViewModel> BuildProductIndexViewModelAsync(int page)
+    private async Task<ProductIndexViewModel> BuildProductIndexViewModelAsync(int page, string? category)
     {
         const int pageSize = 8;
 
-        var products = await _context.Products
+        var normalizedCategory = string.IsNullOrWhiteSpace(category) ? string.Empty : category.Trim();
+
+        var query = _context.Products
             .AsNoTracking()
             .Include(p => p.Category)
             .Where(p => p.Status == "active")
             .OrderByDescending(p => p.IsFeatured)
             .ThenBy(p => p.Name)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(normalizedCategory))
+        {
+            query = query.Where(p => p.Category != null && p.Category.Name != null && p.Category.Name == normalizedCategory);
+        }
+
+        var products = await query.ToListAsync();
+
+        var allCategoryNames = await _context.Products
+            .AsNoTracking()
+            .Include(p => p.Category)
+            .Where(p => p.Status == "active" && p.Category != null && p.Category.Name != null)
+            .Select(p => p.Category!.Name!)
+            .Distinct()
+            .OrderBy(name => name)
             .ToListAsync();
 
         var productCards = products
@@ -100,6 +120,8 @@ public class ProductController : Controller
         return new ProductIndexViewModel
         {
             Products = pagedProducts,
+            CategoryNames = allCategoryNames,
+            SelectedCategory = normalizedCategory,
             CurrentPage = currentPage,
             TotalPages = totalPages,
             PageSize = pageSize,

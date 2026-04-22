@@ -55,7 +55,6 @@
       : (Model.Product.PriceValue.HasValue
           ? $"{Model.Product.PriceValue.Value:N0} đ/{Model.Product.Unit}"
           : "Liên hệ");
-
   var priceLabel = "Giá thu mua";
   var priceNote = "Giá có thể thay đổi theo chất lượng và số lượng";
 
@@ -813,6 +812,7 @@
       body.home-detail-page .detail-referral-overlay h3 {
         font-size: 1.05rem;
       }
+
     }
   </style>
 }
@@ -1118,9 +1118,10 @@
                     count = 8,
                     excludeIds = new[] { Model.Product.Id
           } })
-                  </div>
-                </div>
-              </section>
+              </div>
+            </div>
+          </section>
+
 
                                   <section class="detail-section">
            <div class="detail-shell">

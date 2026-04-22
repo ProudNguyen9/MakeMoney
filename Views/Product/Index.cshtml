@@ -5,21 +5,194 @@
     Layout = "_HomeLayout";
     ViewData["Title"] = "Mặt hàng";
     var contactInfo = await ContactInfoHelper.GetContactInfoAsync();
+    var productCategoryOptions = Model.CategoryNames
+        .Where(categoryName => !string.IsNullOrWhiteSpace(categoryName))
+        .Select(categoryName => new
+        {
+            Name = categoryName.Trim(),
+            Slug = ToCategorySlug(categoryName),
+            IsSelected = string.Equals(categoryName.Trim(), Model.SelectedCategory, StringComparison.OrdinalIgnoreCase)
+        })
+        .OrderBy(item => item.Name)
+        .ToList();
+    var selectedCategoryLabel = productCategoryOptions.FirstOrDefault(item => item.IsSelected)?.Name ?? "Tất cả danh mục";
 }
 
-< <section id="materials" class="services home-card-section">
+<section id="materials" class="services home-card-section">
     <div class="container-fluid home-section-shell" data-aos="fade-up">
-        <div class="section-header mb-0">
-            <h2>Thu mua tất cả các loại phế liệu</h2>
-            <p class="text-dart">
-                Danh mục thu mua được trình bày rõ ràng để khách hàng dễ hình dung ngay từ đầu: chúng tôi tiếp nhận
-                nhiều loại phế liệu từ dân dụng, văn phòng, cửa hàng nhỏ lẻ cho đến hàng công nghiệp số lượng lớn
-                tại kho xưởng, công trình và doanh nghiệp, đồng thời hỗ trợ khảo sát tận nơi, tư vấn phân loại,
-                báo giá minh bạch và thu gom nhanh gọn trong suốt quá trình thanh lý.
-            </p>
+        <div class="materials-header-row">
+            <div class="section-header mb-0 materials-section-header">
+                <div class="materials-title-row">
+                    <h2 class="materials-title mb-0">Thu mua tất cả các loại phế liệu</h2>
+
+                    @if (productCategoryOptions.Any())
+                    {
+                        <div class="materials-category-shortcut dropdown">
+                            <a href="#" id="materialsCategoryToggle" class="materials-category-toggle" aria-expanded="false" aria-haspopup="true">
+                                <span id="materialsCategoryLabel">@selectedCategoryLabel</span>
+                                <i class="bi bi-chevron-down dropdown-indicator"></i>
+                            </a>
+                            <ul id="materialsCategoryMenu" class="materials-category-menu">
+                                <li>
+                                    <a href="#" class="materials-category-option @(string.IsNullOrWhiteSpace(Model.SelectedCategory) ? "active" : string.Empty)" data-category-value="">Tất cả danh mục</a>
+                                </li>
+                                @foreach (var categoryOption in productCategoryOptions)
+                                {
+                                    <li>
+                                        <a href="#" class="materials-category-option @(categoryOption.IsSelected ? "active" : string.Empty)" data-category-value="@categoryOption.Name">@categoryOption.Name</a>
+                                    </li>
+                                }
+                            </ul>
+                            <input type="hidden" id="materialsCategorySelect" value="@Model.SelectedCategory" />
+                        </div>
+                    }
+                </div>
+
+                <p class="text-dart">
+                    Danh mục thu mua được trình bày rõ ràng để khách hàng dễ hình dung ngay từ đầu: chúng tôi tiếp nhận
+                    nhiều loại phế liệu từ dân dụng, văn phòng, cửa hàng nhỏ lẻ cho đến hàng công nghiệp số lượng lớn
+                    tại kho xưởng, công trình và doanh nghiệp, đồng thời hỗ trợ khảo sát tận nơi, tư vấn phân loại,
+                    báo giá minh bạch và thu gom nhanh gọn trong suốt quá trình thanh lý.
+                </p>
+            </div>
         </div>
 
         <style>
+                    #materials .materials-header-row {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+                        margin-bottom: 20px;
+                    }
+
+                    #materials .materials-section-header {
+                        width: 100%;
+                    }
+
+                    #materials .materials-title-row {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 16px;
+                        width: 100%;
+                    }
+
+                    #materials .materials-title {
+                        margin: 0;
+                        flex: 1 1 auto;
+                        text-align: center;
+                        transform: translateX(140px);
+                    }
+
+                    #materials .materials-category-shortcut {
+                        flex: 0 0 260px;
+                        max-width: 260px;
+                        margin-left: auto;
+                        position: relative;
+                    }
+
+                    #materials .materials-category-toggle {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        width: 100%;
+                        min-height: 44px;
+                        border-radius: 999px;
+                        border: 1px solid rgba(25, 135, 84, 0.18);
+                        background: linear-gradient(135deg, #ffffff 0%, #f7fbf8 100%);
+                        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+                        padding: 10px 42px 10px 16px;
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #1f2937;
+                        appearance: none;
+                        -webkit-appearance: none;
+                        -moz-appearance: none;
+                        cursor: pointer;
+                        text-decoration: none;
+                        transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+                        color: #1f2937;
+                    }
+
+                    #materials .materials-category-toggle:focus,
+                    #materials .materials-category-toggle:focus-visible {
+                        outline: none;
+                        border-color: rgba(25, 135, 84, 0.42);
+                        box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.12), 0 10px 24px rgba(15, 23, 42, 0.08);
+                    }
+
+                    #materials .materials-category-toggle:hover {
+                        transform: translateY(-1px);
+                        color: #1f2937;
+                    }
+
+                    #materials .materials-category-toggle .dropdown-indicator {
+                        font-size: 14px;
+                        color: #198754;
+                        transition: transform 0.25s ease;
+                    }
+
+                    #materials .materials-category-shortcut.is-open .materials-category-toggle .dropdown-indicator {
+                        transform: rotate(180deg);
+                    }
+
+                    #materials .materials-category-menu {
+                        list-style: none;
+                        margin: 10px 0 0;
+                        padding: 8px 0;
+                        position: absolute;
+                        top: calc(100% + 2px);
+                        right: 0;
+                        min-width: 280px;
+                        max-width: 320px;
+                        background: #16202d;
+                        border-radius: 18px;
+                        box-shadow: 0 22px 48px rgba(15, 23, 42, 0.22);
+                        z-index: 25;
+                        opacity: 0;
+                        visibility: hidden;
+                        transform: translateY(8px);
+                        transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+                    }
+
+                    #materials .materials-category-shortcut.is-open .materials-category-menu {
+                        opacity: 1;
+                        visibility: visible;
+                        transform: translateY(0);
+                    }
+
+                    #materials .materials-category-menu li {
+                        margin: 0;
+                        padding: 0;
+                    }
+
+                    #materials .materials-category-option {
+                        display: block;
+                        padding: 11px 18px;
+                        color: rgba(255, 255, 255, 0.88);
+                        font-size: 15px;
+                        font-weight: 600;
+                        line-height: 1.4;
+                        text-decoration: none;
+                        transition: background-color 0.2s ease, color 0.2s ease;
+                    }
+
+                    #materials .materials-category-option:hover,
+                    #materials .materials-category-option.active {
+                        background: rgba(37, 99, 235, 0.95);
+                        color: #ffffff;
+                    }
+
+                    #materials .materials-category-menu li:first-child .materials-category-option {
+                        border-top-left-radius: 12px;
+                        border-top-right-radius: 12px;
+                    }
+
+                    #materials .materials-category-menu li:last-child .materials-category-option {
+                        border-bottom-left-radius: 12px;
+                        border-bottom-right-radius: 12px;
+                    }
+
                     #materials .materials-grid-swiper {
                         overflow: hidden;
                         padding: 4px 2px 34px;
@@ -94,12 +267,46 @@
                         gap: 12px;
                         text-shadow: 0 0 18px rgba(25, 135, 84, 0.22);
                     }
+
+                    @@media (max-width: 991.98px) {
+                        #materials .materials-title-row {
+                            flex-direction: column;
+                            align-items: stretch;
+                            gap: 14px;
+                        }
+
+                        #materials .materials-title {
+                            text-align: center;
+                            transform: none;
+                        }
+
+                        #materials .materials-category-shortcut {
+                            flex-basis: auto;
+                            max-width: 100%;
+                            width: 100%;
+                            margin-left: 0;
+                        }
+                    }
+
+                    @@media (max-width: 575.98px) {
+                        #materials .materials-category-toggle {
+                            min-height: 42px;
+                            padding-left: 14px;
+                            padding-right: 40px;
+                            font-size: 13px;
+                        }
+
+                        #materials .materials-category-menu {
+                            min-width: 100%;
+                            max-width: 100%;
+                        }
+                    }
         </style>
 
         <div id="product-list" class="home-cards-grid">
             @foreach (var product in Model.Products)
             {
-                <div data-aos="fade-up" data-aos-delay="100">
+                <div data-aos="fade-up" data-aos-delay="100" data-category="@(product.CategoryName ?? string.Empty)">
                     <a asp-controller="Home" asp-action="Detail" asp-route-slug="@product.Slug" asp-route-id="@product.Id"
                            data-product-id="@product.Id"
                            data-product-slug="@product.Slug"
@@ -158,6 +365,11 @@
         (() => {
             const productList = document.getElementById('product-list');
             const pagination = document.getElementById('product-pagination');
+            const materialsCategorySelect = document.getElementById('materialsCategorySelect');
+            const materialsCategoryToggle = document.getElementById('materialsCategoryToggle');
+            const materialsCategoryLabel = document.getElementById('materialsCategoryLabel');
+            const materialsCategoryMenu = document.getElementById('materialsCategoryMenu');
+            const materialsCategoryShortcut = materialsCategoryToggle?.closest('.materials-category-shortcut');
             const contactPhone = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(contactInfo.Phone));
 
             function escapeHtml(value) {
@@ -185,6 +397,52 @@
                 });
             }
 
+            function toCategorySlug(categoryName) {
+                return String(categoryName ?? '')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/đ/g, 'd')
+                    .replace(/Đ/g, 'D')
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '') || 'tat-ca';
+            }
+
+            function applyCategoryFilter() {
+                if (!productList || !materialsCategorySelect) {
+                    return;
+                }
+
+                const selectedCategory = materialsCategorySelect.value;
+
+                productList.querySelectorAll('[data-category]').forEach(card => {
+                    const cardCategory = card.getAttribute('data-category') || '';
+                    const shouldShow = !selectedCategory || cardCategory === selectedCategory;
+                    card.style.display = shouldShow ? '' : 'none';
+                });
+            }
+
+            function setActiveCategoryOption(selectedCategory) {
+                if (!materialsCategoryMenu) {
+                    return;
+                }
+
+                materialsCategoryMenu.querySelectorAll('.materials-category-option').forEach(option => {
+                    const isActive = (option.getAttribute('data-category-value') || '') === selectedCategory;
+                    option.classList.toggle('active', isActive);
+                });
+            }
+
+            function closeCategoryMenu() {
+                materialsCategoryShortcut?.classList.remove('is-open');
+                materialsCategoryToggle?.setAttribute('aria-expanded', 'false');
+            }
+
+            function openCategoryMenu() {
+                materialsCategoryShortcut?.classList.add('is-open');
+                materialsCategoryToggle?.setAttribute('aria-expanded', 'true');
+            }
+
             function renderProducts(products) {
                 if (!productList) return;
 
@@ -198,11 +456,12 @@
                     const safeImageSequence = imageSequence.map(image => escapeHtml(image)).join('|');
                     const safeCategoryIcon = escapeHtml(product.categoryIcon ?? 'box-seam');
                     const safeCategoryName = escapeHtml(product.categoryName ?? 'Phế liệu');
+                    const safeCategoryValue = escapeHtml(product.categoryName ?? '');
                     const safePhone = escapeHtml(contactPhone ?? '');
                     const safeSlug = escapeHtml(product.slug ?? '');
 
                     return `
-                    <div data-aos="fade-up" data-aos-delay="${100 + (index * 50)}">
+                    <div data-aos="fade-up" data-aos-delay="${100 + (index * 50)}" data-category="${safeCategoryValue}">
                         <a href="${detailUrl}" data-product-id="${product.id}" data-product-slug="${safeSlug}" class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
                             <div class="materials-card-media">
                                 <img src="${safePrimaryImage}"
@@ -228,6 +487,7 @@
 
                 normalizeDetailLinks(productList);
                 bindProductHoverRotation();
+                applyCategoryFilter();
             }
 
             function renderPagination(currentPage, totalPages) {
@@ -257,7 +517,14 @@
             async function loadPage(page) {
                 if (!pagination || page < 1) return;
 
-                const response = await fetch(`/Product/GetPagedProducts?page=${page}`, {
+                const selectedCategory = materialsCategorySelect?.value || '';
+                const query = new URLSearchParams();
+                query.set('page', String(page));
+                if (selectedCategory) {
+                    query.set('category', selectedCategory);
+                }
+
+                const response = await fetch(`/Product/GetPagedProducts?${query.toString()}`, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
@@ -268,9 +535,17 @@
                 }
 
                 const data = await response.json();
+                if (materialsCategorySelect) {
+                    materialsCategorySelect.value = data.selectedCategory ?? '';
+                }
                 renderProducts(data.products);
                 renderPagination(data.currentPage, data.totalPages);
-                window.history.pushState({}, '', `/Product?page=${data.currentPage}`);
+                const historyQuery = new URLSearchParams();
+                historyQuery.set('page', String(data.currentPage));
+                if (data.selectedCategory) {
+                    historyQuery.set('category', data.selectedCategory);
+                }
+                window.history.pushState({}, '', `/Product?${historyQuery.toString()}`);
             }
 
             function bindPaginationAjax() {
@@ -346,6 +621,55 @@
             bindPaginationAjax();
             bindProductHoverRotation();
 
+            if (materialsCategoryToggle && materialsCategoryMenu && materialsCategorySelect) {
+                materialsCategoryToggle.addEventListener('click', event => {
+                    event.preventDefault();
+                    const isOpen = materialsCategoryShortcut?.classList.contains('is-open');
+                    if (isOpen) {
+                        closeCategoryMenu();
+                    } else {
+                        openCategoryMenu();
+                    }
+                });
+
+                materialsCategoryShortcut?.addEventListener('mouseenter', () => {
+                    openCategoryMenu();
+                });
+
+                materialsCategoryShortcut?.addEventListener('mouseleave', () => {
+                    closeCategoryMenu();
+                });
+
+                materialsCategoryMenu.querySelectorAll('.materials-category-option').forEach(option => {
+                    option.addEventListener('click', event => {
+                        event.preventDefault();
+                        const selectedCategory = option.getAttribute('data-category-value') || '';
+                        materialsCategorySelect.value = selectedCategory;
+                        if (materialsCategoryLabel) {
+                            materialsCategoryLabel.textContent = option.textContent?.trim() || 'Tất cả danh mục';
+                        }
+                        setActiveCategoryOption(selectedCategory);
+                        loadPage(1);
+                        closeCategoryMenu();
+                    });
+                });
+
+                document.addEventListener('click', event => {
+                    if (!materialsCategoryShortcut?.contains(event.target)) {
+                        closeCategoryMenu();
+                    }
+                });
+
+                document.addEventListener('keydown', event => {
+                    if (event.key === 'Escape') {
+                        closeCategoryMenu();
+                    }
+                });
+
+                setActiveCategoryOption(materialsCategorySelect.value);
+                applyCategoryFilter();
+            }
+
             window.addEventListener('popstate', () => {
                 const params = new URLSearchParams(window.location.search);
                 const page = Number(params.get('page') ?? '1');
@@ -407,4 +731,45 @@
 </section>
 
 @await Component.InvokeAsync("ScrapPurchaseServicesSectionComponent")
+
+@functions {
+    string ToCategorySlug(string? categoryName)
+    {
+        if (string.IsNullOrWhiteSpace(categoryName))
+        {
+            return "tat-ca";
+        }
+
+        var normalized = categoryName.Trim().ToLowerInvariant().Normalize(System.Text.NormalizationForm.FormD);
+        var builder = new System.Text.StringBuilder();
+
+        foreach (var character in normalized)
+        {
+            var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(character);
+
+            if (unicodeCategory == System.Globalization.UnicodeCategory.NonSpacingMark)
+            {
+                continue;
+            }
+
+            var convertedCharacter = character switch
+            {
+                'đ' => 'd',
+                _ => character
+            };
+
+            if (char.IsLetterOrDigit(convertedCharacter))
+            {
+                builder.Append(convertedCharacter);
+            }
+            else if (builder.Length == 0 || builder[^1] != '-')
+            {
+                builder.Append('-');
+            }
+        }
+
+        return builder.ToString().Trim('-');
+    }
+}
+
 

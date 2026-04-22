@@ -165,11 +165,12 @@ public class AdminController : Controller
         }
         else
         {
+            var productId = editor.Id.GetValueOrDefault();
             product = await _context.Products
                 .Include(p => p.ProductImages.OrderBy(i => i.OrderIndex))
                 .Include(p => p.PriceHistories.OrderByDescending(h => h.RecordedAt))
-                .FirstOrDefaultAsync(p => p.Id == editor.Id.Value)
-                ?? throw new InvalidOperationException($"Không tìm thấy sản phẩm ID {editor.Id.Value}.");
+                .FirstOrDefaultAsync(p => p.Id == productId)
+                ?? throw new InvalidOperationException($"Không tìm thấy sản phẩm ID {productId}.");
 
             oldPrice = product.PriceValue;
             oldUnit = product.Unit;
@@ -449,8 +450,9 @@ public class AdminController : Controller
         }
         else
         {
-            history = await _context.PriceHistories.FirstOrDefaultAsync(h => h.Id == editor.Id.Value)
-                ?? throw new InvalidOperationException($"Không tìm thấy lịch sử giá ID {editor.Id.Value}.");
+            var historyId = editor.Id.GetValueOrDefault();
+            history = await _context.PriceHistories.FirstOrDefaultAsync(h => h.Id == historyId)
+                ?? throw new InvalidOperationException($"Không tìm thấy lịch sử giá ID {historyId}.");
         }
 
         history.ProductId = editor.ProductId;

@@ -54,8 +54,9 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "product-detail",
-    pattern: "Home/Detail/{slug}/{id?}",
-    defaults: new { controller = "Home", action = "Detail" });
+    pattern: "Home/Detail/{slug?}/{id:int?}",
+    defaults: new { controller = "Home", action = "Detail" })
+    .WithStaticAssets();
 
 app.MapControllerRoute(
     name: "default",

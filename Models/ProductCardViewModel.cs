@@ -29,6 +29,10 @@ public class ProductIndexViewModel
 {
     public List<ProductCardViewModel> Products { get; set; } = [];
 
+    public List<string> CategoryNames { get; set; } = [];
+
+    public string SelectedCategory { get; set; } = string.Empty;
+
     public int CurrentPage { get; set; }
 
     public int TotalPages { get; set; }

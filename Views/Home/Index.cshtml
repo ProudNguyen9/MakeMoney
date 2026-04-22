@@ -131,15 +131,67 @@
                         <main id="main">
                             <section id="materials" class="services home-card-section">
                                 <div class="container-fluid home-section-shell" data-aos="fade-up">
-                                    <div class="section-header mb-0">
-                                        <h2>Thu mua tất cả các loại phế liệu</h2>
-                                        <p class="text-dart">Danh mục thu mua được trình bày rõ ràng để khách hàng dễ hình dung ngay từ đầu: chúng tôi tiếp nhận
-                                            nhiều loại phế liệu từ dân dụng, văn phòng, cửa hàng nhỏ lẻ cho đến hàng công nghiệp số lượng lớn
-                                            tại kho xưởng, công trình và doanh nghiệp, đồng thời hỗ trợ khảo sát tận nơi, tư vấn phân loại,
-                                            báo giá minh bạch và thu gom nhanh gọn trong suốt quá trình thanh lý.</p>
-                                    </div>
-
                                         <style>
+                                            #materials .materials-header-row {
+                                                display: flex;
+                                                align-items: flex-start;
+                                                justify-content: space-between;
+                                                gap: 18px;
+                                                margin-bottom: 20px;
+                                            }
+
+                                            #materials .materials-header-row .section-header {
+                                                flex: 1 1 0;
+                                            }
+
+                                            #materials .materials-category-shortcut {
+                                                flex: 0 0 260px;
+                                                max-width: 260px;
+                                                align-self: center;
+                                            }
+
+                                            #materials .materials-category-shortcut-label {
+                                                display: block;
+                                                margin-bottom: 8px;
+                                                font-size: 12px;
+                                                font-weight: 700;
+                                                letter-spacing: 0.08em;
+                                                text-transform: uppercase;
+                                                color: rgba(15, 23, 42, 0.65);
+                                            }
+
+                                            #materials .materials-category-shortcut select {
+                                                width: 100%;
+                                                min-height: 44px;
+                                                border-radius: 999px;
+                                                border: 1px solid rgba(25, 135, 84, 0.18);
+                                                background: linear-gradient(135deg, #ffffff 0%, #f7fbf8 100%);
+                                                box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+                                                padding: 10px 42px 10px 16px;
+                                                font-size: 14px;
+                                                font-weight: 600;
+                                                color: #1f2937;
+                                                appearance: none;
+                                                -webkit-appearance: none;
+                                                -moz-appearance: none;
+                                                background-image: linear-gradient(135deg, transparent 50%, #198754 50%), linear-gradient(45deg, #198754 50%, transparent 50%);
+                                                background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px);
+                                                background-size: 6px 6px, 6px 6px;
+                                                background-repeat: no-repeat;
+                                                cursor: pointer;
+                                                transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+                                            }
+
+                                            #materials .materials-category-shortcut select:focus {
+                                                outline: none;
+                                                border-color: rgba(25, 135, 84, 0.42);
+                                                box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.12), 0 10px 24px rgba(15, 23, 42, 0.08);
+                                            }
+
+                                            #materials .materials-category-shortcut select:hover {
+                                                transform: translateY(-1px);
+                                            }
+
                                             #materials .materials-grid-swiper {
                                                 overflow: hidden;
                                                 padding: 4px 2px 34px;
@@ -214,11 +266,61 @@
                                                 gap: 12px;
                                                 text-shadow: 0 0 18px rgba(25, 135, 84, 0.22);
                                             }
+
+                                            @@media (max-width: 991.98px) {
+                                                #materials .materials-header-row {
+                                                    flex-direction: column;
+                                                    align-items: stretch;
+                                                    gap: 14px;
+                                                }
+
+                                                #materials .materials-category-shortcut {
+                                                    flex-basis: auto;
+                                                    max-width: 100%;
+                                                    width: 100%;
+                                                }
+                                            }
+
+                                            @@media (max-width: 575.98px) {
+                                                #materials .materials-category-shortcut-label {
+                                                    font-size: 11px;
+                                                    margin-bottom: 6px;
+                                                }
+
+                                                #materials .materials-category-shortcut select {
+                                                    min-height: 42px;
+                                                    padding-left: 14px;
+                                                    padding-right: 40px;
+                                                    font-size: 13px;
+                                                }
+                                            }
                                         </style>
 
                                         @{
                                             var productList = Model?.Products?.ToList() ?? new List<WebThuMuaPheLieu.Models.Product>();
+                                            var materialCategoryOptions = productList
+                                                .Where(product => product.Category != null && !string.IsNullOrWhiteSpace(product.Category.Name))
+                                                .GroupBy(product => product.Category!.Name!.Trim(), StringComparer.OrdinalIgnoreCase)
+                                                .Select(group => new
+                                                {
+                                                    Name = group.First().Category!.Name!.Trim(),
+                                                    Slug = ToCategorySlug(group.First().Category!.Name!)
+                                                })
+                                                .OrderBy(item => item.Name)
+                                                .ToList();
                                         }
+
+                                        <div class="materials-header-row">
+                                            <div class="section-header mb-0">
+                                                <h2>Thu mua tất cả các loại phế liệu</h2>
+                                                <p class="text-dart">Danh mục thu mua được trình bày rõ ràng để khách hàng dễ hình dung ngay từ đầu: chúng tôi tiếp nhận
+                                                    nhiều loại phế liệu từ dân dụng, văn phòng, cửa hàng nhỏ lẻ cho đến hàng công nghiệp số lượng lớn
+                                                    tại kho xưởng, công trình và doanh nghiệp, đồng thời hỗ trợ khảo sát tận nơi, tư vấn phân loại,
+                                                    báo giá minh bạch và thu gom nhanh gọn trong suốt quá trình thanh lý.</p>
+                                            </div>
+
+                                           
+                                        </div>
 
                                         @if (productList.Any())
                                         {
@@ -227,8 +329,9 @@
                                                     @foreach (var product in productList)
                                                     {
                                                         var imageSequence = BuildImageSequence(product);
+                                                        var categorySlug = ToCategorySlug(product.Category?.Name);
 
-                                                        <div class="swiper-slide">
+                                                        <div class="swiper-slide" data-category="@categorySlug">
                                                             <a asp-controller="Home" asp-action="Detail" asp-route-slug="@product.Slug" asp-route-id="@product.Id"
                                                                class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
                                                                  <div class="materials-card-media">
@@ -270,7 +373,6 @@
 
                                                 if (materialsSwiperElement && typeof Swiper !== 'undefined') {
                                                     const totalSlides = materialsSwiperElement.querySelectorAll('.swiper-slide').length;
-                                                    const shouldLoop = totalSlides > 8;
 
                                                     new Swiper(materialsSwiperElement, {
                                                         speed: 800,
@@ -326,6 +428,25 @@
                                                             }
                                                         }
                                                     });
+                                                }
+
+                                                const materialsCategorySelect = document.getElementById('materialsCategorySelect');
+
+                                                if (materialsCategorySelect && materialsSwiperElement) {
+                                                    const slides = Array.from(materialsSwiperElement.querySelectorAll('.swiper-slide'));
+
+                                                    const applyCategoryFilter = function () {
+                                                        const selectedCategory = materialsCategorySelect.value;
+
+                                                        slides.forEach(function (slideElement) {
+                                                            const slideCategory = slideElement.getAttribute('data-category') || '';
+                                                            const shouldShow = !selectedCategory || slideCategory === selectedCategory;
+                                                            slideElement.style.display = shouldShow ? '' : 'none';
+                                                        });
+                                                    };
+
+                                                    materialsCategorySelect.addEventListener('change', applyCategoryFilter);
+                                                    applyCategoryFilter();
                                                 }
 
                                                 document.querySelectorAll('.materials-hover-image').forEach(function (imageElement) {
@@ -387,6 +508,44 @@
                                                     var c when c.Contains("nhựa") => "recycle",
                                                     _ => "box-seam"
                                                 };
+                                            }
+
+                                            string ToCategorySlug(string? categoryName)
+                                            {
+                                                if (string.IsNullOrWhiteSpace(categoryName))
+                                                {
+                                                    return "tat-ca";
+                                                }
+
+                                                var normalized = categoryName.Trim().ToLowerInvariant().Normalize(System.Text.NormalizationForm.FormD);
+                                                var builder = new System.Text.StringBuilder();
+
+                                                foreach (var character in normalized)
+                                                {
+                                                    var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(character);
+
+                                                    if (unicodeCategory == System.Globalization.UnicodeCategory.NonSpacingMark)
+                                                    {
+                                                        continue;
+                                                    }
+
+                                                    var convertedCharacter = character switch
+                                                    {
+                                                        'đ' => 'd',
+                                                        _ => character
+                                                    };
+
+                                                    if (char.IsLetterOrDigit(convertedCharacter))
+                                                    {
+                                                        builder.Append(convertedCharacter);
+                                                    }
+                                                    else if (builder.Length == 0 || builder[^1] != '-')
+                                                    {
+                                                        builder.Append('-');
+                                                    }
+                                                }
+
+                                                return builder.ToString().Trim('-');
                                             }
 
                                             string NormalizeImagePath(string? imagePath)
