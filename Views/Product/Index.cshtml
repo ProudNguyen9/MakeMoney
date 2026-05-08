@@ -4,6 +4,9 @@
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Mặt hàng";
+    ViewData["Description"] = "Danh sách mặt hàng phế liệu thu mua giá cao gồm sắt, đồng, nhôm, inox, giấy carton, nhựa và máy móc cũ.";
+    ViewData["Canonical"] = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
+    ViewData["OgType"] = "website";
     var contactInfo = await ContactInfoHelper.GetContactInfoAsync();
     var productCategoryOptions = Model.CategoryNames
         .Where(categoryName => !string.IsNullOrWhiteSpace(categoryName))
@@ -20,6 +23,7 @@
 
 <section id="materials" class="services home-card-section">
     <div class="container-fluid home-section-shell" data-aos="fade-up">
+        <h1 class="visually-hidden">Danh sách mặt hàng phế liệu thu mua</h1>
         <div class="materials-header-row">
             <div class="section-header mb-0 materials-section-header">
                 <div class="materials-title-row">

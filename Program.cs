@@ -1,9 +1,17 @@
+using System.IO;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using WebThuMuaPheLieu.helpper;
 using WebThuMuaPheLieu.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var dataProtectionKeysPath = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "DataProtection-Keys");
+Directory.CreateDirectory(dataProtectionKeysPath);
+
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
 
 // Add services to the container.
 builder.Services.AddDistributedMemoryCache();

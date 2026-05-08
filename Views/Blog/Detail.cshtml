@@ -1,5 +1,6 @@
 @model WebThuMuaPheLieu.Models.BlogDetailViewModel
 @using System.Text.RegularExpressions
+@using System.Text.Json
 
 @{
     Layout = "_HomeLayout";
@@ -58,10 +59,36 @@
     }
 
     var publishDate = Model.Post.PublishedAt ?? Model.Post.CreatedAt;
+    var publishDateValue = publishDate ?? DateTime.Now;
+    var publishDateOffset = new DateTimeOffset(publishDateValue);
     var plainSummary = BuildPlainSummary();
     var readingTime = BuildReadingTime();
     var displayCategory = string.IsNullOrWhiteSpace(Model.PrimaryCategoryName) ? "Tin tức" : Model.PrimaryCategoryName;
     var authorName = string.IsNullOrWhiteSpace(Model.AuthorName) ? "Ban biên tập Phế Liệu Hoàng Doanh" : Model.AuthorName;
+
+    ViewData["Description"] = plainSummary;
+    ViewData["Canonical"] = !string.IsNullOrWhiteSpace(Model.CurrentUrl)
+        ? Model.CurrentUrl
+        : $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
+    ViewData["OgType"] = "article";
+
+    var articleSchema = new Dictionary<string, object?>
+    {
+        ["@context"] = "https://schema.org",
+        ["@type"] = "Article",
+        ["headline"] = Model.Post.Title,
+        ["description"] = plainSummary,
+        ["author"] = new Dictionary<string, object?>
+        {
+            ["@type"] = "Person",
+            ["name"] = authorName
+        },
+        ["datePublished"] = publishDateOffset.ToString("yyyy-MM-ddTHH:mm:ssK"),
+        ["dateModified"] = new DateTimeOffset(Model.Post.UpdatedAt ?? publishDateValue).ToString("yyyy-MM-ddTHH:mm:ssK"),
+        ["mainEntityOfPage"] = ViewData["Canonical"],
+        ["image"] = (Model.GalleryImages?.Any() == true ? Model.GalleryImages : new List<string> { Model.CoverImage })
+    };
+    var articleSchemaJson = JsonSerializer.Serialize(articleSchema);
 }
 
 @section Styles {
@@ -1843,6 +1870,10 @@
         </div>
     </div>
 </main>
+
+<script type="application/ld+json">
+    @Html.Raw(articleSchemaJson)
+</script>
 
 @section Scripts {
     <script>

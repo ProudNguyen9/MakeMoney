@@ -4,6 +4,9 @@
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Tin tức";
+    ViewData["Description"] = "Cập nhật tin tức thị trường phế liệu, kinh nghiệm phân loại và mẹo bán phế liệu giá cao từ Phế Liệu Thành Trung.";
+    ViewData["Canonical"] = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
+    ViewData["OgType"] = "website";
     ViewData["BodyClass"] = "blog-page";
     var contactInfo = await ContactInfoHelper.GetContactInfoAsync();
 }
@@ -361,6 +364,7 @@
 }
 
 <main id="main" class="blog-page-main">
+    <h1 class="visually-hidden">Tin tức thu mua phế liệu mới nhất</h1>
     <button type="button" class="blog-mobile-search-btn" id="blogMobileSearchBtn" aria-label="Mở tìm kiếm nhanh tin tức">
         <i class="bi bi-search"></i>
     </button>

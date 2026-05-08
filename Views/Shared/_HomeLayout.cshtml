@@ -2,17 +2,38 @@
 @{
     var seoSettings = await SeoSettingHelper.GetSeoSettingsAsync();
 
+    var pageTitle = ViewData["Title"]?.ToString()?.Trim();
+    var pageDescription = ViewData["Description"]?.ToString()?.Trim();
+    var pageKeywords = ViewData["Keywords"]?.ToString()?.Trim();
+    var pageCanonical = ViewData["Canonical"]?.ToString()?.Trim();
+    var pageOgType = ViewData["OgType"]?.ToString()?.Trim();
+
     var metaTitle = seoSettings.TryGetValue("MetaTitle", out var storedMetaTitle) && !string.IsNullOrWhiteSpace(storedMetaTitle)
         ? storedMetaTitle
-        : $"{ViewData["Title"]} - Phế Liệu Thành Trung";
+        : "Phế Liệu Thành Trung";
+
+    if (!string.IsNullOrWhiteSpace(pageTitle))
+    {
+        metaTitle = $"{pageTitle} - Phế Liệu Thành Trung";
+    }
 
     var metaDescription = seoSettings.TryGetValue("MetaDescription", out var storedMetaDescription) && !string.IsNullOrWhiteSpace(storedMetaDescription)
         ? storedMetaDescription
         : "Phế Liệu Hoàng Doanh chuyên thu mua phế liệu giá cao tận nơi tại TP.HCM, Bình Dương, Đồng Nai. Nhận thu mua sắt, đồng, nhôm, inox, giấy carton, nhựa và máy móc cũ.";
 
+    if (!string.IsNullOrWhiteSpace(pageDescription))
+    {
+        metaDescription = pageDescription;
+    }
+
     var seoKeywords = seoSettings.TryGetValue("SeoKeywords", out var storedSeoKeywords) && !string.IsNullOrWhiteSpace(storedSeoKeywords)
         ? storedSeoKeywords
         : "thu mua phế liệu, phế liệu giá cao, thu mua sắt vụn, thu mua đồng, thu mua nhôm, thu mua inox";
+
+    if (!string.IsNullOrWhiteSpace(pageKeywords))
+    {
+        seoKeywords = pageKeywords;
+    }
 
     var ogTitle = seoSettings.TryGetValue("OgTitle", out var storedOgTitle) && !string.IsNullOrWhiteSpace(storedOgTitle)
         ? storedOgTitle
@@ -23,6 +44,12 @@
         : "/assets/img/satthep.png";
 
     var faviconUrl = Url.Content(ogImage);
+    var currentAbsoluteUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
+    var canonicalUrl = !string.IsNullOrWhiteSpace(pageCanonical)
+        ? pageCanonical
+        : currentAbsoluteUrl;
+    var ogUrl = canonicalUrl;
+    var ogType = !string.IsNullOrWhiteSpace(pageOgType) ? pageOgType : "website";
 }
 
 <!DOCTYPE html>
@@ -35,10 +62,12 @@
     <title>@metaTitle</title>
     <meta name="description" content="@metaDescription" />
     <meta name="keywords" content="@seoKeywords" />
+    <link rel="canonical" href="@canonicalUrl" />
     <meta property="og:title" content="@ogTitle" />
     <meta property="og:description" content="@metaDescription" />
+    <meta property="og:url" content="@ogUrl" />
     <meta property="og:image" content="@faviconUrl" />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="@ogType" />
 
     <link href="@faviconUrl" rel="icon" />
     <link href="@faviconUrl" rel="apple-touch-icon" />

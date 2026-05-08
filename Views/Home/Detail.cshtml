@@ -1,5 +1,6 @@
 @inject WebThuMuaPheLieu.helpper.IContactInfoHelper ContactInfoHelper
 @model WebThuMuaPheLieu.ViewModels.ProductDetailViewModel
+@using System.Text.Json
 @{
   Layout = "_HomeLayout";
   ViewData["BodyClass"] = "home-detail-page";
@@ -50,6 +51,30 @@
       : !string.IsNullOrWhiteSpace(Model.Product.Description)
           ? Model.Product.Description
           : "Thông tin đang được cập nhật.";
+
+  ViewData["Description"] = shortDescription;
+  ViewData["Canonical"] = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
+  ViewData["OgType"] = "product";
+
+  var productSchema = new Dictionary<string, object?>
+  {
+    ["@context"] = "https://schema.org",
+    ["@type"] = "Product",
+    ["name"] = heroTitle,
+    ["description"] = shortDescription,
+    ["image"] = galleryImages.Select(img => NormalizeAssetUrl(img.ImageUrl)).DefaultIfEmpty(primaryImage).ToList(),
+    ["sku"] = Model.Product.Id.ToString(),
+    ["category"] = Model.Category?.Name,
+    ["url"] = ViewData["Canonical"],
+    ["offers"] = new Dictionary<string, object?>
+    {
+      ["@type"] = "Offer",
+      ["priceCurrency"] = "VND",
+      ["price"] = Model.Product.PriceValue,
+      ["availability"] = "https://schema.org/InStock"
+    }
+  };
+  var productSchemaJson = JsonSerializer.Serialize(productSchema);
   var formattedPrice = !string.IsNullOrWhiteSpace(Model.Product.PriceLabel)
       ? Model.Product.PriceLabel
       : (Model.Product.PriceValue.HasValue
@@ -1350,3 +1375,7 @@
                                       </div>
                                     </section>
                                   </main>
+
+<script type="application/ld+json">
+  @Html.Raw(productSchemaJson)
+</script>

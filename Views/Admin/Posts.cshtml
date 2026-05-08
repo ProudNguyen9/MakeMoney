@@ -210,6 +210,7 @@
                                             }
 
                                             <form asp-action="ChangePostStatus" asp-controller="Admin" method="post" class="posts-action-inline-form">
+                                                @Html.AntiForgeryToken()
                                                 <input type="hidden" name="id" value="@post.Id" />
                                                 <input type="hidden" name="status" value="@post.PrimaryActionValue" />
                                                 <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
@@ -221,6 +222,7 @@
                                             </form>
 
                                             <form asp-action="ChangePostStatus" asp-controller="Admin" method="post" class="posts-action-inline-form">
+                                                @Html.AntiForgeryToken()
                                                 <input type="hidden" name="id" value="@post.Id" />
                                                 <input type="hidden" name="status" value="@post.SecondaryActionValue" />
                                                 <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
@@ -232,6 +234,7 @@
                                             </form>
 
                                             <form asp-action="DeletePost" asp-controller="Admin" method="post" class="posts-action-inline-form" onsubmit="return confirm('Xóa bài viết này và toàn bộ liên kết liên quan?');">
+                                                @Html.AntiForgeryToken()
                                                 <input type="hidden" name="id" value="@post.Id" />
                                                 <input type="hidden" name="searchTerm" value="@Model.SearchTerm" />
                                                 <input type="hidden" name="returnStatus" value="@Model.SelectedStatus" />

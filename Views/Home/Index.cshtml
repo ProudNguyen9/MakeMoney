@@ -3,6 +3,9 @@
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Trang chủ";
+    ViewData["Description"] = "Phế Liệu Thành Trung chuyên thu mua phế liệu giá cao tận nơi, hỗ trợ khảo sát nhanh, báo giá minh bạch và thanh toán linh hoạt tại TP.HCM, Bình Dương, Đồng Nai.";
+    ViewData["Canonical"] = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
+    ViewData["OgType"] = "website";
 
     var heroBanner = Model?.Banner;
     var contactInfo = Model?.ContactInfo ?? new WebThuMuaPheLieu.helpper.ContactInfoSettings();
@@ -86,6 +89,7 @@
     <div class="container-fluid home-wide-shell position-relative">
         <div class="row align-items-center gy-5">
             <div class="col-lg-5 hero-content" data-aos="fade-right" data-aos-delay="100">
+                <h1 class="visually-hidden">Thu mua phế liệu giá cao tận nơi - Phế Liệu Thành Trung</h1>
                 <h2 class="hero-title"><span class="hero-title-line">@heroLine1</span><span>@heroLine2</span><span class="hero-title-line">@heroLine3</span><span class="hero-title-tail">@heroLine4</span></h2>
                 <div class="hero-actions">
                     <a href="@heroButtonPrimaryLink" class="hero-btn-primary"><i class="bi bi-telephone-fill"></i> @heroButtonPrimaryText</a>
