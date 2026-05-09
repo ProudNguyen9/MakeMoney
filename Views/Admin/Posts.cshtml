@@ -2650,6 +2650,98 @@
             });
         }
 
+        function blobToDataUrl(blob) {
+            return readFileAsDataUrl(blob);
+        }
+
+        function loadImageFromBlob(blob) {
+            return new Promise(function (resolve, reject) {
+                var objectUrl = URL.createObjectURL(blob);
+                var image = new Image();
+
+                image.onload = function () {
+                    URL.revokeObjectURL(objectUrl);
+                    resolve(image);
+                };
+
+                image.onerror = function () {
+                    URL.revokeObjectURL(objectUrl);
+                    reject(new Error('Không thể đọc kích thước ảnh.'));
+                };
+
+                image.src = objectUrl;
+            });
+        }
+
+        function canvasToBlob(canvas, mimeType, quality) {
+            return new Promise(function (resolve, reject) {
+                canvas.toBlob(function (blob) {
+                    if (!blob) {
+                        reject(new Error('Không thể nén ảnh.'));
+                        return;
+                    }
+
+                    resolve(blob);
+                }, mimeType, quality);
+            });
+        }
+
+        async function optimizeInlineImage(fileOrBlob) {
+            var maxWidth = 1600;
+            var maxHeight = 1600;
+            var targetBytes = 200 * 1024;
+            var minBytes = 100 * 1024;
+            var sourceBlob = fileOrBlob;
+
+            if (!sourceBlob || !sourceBlob.type || sourceBlob.type.indexOf('image/') !== 0) {
+                return fileOrBlob;
+            }
+
+            var image = await loadImageFromBlob(sourceBlob);
+            var width = image.naturalWidth || image.width;
+            var height = image.naturalHeight || image.height;
+
+            var ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+            var targetWidth = Math.max(1, Math.round(width * ratio));
+            var targetHeight = Math.max(1, Math.round(height * ratio));
+
+            var canvas = document.createElement('canvas');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+
+            var context = canvas.getContext('2d', { alpha: false });
+            context.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+            var supportsWebp = !!document.createElement('canvas').toDataURL('image/webp').match('data:image/webp');
+            var outputType = supportsWebp ? 'image/webp' : 'image/jpeg';
+
+            var qualityCandidates = [0.82, 0.76, 0.7, 0.64, 0.58];
+            var bestBlob = null;
+
+            for (var i = 0; i < qualityCandidates.length; i++) {
+                var candidate = await canvasToBlob(canvas, outputType, qualityCandidates[i]);
+                bestBlob = candidate;
+
+                if (candidate.size <= targetBytes) {
+                    if (candidate.size < minBytes && i > 0) {
+                        continue;
+                    }
+
+                    break;
+                }
+            }
+
+            if (!bestBlob) {
+                return sourceBlob;
+            }
+
+            if (bestBlob.size >= sourceBlob.size) {
+                return sourceBlob;
+            }
+
+            return bestBlob;
+        }
+
         function pickInlineImage(callback) {
             var picker = document.createElement('input');
             picker.type = 'file';
@@ -2661,9 +2753,16 @@
                     return;
                 }
 
-                readFileAsDataUrl(file)
-                    .then(function (dataUrl) {
-                        callback(dataUrl, file);
+                showContentEditorStatus('Đang tối ưu ảnh trước khi chèn để soạn thảo mượt hơn...', 'ready');
+
+                optimizeInlineImage(file)
+                    .then(function (optimizedBlob) {
+                        return blobToDataUrl(optimizedBlob).then(function (dataUrl) {
+                            callback(dataUrl, file);
+                        });
+                    })
+                    .then(function () {
+                        showContentEditorStatus('Ảnh đã được tối ưu và chèn vào nội dung.', 'ready');
                     })
                     .catch(function () {
                         showContentEditorStatus('Không thể chèn ảnh vừa chọn. Vui lòng thử lại.', 'error');
@@ -2695,7 +2794,7 @@
                 autoresize_bottom_margin: 24,
                 block_formats: 'Đoạn văn=p; Tiêu đề 1=h1; Tiêu đề 2=h2; Tiêu đề 3=h3',
                 contextmenu: 'undo redo | bold italic | link image table',
-                paste_data_images: true,
+                paste_data_images: false,
                 automatic_uploads: true,
                 image_title: true,
                 image_caption: true,
@@ -2707,8 +2806,14 @@
                     }
 
                     pickInlineImage(function (dataUrl, file) {
-                        callback(dataUrl, { alt: file.name });
-                        showContentEditorStatus('Ảnh đã được chèn trực tiếp vào nội dung bài viết.', 'ready');
+                        uploadInlineEditorImage(dataUrl, file.name)
+                            .then(function (uploadedUrl) {
+                                callback(uploadedUrl, { alt: file.name });
+                                showContentEditorStatus('Ảnh đã được tải lên và chèn vào nội dung bài viết.', 'ready');
+                            })
+                            .catch(function () {
+                                showContentEditorStatus('Không thể tải ảnh lên để chèn vào nội dung.', 'error');
+                            });
                     });
                 },
                 images_upload_handler: function (blobInfo, progress) {
@@ -2717,10 +2822,16 @@
                             progress(100);
                         }
 
-                        readFileAsDataUrl(blobInfo.blob())
+                        optimizeInlineImage(blobInfo.blob())
+                            .then(function (optimizedBlob) {
+                                return blobToDataUrl(optimizedBlob);
+                            })
                             .then(function (dataUrl) {
-                                showContentEditorStatus('Ảnh đã được nhúng trực tiếp vào nội dung bài viết.', 'ready');
-                                resolve(dataUrl);
+                                return uploadInlineEditorImage(dataUrl, blobInfo.filename() || 'inline-image.webp');
+                            })
+                            .then(function (uploadedUrl) {
+                                showContentEditorStatus('Ảnh đã được tối ưu và tải lên trước khi chèn nội dung.', 'ready');
+                                resolve(uploadedUrl);
                             })
                             .catch(function () {
                                 reject('Không thể xử lý ảnh để chèn vào nội dung.');
@@ -2733,14 +2844,72 @@
                         showContentEditorStatus('Trình soạn thảo đã sẵn sàng. Bạn có thể viết bài như Word.', 'ready');
                     });
 
-                    editor.on('change input undo redo SetContent', function () {
-                        editor.save();
-                    });
+                    var saveTimer = null;
+                    var requestSave = function () {
+                        if (saveTimer) {
+                            window.clearTimeout(saveTimer);
+                        }
+
+                        saveTimer = window.setTimeout(function () {
+                            editor.save();
+                        }, 250);
+                    };
+
+                    editor.on('change input undo redo SetContent', requestSave);
 
                     editor.on('drop paste', function () {
                         showContentEditorStatus('Bạn có thể dán hoặc kéo thả ảnh trực tiếp vào vùng nội dung.', 'ready');
                     });
                 }
+            });
+        }
+
+        function uploadInlineEditorImage(dataUrl, fileName) {
+            return new Promise(function (resolve, reject) {
+                var antiForgeryInput = document.querySelector('#posts-editor-form input[name="__RequestVerificationToken"]');
+                var token = antiForgeryInput ? antiForgeryInput.value : '';
+
+                fetch(dataUrl)
+                    .then(function (response) {
+                        return response.blob();
+                    })
+                    .then(function (blob) {
+                        var safeName = (fileName || 'inline-image.webp').replace(/[^a-zA-Z0-9._-]/g, '-');
+                        var extension = blob.type === 'image/jpeg' ? '.jpg' : '.webp';
+                        if (!safeName.toLowerCase().endsWith('.jpg')
+                            && !safeName.toLowerCase().endsWith('.jpeg')
+                            && !safeName.toLowerCase().endsWith('.png')
+                            && !safeName.toLowerCase().endsWith('.webp')) {
+                            safeName += extension;
+                        }
+
+                        var file = new File([blob], safeName, { type: blob.type || 'image/webp' });
+                        var formData = new FormData();
+                        formData.append('file', file);
+
+                        return fetch('/admin/posts/upload-inline-image', {
+                            method: 'POST',
+                            headers: token ? { 'RequestVerificationToken': token } : {},
+                            body: formData
+                        });
+                    })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('upload-failed');
+                        }
+
+                        return response.json();
+                    })
+                    .then(function (result) {
+                        if (!result || !result.success || !result.url) {
+                            throw new Error('invalid-upload-result');
+                        }
+
+                        resolve(result.url);
+                    })
+                    .catch(function () {
+                        reject(new Error('inline-upload-failed'));
+                    });
             });
         }
 

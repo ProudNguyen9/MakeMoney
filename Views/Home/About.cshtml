@@ -1,11 +1,17 @@
 @using WebThuMuaPheLieu.helpper
+@inject WebThuMuaPheLieu.Services.IStructuredDataService StructuredDataService
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Giới thiệu";
     ViewData["BodyClass"] = "about-page";
+    var structuredDataJson = StructuredDataService.SerializeSchemas(StructuredDataService.BuildAboutSchemas(Context));
     var contactInfo = ViewData["ContactInfo"] as ContactInfoSettings ?? new ContactInfoSettings();
     var aboutPhone = !string.IsNullOrWhiteSpace(contactInfo.Phone) ? contactInfo.Phone : "0909 123 456";
     var aboutPhoneHref = $"tel:{new string(aboutPhone.Where(char.IsDigit).ToArray())}";
+}
+
+@section Head {
+    <partial name="_StructuredData" model="structuredDataJson" />
 }
 
 <section id="about-hero" class="about-hero scrap-hero d-flex align-items-center">

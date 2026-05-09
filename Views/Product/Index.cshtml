@@ -1,4 +1,5 @@
 @inject WebThuMuaPheLieu.helpper.IContactInfoHelper ContactInfoHelper
+@inject WebThuMuaPheLieu.Services.IStructuredDataService StructuredDataService
 @model WebThuMuaPheLieu.Models.ProductIndexViewModel
 
 @{
@@ -7,6 +8,7 @@
     ViewData["Description"] = "Danh sách mặt hàng phế liệu thu mua giá cao gồm sắt, đồng, nhôm, inox, giấy carton, nhựa và máy móc cũ.";
     ViewData["Canonical"] = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
     ViewData["OgType"] = "website";
+    var structuredDataJson = StructuredDataService.SerializeSchemas(StructuredDataService.BuildProductListSchemas(Context));
     var contactInfo = await ContactInfoHelper.GetContactInfoAsync();
     var productCategoryOptions = Model.CategoryNames
         .Where(categoryName => !string.IsNullOrWhiteSpace(categoryName))
@@ -19,6 +21,10 @@
         .OrderBy(item => item.Name)
         .ToList();
     var selectedCategoryLabel = productCategoryOptions.FirstOrDefault(item => item.IsSelected)?.Name ?? "Tất cả danh mục";
+}
+
+@section Head {
+    <partial name="_StructuredData" model="structuredDataJson" />
 }
 
 <section id="materials" class="services home-card-section">

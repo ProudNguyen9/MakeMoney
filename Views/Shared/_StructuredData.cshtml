@@ -1,0 +1,9 @@
+@model string
+
+@if (!string.IsNullOrWhiteSpace(Model))
+{
+    <script type="application/ld+json">
+        @Html.Raw(Model)
+    </script>
+}
+

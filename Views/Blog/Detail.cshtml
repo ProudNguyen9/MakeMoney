@@ -1,6 +1,6 @@
 @model WebThuMuaPheLieu.Models.BlogDetailViewModel
 @using System.Text.RegularExpressions
-@using System.Text.Json
+@inject WebThuMuaPheLieu.Services.IStructuredDataService StructuredDataService
 
 @{
     Layout = "_HomeLayout";
@@ -72,23 +72,11 @@
         : $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
     ViewData["OgType"] = "article";
 
-    var articleSchema = new Dictionary<string, object?>
-    {
-        ["@context"] = "https://schema.org",
-        ["@type"] = "Article",
-        ["headline"] = Model.Post.Title,
-        ["description"] = plainSummary,
-        ["author"] = new Dictionary<string, object?>
-        {
-            ["@type"] = "Person",
-            ["name"] = authorName
-        },
-        ["datePublished"] = publishDateOffset.ToString("yyyy-MM-ddTHH:mm:ssK"),
-        ["dateModified"] = new DateTimeOffset(Model.Post.UpdatedAt ?? publishDateValue).ToString("yyyy-MM-ddTHH:mm:ssK"),
-        ["mainEntityOfPage"] = ViewData["Canonical"],
-        ["image"] = (Model.GalleryImages?.Any() == true ? Model.GalleryImages : new List<string> { Model.CoverImage })
-    };
-    var articleSchemaJson = JsonSerializer.Serialize(articleSchema);
+    var structuredDataJson = StructuredDataService.SerializeSchemas(StructuredDataService.BuildBlogDetailSchemas(Context, Model));
+}
+
+@section Head {
+    <partial name="_StructuredData" model="structuredDataJson" />
 }
 
 @section Styles {
@@ -1871,9 +1859,6 @@
     </div>
 </main>
 
-<script type="application/ld+json">
-    @Html.Raw(articleSchemaJson)
-</script>
 
 @section Scripts {
     <script>

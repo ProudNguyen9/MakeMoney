@@ -1,11 +1,17 @@
 @model WebThuMuaPheLieu.ViewModels.ContactPageViewModel
+@inject WebThuMuaPheLieu.Services.IStructuredDataService StructuredDataService
 @{
     Layout = "_HomeLayout";
     ViewData["Title"] = "Liên hệ";
+    var structuredDataJson = StructuredDataService.SerializeSchemas(StructuredDataService.BuildContactSchemas(Context, Model));
 
     string displayPhone = string.IsNullOrWhiteSpace(Model.Phone) ? "0909 123 456" : Model.Phone;
     string phoneHref = $"tel:{new string(displayPhone.Where(char.IsDigit).ToArray())}";
     string emailHref = string.IsNullOrWhiteSpace(Model.Email) ? "mailto:contact@phelieupro.vn" : $"mailto:{Model.Email}";
+}
+
+@section Head {
+    <partial name="_StructuredData" model="structuredDataJson" />
 }
 <style>
 .owner-box {

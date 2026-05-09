@@ -1,4 +1,5 @@
 ﻿ @using System.IO
+@inject WebThuMuaPheLieu.Services.IStructuredDataService StructuredDataService
 @model WebThuMuaPheLieu.ViewModels.HomeIndexViewModel
 @{
     Layout = "_HomeLayout";
@@ -6,6 +7,7 @@
     ViewData["Description"] = "Phế Liệu Thành Trung chuyên thu mua phế liệu giá cao tận nơi, hỗ trợ khảo sát nhanh, báo giá minh bạch và thanh toán linh hoạt tại TP.HCM, Bình Dương, Đồng Nai.";
     ViewData["Canonical"] = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
     ViewData["OgType"] = "website";
+    var structuredDataJson = StructuredDataService.SerializeSchemas(StructuredDataService.BuildHomeSchemas(Context));
 
     var heroBanner = Model?.Banner;
     var contactInfo = Model?.ContactInfo ?? new WebThuMuaPheLieu.helpper.ContactInfoSettings();
@@ -36,6 +38,16 @@
         new { Url = Url.Content("~/assets/img/dongnhom.jpg"), Alt = "Thu mua đồng nhôm và kim loại màu" },
         new { Url = Url.Content("~/assets/img/maymoc.jpg"), Alt = "Thu mua máy móc công nghiệp và phế liệu cơ khí" }
     };
+
+    var heroLcpImageUrl = heroImages.Any()
+        ? ResolveBannerImageUrl(heroImages[0].ImageUrl)
+        : defaultHeroImages[0].Url;
+
+    var heroLcpAlt = heroImages.Any()
+        ? (string.IsNullOrWhiteSpace(heroImages[0].Caption) ? heroLine1 : heroImages[0].Caption)
+        : defaultHeroImages[0].Alt;
+
+    var (heroLcpWidth, heroLcpHeight) = GetImageDimensions(heroLcpImageUrl, 1280, 720);
 
     string ResolveBannerImageUrl(string? imageUrl)
     {
@@ -85,10 +97,18 @@
     }
 }
 
+@section Head {
+    <partial name="_StructuredData" model="structuredDataJson" />
+    <link rel="preload"
+          as="image"
+          href="@heroLcpImageUrl"
+          fetchpriority="high" />
+}
+
 <section id="hero" class="hero scrap-hero d-flex align-items-center">
     <div class="container-fluid home-wide-shell position-relative">
         <div class="row align-items-center gy-5">
-            <div class="col-lg-5 hero-content" data-aos="fade-right" data-aos-delay="100">
+            <div class="col-lg-5 hero-content">
                 <h1 class="visually-hidden">Thu mua phế liệu giá cao tận nơi - Phế Liệu Thành Trung</h1>
                 <h2 class="hero-title"><span class="hero-title-line">@heroLine1</span><span>@heroLine2</span><span class="hero-title-line">@heroLine3</span><span class="hero-title-tail">@heroLine4</span></h2>
                 <div class="hero-actions">
@@ -96,7 +116,7 @@
                     <a href="@heroButtonSecondaryLink" class="hero-btn-secondary"><i class="bi bi-arrow-down-circle"></i> @heroButtonSecondaryText</a>
                 </div>
             </div> 
-            <div class="col-lg-7 mt-mobile-2" data-aos="fade-left" data-aos-delay="180">
+            <div class="col-lg-7 mt-mobile-2">
                 <div class="hero-visual-wrap">
                     <div class="hero-illustration">
                         <div class="hero-illustration-mask">
@@ -104,21 +124,47 @@
                                 <div class="swiper-wrapper">
                                                 @if (heroImages.Any())
                                                 {
-                                                    @foreach (var image in heroImages)
+                                                    @for (var heroIndex = 0; heroIndex < heroImages.Count; heroIndex++)
                                                     {
+                                                        var image = heroImages[heroIndex];
+                                                        var imageUrl = ResolveBannerImageUrl(image.ImageUrl);
+                                                        var imageAlt = string.IsNullOrWhiteSpace(image.Caption) ? heroLine1 : image.Caption;
+                                                        var (imageWidth, imageHeight) = heroIndex == 0
+                                                            ? (heroLcpWidth, heroLcpHeight)
+                                                            : GetImageDimensions(imageUrl, 1280, 720);
+
                                                         <div class="swiper-slide">
-                                                            <img src="@ResolveBannerImageUrl(image.ImageUrl)" alt="@(string.IsNullOrWhiteSpace(image.Caption) ? heroLine1 : image.Caption)"
-                                                                  class="img-fluid w-100">
+                                                            <img src="@imageUrl"
+                                                                 alt="@imageAlt"
+                                                                 class="img-fluid w-100"
+                                                                 width="@imageWidth"
+                                                                 height="@imageHeight"
+                                                                 loading="@(heroIndex == 0 ? "eager" : "lazy")"
+                                                                 decoding="async"
+                                                                 fetchpriority="@(heroIndex == 0 ? "high" : "auto")"
+                                                                 sizes="(max-width: 991.98px) 100vw, 58vw">
                                                         </div>
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    @foreach (var image in defaultHeroImages)
+                                                    @for (var heroIndex = 0; heroIndex < defaultHeroImages.Length; heroIndex++)
                                                     {
+                                                        var image = defaultHeroImages[heroIndex];
+                                                        var (imageWidth, imageHeight) = heroIndex == 0
+                                                            ? (heroLcpWidth, heroLcpHeight)
+                                                            : GetImageDimensions(image.Url, 1280, 720);
+
                                                         <div class="swiper-slide">
-                                                            <img src="@image.Url" alt="@image.Alt"
-                                                                 class="img-fluid w-100">
+                                                            <img src="@image.Url"
+                                                                 alt="@image.Alt"
+                                                                 class="img-fluid w-100"
+                                                                 width="@imageWidth"
+                                                                 height="@imageHeight"
+                                                                 loading="@(heroIndex == 0 ? "eager" : "lazy")"
+                                                                 decoding="async"
+                                                                 fetchpriority="@(heroIndex == 0 ? "high" : "auto")"
+                                                                 sizes="(max-width: 991.98px) 100vw, 58vw">
                                                         </div>
                                                     }
                                                 }
@@ -134,583 +180,926 @@
 
                         <main id="main">
                             <section id="materials" class="services home-card-section">
-                                <div class="container-fluid home-section-shell" data-aos="fade-up">
-                                        <style>
-                                            #materials .materials-header-row {
-                                                display: flex;
-                                                align-items: flex-start;
-                                                justify-content: space-between;
-                                                gap: 18px;
-                                                margin-bottom: 20px;
-                                            }
-
-                                            #materials .materials-header-row .section-header {
-                                                flex: 1 1 0;
-                                            }
-
-                                            #materials .materials-category-shortcut {
-                                                flex: 0 0 260px;
-                                                max-width: 260px;
-                                                align-self: center;
-                                            }
-
-                                            #materials .materials-category-shortcut-label {
-                                                display: block;
-                                                margin-bottom: 8px;
-                                                font-size: 12px;
-                                                font-weight: 700;
-                                                letter-spacing: 0.08em;
-                                                text-transform: uppercase;
-                                                color: rgba(15, 23, 42, 0.65);
-                                            }
-
-                                            #materials .materials-category-shortcut select {
-                                                width: 100%;
-                                                min-height: 44px;
-                                                border-radius: 999px;
-                                                border: 1px solid rgba(25, 135, 84, 0.18);
-                                                background: linear-gradient(135deg, #ffffff 0%, #f7fbf8 100%);
-                                                box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
-                                                padding: 10px 42px 10px 16px;
-                                                font-size: 14px;
-                                                font-weight: 600;
-                                                color: #1f2937;
-                                                appearance: none;
-                                                -webkit-appearance: none;
-                                                -moz-appearance: none;
-                                                background-image: linear-gradient(135deg, transparent 50%, #198754 50%), linear-gradient(45deg, #198754 50%, transparent 50%);
-                                                background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px);
-                                                background-size: 6px 6px, 6px 6px;
-                                                background-repeat: no-repeat;
-                                                cursor: pointer;
-                                                transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
-                                            }
-
-                                            #materials .materials-category-shortcut select:focus {
-                                                outline: none;
-                                                border-color: rgba(25, 135, 84, 0.42);
-                                                box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.12), 0 10px 24px rgba(15, 23, 42, 0.08);
-                                            }
-
-                                            #materials .materials-category-shortcut select:hover {
-                                                transform: translateY(-1px);
-                                            }
-
-                                            #materials .materials-grid-swiper {
-                                                overflow: hidden;
-                                                padding: 4px 2px 34px;
-                                            }
-
-                                            #materials .materials-grid-swiper .swiper-wrapper {
-                                                align-items: stretch;
-                                            }
-
-                                            #materials .materials-grid-swiper .swiper-slide {
-                                                height: auto;
-                                                display: flex;
-                                            }
-
-                                            #materials .materials-grid-swiper .materials-card-v2 {
-                                                width: 100%;
-                                                height: 100%;
-                                            }
-
-                                             #materials .materials-grid-swiper .materials-card-media {
-                                                 aspect-ratio: 16 / 10;
-                                                 height: auto;
-                                                 min-height: 220px;
-                                                 position: relative;
-                                                 overflow: hidden;
-                                             }
-
-                                             #materials .materials-phone-overlay {
-                                                 position: absolute;
-                                                 right: 30px;
-                                                 bottom: 12px;
-                                                 z-index: 2;
-                                                 color: #ffd54a;
-                                                 font-size: 20px;
-                                                 font-weight: 800;
-                                                 letter-spacing: 0.04em;
-                                                 text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
-                                                 pointer-events: none;
-                                             }
-
-                                            #materials .materials-products-pagination {
-                                                bottom: 0 !important;
-                                            }
-
-                                            #materials .materials-products-pagination .swiper-pagination-bullet {
-                                                width: 10px;
-                                                height: 10px;
-                                                background: rgba(15, 23, 42, 0.22);
-                                                opacity: 1;
-                                            }
-
-                                            #materials .materials-products-pagination .swiper-pagination-bullet-active {
-                                                background: #198754;
-                                            }
-
-                                            #materials .materials-card-body .readmore {
-                                                display: inline-flex;
-                                                align-items: center;
-                                                gap: 8px;
-                                                color: rgba(15, 23, 42, 0.62);
-                                                opacity: 0.72;
-                                                transition: color 0.3s ease, opacity 0.3s ease, gap 0.3s ease, text-shadow 0.3s ease;
-                                            }
-
-                                            #materials .materials-card-body .readmore i {
-                                                font-size: 15px;
-                                            }
-
-                                            #materials .materials-card-v2:hover .readmore {
-                                                color: #198754;
-                                                opacity: 1;
-                                                gap: 12px;
-                                                text-shadow: 0 0 18px rgba(25, 135, 84, 0.22);
-                                            }
-
-                                            @@media (max-width: 991.98px) {
-                                                #materials .materials-header-row {
-                                                    flex-direction: column;
-                                                    align-items: stretch;
-                                                    gap: 14px;
-                                                }
-
-                                                #materials .materials-category-shortcut {
-                                                    flex-basis: auto;
-                                                    max-width: 100%;
-                                                    width: 100%;
-                                                }
-                                            }
-
-                                            @@media (max-width: 575.98px) {
-                                                #materials .materials-category-shortcut-label {
-                                                    font-size: 11px;
-                                                    margin-bottom: 6px;
-                                                }
-
-                                                #materials .materials-category-shortcut select {
-                                                    min-height: 42px;
-                                                    padding-left: 14px;
-                                                    padding-right: 40px;
-                                                    font-size: 13px;
-                                                }
-                                            }
-                                        </style>
-
-                                        @{
-                                            var productList = Model?.Products?.ToList() ?? new List<WebThuMuaPheLieu.Models.Product>();
-                                            var materialCategoryOptions = productList
-                                                .Where(product => product.Category != null && !string.IsNullOrWhiteSpace(product.Category.Name))
-                                                .GroupBy(product => product.Category!.Name!.Trim(), StringComparer.OrdinalIgnoreCase)
-                                                .Select(group => new
-                                                {
-                                                    Name = group.First().Category!.Name!.Trim(),
-                                                    Slug = ToCategorySlug(group.First().Category!.Name!)
-                                                })
-                                                .OrderBy(item => item.Name)
-                                                .ToList();
-                                        }
-
-                                        <div class="materials-header-row">
-                                            <div class="section-header mb-0">
-                                                <h2>Thu mua tất cả các loại phế liệu</h2>
-                                                <p class="text-dart">Danh mục thu mua được trình bày rõ ràng để khách hàng dễ hình dung ngay từ đầu: chúng tôi tiếp nhận
-                                                    nhiều loại phế liệu từ dân dụng, văn phòng, cửa hàng nhỏ lẻ cho đến hàng công nghiệp số lượng lớn
-                                                    tại kho xưởng, công trình và doanh nghiệp, đồng thời hỗ trợ khảo sát tận nơi, tư vấn phân loại,
-                                                    báo giá minh bạch và thu gom nhanh gọn trong suốt quá trình thanh lý.</p>
-                                            </div>
-
-                                           
-                                        </div>
-
-                                        @if (productList.Any())
-                                        {
-                                            <div class="materials-grid-swiper swiper" data-aos="fade-up" data-aos-delay="100">
-                                                <div class="swiper-wrapper">
-                                                    @foreach (var product in productList)
-                                                    {
-                                                        var imageSequence = BuildImageSequence(product);
-                                                        var categorySlug = ToCategorySlug(product.Category?.Name);
-
-                                                        <div class="swiper-slide" data-category="@categorySlug">
-                                                            <a asp-controller="Home" asp-action="Detail" asp-route-slug="@product.Slug" asp-route-id="@product.Id"
-                                                               class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
-                                                                 <div class="materials-card-media">
-                                                                     <img src="@imageSequence[0]"
-                                                                          data-image-sequence="@string.Join("|", imageSequence)"
-                                                                          data-default-image="@imageSequence[0]"
-                                                                          alt="@product.Name"
-                                                                          class="img-fluid w-100 materials-hover-image"
-                                                                          loading="lazy">
-                                                                     <span class="materials-phone-overlay">@contactInfo.Phone</span>
-                                                                     <span class="materials-badge">
-                                                                         <i class="bi bi-@(GetCategoryIcon(product.Category?.Name))"></i>
-                                                                         @(product.Category?.Name ?? "Phế liệu")
-                                                                     </span>
-                                                                 </div>
-                                                                <div class="materials-card-body">
-                                                                    <h4 class="card-title">@product.Name</h4>
-                                                                    <p>@(product.ShortDescription ?? product.Description ?? "Đang cập nhật thông tin sản phẩm.")</p>
-                                                                    <span class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></span>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                    }
-                                                </div>
-
-                                                <div class="materials-products-pagination swiper-pagination"></div>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="col-12 text-center py-5">
-                                                <p class="text-muted">Đang cập nhật danh sách sản phẩm...</p>
-                                            </div>
-                                        }
-
-                                        <script>
-                                            document.addEventListener('DOMContentLoaded', function () {
-                                                const materialsSwiperElement = document.querySelector('.materials-grid-swiper');
-
-                                                if (materialsSwiperElement && typeof Swiper !== 'undefined') {
-                                                    const totalSlides = materialsSwiperElement.querySelectorAll('.swiper-slide').length;
-
-                                                    new Swiper(materialsSwiperElement, {
-                                                        speed: 800,
-                                                        loop: false,
-                                                        rewind: true,
-                                                        slidesPerView: 1,
-                                                        slidesPerGroup: 1,
-                                                        spaceBetween: 16,
-                                                        grabCursor: true,
-                                                        allowTouchMove: true,
-                                                        simulateTouch: true,
-                                                        touchStartPreventDefault: false,
-                                                        watchOverflow: true,
-                                                        grid: {
-                                                            rows: 2,
-                                                            fill: 'row'
-                                                        },
-                                                        autoplay: {
-                                                            delay: 5000,
-                                                            disableOnInteraction: false,
-                                                            pauseOnMouseEnter: false,
-                                                            stopOnLastSlide: false
-                                                        },
-                                                        pagination: {
-                                                            el: '.materials-products-pagination',
-                                                            clickable: true
-                                                        },
-                                                        breakpoints: {
-                                                            576: {
-                                                                slidesPerView: 2,
-                                                                spaceBetween: 18,
-                                                                grid: {
-                                                                    rows: 2,
-                                                                    fill: 'row'
-                                                                }
-                                                            },
-                                                            992: {
-                                                                slidesPerView: 3,
-                                                                spaceBetween: 20,
-                                                                grid: {
-                                                                    rows: 2,
-                                                                    fill: 'row'
-                                                                }
-                                                            },
-                                                            1200: {
-                                                                slidesPerView: 4,
-                                                                spaceBetween: 20,
-                                                             
-                                                                grid: {
-                                                                    rows: 2,
-                                                                    fill: 'row'
-                                                                }
-                                                            }
-                                                        }
-                                                    });
-                                                }
-
-                                                const materialsCategorySelect = document.getElementById('materialsCategorySelect');
-
-                                                if (materialsCategorySelect && materialsSwiperElement) {
-                                                    const slides = Array.from(materialsSwiperElement.querySelectorAll('.swiper-slide'));
-
-                                                    const applyCategoryFilter = function () {
-                                                        const selectedCategory = materialsCategorySelect.value;
-
-                                                        slides.forEach(function (slideElement) {
-                                                            const slideCategory = slideElement.getAttribute('data-category') || '';
-                                                            const shouldShow = !selectedCategory || slideCategory === selectedCategory;
-                                                            slideElement.style.display = shouldShow ? '' : 'none';
-                                                        });
-                                                    };
-
-                                                    materialsCategorySelect.addEventListener('change', applyCategoryFilter);
-                                                    applyCategoryFilter();
-                                                }
-
-                                                document.querySelectorAll('.materials-hover-image').forEach(function (imageElement) {
-                                                    const sequence = (imageElement.dataset.imageSequence || '')
-                                                        .split('|')
-                                                        .filter(Boolean);
-
-                                                    if (sequence.length <= 1) {
-                                                        return;
-                                                    }
-
-                                                    const defaultImage = imageElement.dataset.defaultImage || sequence[0];
-                                                    let intervalId = null;
-                                                    let currentIndex = 0;
-
-                                                    const startHoverRotation = function () {
-                                                        if (intervalId) {
-                                                            return;
-                                                        }
-
-                                                        currentIndex = sequence.length > 1 ? 1 : 0;
-                                                        imageElement.src = sequence[currentIndex];
-
-                                                        intervalId = setInterval(function () {
-                                                            currentIndex = (currentIndex + 1) % sequence.length;
-                                                            imageElement.src = sequence[currentIndex];
-                                                        }, 900);
-                                                    };
-
-                                                    const stopHoverRotation = function () {
-                                                        if (intervalId) {
-                                                            clearInterval(intervalId);
-                                                            intervalId = null;
-                                                        }
-
-                                                        currentIndex = 0;
-                                                        imageElement.src = defaultImage;
-                                                    };
-
-                                                    imageElement.addEventListener('mouseenter', startHoverRotation);
-                                                    imageElement.addEventListener('mouseleave', stopHoverRotation);
-                                                });
-                                            });
-                                        </script>
-
-                                        @functions {
-                                            string GetCategoryIcon(string? categoryName)
-                                            {
-                                                if (string.IsNullOrWhiteSpace(categoryName)) return "box-seam";
-
-                                                return categoryName.ToLower() switch
-                                                {
-                                                    var c when c.Contains("sắt") || c.Contains("thép") || c.Contains("kim loại") => "building",
-                                                    var c when c.Contains("đồng") || c.Contains("nhôm") || c.Contains("inox") => "gem",
-                                                    var c when c.Contains("giấy") || c.Contains("carton") => "box-seam",
-                                                    var c when c.Contains("máy") || c.Contains("điện") || c.Contains("cáp") => "cpu",
-                                                    var c when c.Contains("xưởng") || c.Contains("công nghiệp") => "gear-wide-connected",
-                                                    var c when c.Contains("dân dụng") || c.Contains("gia đình") => "house-door-fill",
-                                                    var c when c.Contains("nhựa") => "recycle",
-                                                    _ => "box-seam"
-                                                };
-                                            }
-
-                                            string ToCategorySlug(string? categoryName)
-                                            {
-                                                if (string.IsNullOrWhiteSpace(categoryName))
-                                                {
-                                                    return "tat-ca";
-                                                }
-
-                                                var normalized = categoryName.Trim().ToLowerInvariant().Normalize(System.Text.NormalizationForm.FormD);
-                                                var builder = new System.Text.StringBuilder();
-
-                                                foreach (var character in normalized)
-                                                {
-                                                    var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(character);
-
-                                                    if (unicodeCategory == System.Globalization.UnicodeCategory.NonSpacingMark)
-                                                    {
-                                                        continue;
-                                                    }
-
-                                                    var convertedCharacter = character switch
-                                                    {
-                                                        'đ' => 'd',
-                                                        _ => character
-                                                    };
-
-                                                    if (char.IsLetterOrDigit(convertedCharacter))
-                                                    {
-                                                        builder.Append(convertedCharacter);
-                                                    }
-                                                    else if (builder.Length == 0 || builder[^1] != '-')
-                                                    {
-                                                        builder.Append('-');
-                                                    }
-                                                }
-
-                                                return builder.ToString().Trim('-');
-                                            }
-
-                                            string NormalizeImagePath(string? imagePath)
-                                            {
-                                                if (string.IsNullOrWhiteSpace(imagePath))
-                                                {
-                                                    return "/assets/images/products/satdac1.jpg";
-                                                }
-
-                                                var normalized = imagePath.Replace("\\", "/").Trim();
-
-                                                if (normalized.StartsWith("~/"))
-                                                {
-                                                    return $"/{normalized[2..]}";
-                                                }
-
-                                                if (!normalized.StartsWith('/'))
-                                                {
-                                                    normalized = $"/{normalized}";
-                                                }
-
-                                                return normalized;
-                                            }
-
-                                            string NormalizeAssetPath(string? imagePath)
-                                            {
-                                                if (string.IsNullOrWhiteSpace(imagePath))
-                                                {
-                                                    return "~/assets/img/satthep.png";
-                                                }
-
-                                                var normalized = imagePath.Replace("\\", "/").Trim();
-
-                                                if (normalized.StartsWith("~/", StringComparison.Ordinal))
-                                                {
-                                                    return normalized;
-                                                }
-
-                                                if (normalized.StartsWith("/", StringComparison.Ordinal))
-                                                {
-                                                    return $"~{normalized}";
-                                                }
-
-                                                return $"~/{normalized.TrimStart('/')}";
-                                            }
-
-                                            string ResolveHeroActionLink(string? configuredLink, string phoneHref, string zaloHref, string fallback)
-                                            {
-                                                if (string.IsNullOrWhiteSpace(configuredLink))
-                                                {
-                                                    return fallback;
-                                                }
-
-                                                var normalized = configuredLink.Trim();
-                                                var normalizedLower = normalized.ToLowerInvariant();
-
-                                                if (normalizedLower.StartsWith("tel:")
-                                                    || normalizedLower.Contains("gọi")
-                                                    || normalizedLower.Contains("hotline")
-                                                    || normalizedLower.Contains("phone"))
-                                                {
-                                                    return phoneHref;
-                                                }
-
-                                                if (normalizedLower.Contains("zalo")
-                                                    || normalizedLower.StartsWith("http://zalo.me")
-                                                    || normalizedLower.StartsWith("https://zalo.me"))
-                                                {
-                                                    return zaloHref;
-                                                }
-
-                                                return normalized;
-                                            }
-
-                                            string[] BuildImageSequence(WebThuMuaPheLieu.Models.Product product)
-                                            {
-                                                var imageSequence = (product.ProductImages ?? new List<WebThuMuaPheLieu.Models.ProductImage>())
-                                                    .OrderBy(image => image.OrderIndex ?? int.MaxValue)
-                                                    .Select(image => NormalizeImagePath(image.ImageUrl))
-                                                    .Where(path => !string.IsNullOrWhiteSpace(path))
-                                                    .Distinct()
-                                                    .ToList();
-
-                                                var primaryImage = NormalizeImagePath(product.PrimaryImage);
-
-                                                if (!imageSequence.Any())
-                                                {
-                                                    imageSequence.Add(primaryImage);
-                                                }
-                                                else if (!imageSequence.Any(path => string.Equals(path, primaryImage, StringComparison.OrdinalIgnoreCase)))
-                                                {
-                                                    imageSequence.Insert(0, primaryImage);
-                                                }
-
-                                                return imageSequence.ToArray();
-                                            }
-
-                                        }
-
-                                                                                        <div class="referral-highlight" data-aos="fade-up" data-aos-delay="150">
-                                                                                            <div class="referral-highlight__content">
-                                                                                                <span class="referral-highlight__eyebrow"><i class="bi bi-cash-coin"></i> Hoa hồng cho người giới
-                                                                                                    thiệu</span>
-                                                                                                    <h3 class="referral-highlight__title">Có mối phế liệu, <strong>giới thiệu ngay</strong> - nhận hoa
-                                                                                                        hồng rõ ràng, nhanh gọn và minh bạch theo từng đơn.</h3>
-                                                                                                        <p class="referral-highlight__lead">Nếu bạn quen chủ kho, công trình, nhà xưởng, cửa hàng hoặc doanh
-                                                                                                            nghiệp có nhu cầu thanh lý phế liệu, chỉ cần gửi thông tin cho chúng tôi. Đội ngũ sẽ khảo sát
-                                                                                                            tận nơi, báo giá nhanh và chốt đơn chuyên nghiệp để bạn yên tâm giới thiệu.</p>
-                                                                                                            <div class="referral-highlight__benefits">
-                                                                                                                <div class="referral-benefit">
-                                                                                                                    <i class="bi bi-patch-check-fill"></i>
-                                                                                                                    <span>Chính sách <strong>hoa hồng hấp dẫn</strong>, trao đổi rõ trước khi triển khai.</span>
-                                                                                                                </div>
-                                                                                                                <div class="referral-benefit">
-                                                                                                                    <i class="bi bi-clock-history"></i>
-                                                                                                                    <span>Phản hồi nhanh, khảo sát sớm để không lỡ cơ hội chốt khách cho bạn.</span>
-                                                                                                                </div>
-                                                                                                                <div class="referral-benefit">
-                                                                                                                    <i class="bi bi-shield-check"></i>
-                                                                                                                    <span>Làm việc uy tín, thanh toán minh bạch để người giới thiệu an tâm lâu dài.</span>
-                                                                                                                </div>
-                                                                                                                <div class="referral-benefit">
-                                                                                                                    <i class="bi bi-people-fill"></i>
-                                                                                                                    <span>Phù hợp cho môi giới, bảo vệ, quản lý kho, thợ công trình và người có quan hệ khách
-                                                                                                                        hàng.</span>
-                                                                                                                    </div>
-                                                                                                                </div>
-                                                                                                            </div>
-
-                                                                                                            <div class="referral-highlight__aside">
-                                                                                                                <div class="referral-highlight__card">
-                                                                                                                    <span class="referral-highlight__card-label"><i class="bi bi-lightning-charge-fill"></i> Quy
-                                                                                                                        trình cực dễ</span>
-                                                                                                                        <h4>Chỉ cần gửi thông tin khách, phần còn lại để chúng tôi lo.</h4>
-                                                                                                                        <p>Bạn cung cấp số điện thoại, địa chỉ hoặc hình ảnh lô hàng. Chúng tôi chủ động liên hệ, khảo
-                                                                                                                            sát và báo giá. Khi đơn thu mua hoàn tất, hoa hồng sẽ được xác nhận rõ ràng, nhanh chóng.
-                                                                                                                        </p>
-                                                                                                                        <div class="referral-highlight__stats">
-                                                                                                                            <div class="referral-stat">
-                                                                                                                                <strong>Khảo sát tận nơi</strong>
-                                                                                                                                <span>Hỗ trợ nhanh tại TP.HCM, Bình Dương, Đồng Nai và khu vực lân cận.</span>
-                                                                                                                            </div>
-                                                                                                                            <div class="referral-stat">
-                                                                                                                                <strong>Chốt đơn minh bạch</strong>
-                                                                                                                                <span>Cân đo, báo giá và thanh toán rõ ràng để giữ uy tín cho người giới thiệu.</span>
-                                                                                                                            </div>
-                                                                                                                        </div>
-                                                                                                                    </div>
-
-                                                                                                                    <div class="referral-highlight__actions">
-                                                                                                                         <a href="@referralPhoneHref" class="referral-btn referral-btn--primary"><i
-                                                                                                                             class="bi bi-telephone-fill"></i> Gọi nhận chính sách hoa hồng</a>
-                                                                                                                             <a href="@referralZaloLink" class="referral-btn referral-btn--secondary" target="_blank" rel="noopener noreferrer"><i
-                                                                                                                                 class="bi bi-chat-dots-fill"></i> Nhắn Zalo gửi mối ngay</a>
-                                                                                                                                 <a href="@referralContactLink" class="referral-btn referral-btn--ghost"><i
-                                                                                                                                     class="bi bi-send-fill"></i> Gửi thông tin liên hệ để được tư vấn</a>
-                                                                                                                                </div>
-                                                                                                                            </div>
-                                                                                                                        </div>
-                                                                                                                    </div>
-                                                                                                                </section>
+    <div class="container-fluid home-section-shell" data-aos="fade-up">
+        <style>
+            #materials .materials-header-row {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 18px;
+                margin-bottom: 20px;
+            }
+
+            #materials .materials-header-row .section-header {
+                flex: 1 1 0;
+            }
+
+            #materials .materials-category-shortcut {
+                flex: 0 0 260px;
+                max-width: 260px;
+                align-self: center;
+            }
+
+            #materials .materials-category-shortcut-label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                color: rgba(15, 23, 42, 0.65);
+            }
+
+            #materials .materials-category-shortcut select {
+                width: 100%;
+                min-height: 44px;
+                border-radius: 999px;
+                border: 1px solid rgba(25, 135, 84, 0.18);
+                background: linear-gradient(135deg, #ffffff 0%, #f7fbf8 100%);
+                box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+                padding: 10px 42px 10px 16px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #1f2937;
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                background-image:
+                    linear-gradient(135deg, transparent 50%, #198754 50%),
+                    linear-gradient(45deg, #198754 50%, transparent 50%);
+                background-position:
+                    calc(100% - 18px) calc(50% - 3px),
+                    calc(100% - 12px) calc(50% - 3px);
+                background-size: 6px 6px, 6px 6px;
+                background-repeat: no-repeat;
+                cursor: pointer;
+                transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+            }
+
+            #materials .materials-category-shortcut select:focus {
+                outline: none;
+                border-color: rgba(25, 135, 84, 0.42);
+                box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.12), 0 10px 24px rgba(15, 23, 42, 0.08);
+            }
+
+            #materials .materials-category-shortcut select:hover {
+                transform: translateY(-1px);
+            }
+
+            #materials .materials-grid-swiper {
+                overflow: hidden;
+                padding: 4px 2px 36px;
+                cursor: grab;
+                user-select: none;
+                -webkit-user-select: none;
+                touch-action: pan-y;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            #materials .materials-grid-swiper.swiper-grabbing {
+                cursor: grabbing;
+            }
+
+            #materials .materials-grid-swiper .swiper-wrapper {
+                align-items: stretch;
+                will-change: transform;
+                transition-property: transform;
+                transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+            }
+
+            #materials .materials-grid-swiper .swiper-slide {
+                height: auto;
+                display: flex;
+                transform: translateZ(0);
+                backface-visibility: hidden;
+            }
+
+            #materials .materials-grid-swiper .materials-card-v2 {
+                width: 100%;
+                height: 100%;
+                display: flex !important;
+                flex-direction: column;
+                border-radius: 18px;
+                overflow: hidden;
+                transform: translateZ(0);
+                backface-visibility: hidden;
+            }
+
+            #materials .materials-grid-swiper .materials-card-media {
+                aspect-ratio: 16 / 10;
+                height: auto;
+                min-height: 220px;
+                position: relative;
+                overflow: hidden;
+                transform: translateZ(0);
+                backface-visibility: hidden;
+            }
+
+            #materials .materials-grid-swiper .materials-hover-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                will-change: transform;
+                transform: translateZ(0) scale(1.001);
+                backface-visibility: hidden;
+                pointer-events: none;
+                transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
+            }
+
+            #materials .materials-card-v2:hover .materials-hover-image {
+                transform: translateZ(0) scale(1.045);
+            }
+
+            #materials .materials-phone-overlay {
+                position: absolute;
+                right: 30px;
+                bottom: 12px;
+                z-index: 2;
+                color: #ffd54a;
+                font-size: 20px;
+                font-weight: 800;
+                letter-spacing: 0.04em;
+                text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+                pointer-events: none;
+            }
+
+            #materials .materials-products-pagination {
+                bottom: 0 !important;
+            }
+
+            #materials .materials-products-pagination .swiper-pagination-bullet {
+                width: 10px;
+                height: 10px;
+                background: rgba(15, 23, 42, 0.22);
+                opacity: 1;
+                transition: width 0.25s ease, border-radius 0.25s ease, background 0.25s ease;
+            }
+
+            #materials .materials-products-pagination .swiper-pagination-bullet-active {
+                width: 24px;
+                border-radius: 999px;
+                background: #198754;
+            }
+
+            #materials .materials-card-body {
+                flex: 1 1 auto;
+            }
+
+            #materials .materials-card-body .readmore {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                color: rgba(15, 23, 42, 0.62);
+                opacity: 0.72;
+                transition: color 0.3s ease, opacity 0.3s ease, gap 0.3s ease, text-shadow 0.3s ease;
+            }
+
+            #materials .materials-card-body .readmore i {
+                font-size: 15px;
+            }
+
+            #materials .materials-card-v2:hover .readmore {
+                color: #198754;
+                opacity: 1;
+                gap: 12px;
+                text-shadow: 0 0 18px rgba(25, 135, 84, 0.22);
+            }
+
+            @@media (max-width: 991.98px) {
+                #materials .materials-header-row {
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 14px;
+                }
+
+                #materials .materials-category-shortcut {
+                    flex-basis: auto;
+                    max-width: 100%;
+                    width: 100%;
+                }
+            }
+
+            @@media (max-width: 575.98px) {
+                #materials .materials-category-shortcut-label {
+                    font-size: 11px;
+                    margin-bottom: 6px;
+                }
+
+                #materials .materials-category-shortcut select {
+                    min-height: 42px;
+                    padding-left: 14px;
+                    padding-right: 40px;
+                    font-size: 13px;
+                }
+
+                #materials .materials-grid-swiper {
+                    padding-bottom: 34px;
+                }
+
+                #materials .materials-grid-swiper .materials-card-media {
+                    min-height: 190px;
+                }
+
+                #materials .materials-phone-overlay {
+                    right: 18px;
+                    bottom: 10px;
+                    font-size: 17px;
+                }
+            }
+        </style>
+
+        @{
+            var productList = Model?.Products?.ToList() ?? new List<WebThuMuaPheLieu.Models.Product>();
+            var materialCategoryOptions = productList
+                .Where(product => product.Category != null && !string.IsNullOrWhiteSpace(product.Category.Name))
+                .GroupBy(product => product.Category!.Name!.Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(group => new
+                {
+                    Name = group.First().Category!.Name!.Trim(),
+                    Slug = ToCategorySlug(group.First().Category!.Name!)
+                })
+                .OrderBy(item => item.Name)
+                .ToList();
+        }
+
+        <div class="materials-header-row">
+            <div class="section-header mb-0">
+                <h2>Thu mua tất cả các loại phế liệu</h2>
+                <p class="text-dart">
+                    Danh mục thu mua được trình bày rõ ràng để khách hàng dễ hình dung ngay từ đầu: chúng tôi tiếp nhận
+                    nhiều loại phế liệu từ dân dụng, văn phòng, cửa hàng nhỏ lẻ cho đến hàng công nghiệp số lượng lớn
+                    tại kho xưởng, công trình và doanh nghiệp, đồng thời hỗ trợ khảo sát tận nơi, tư vấn phân loại,
+                    báo giá minh bạch và thu gom nhanh gọn trong suốt quá trình thanh lý.
+                </p>
+            </div>
+        </div>
+
+        @if (productList.Any())
+        {
+            <div class="materials-grid-swiper swiper" data-aos="fade-up" data-aos-delay="100">
+                <div class="swiper-wrapper">
+                    @for (var productIndex = 0; productIndex < productList.Count; productIndex++)
+                    {
+                        var product = productList[productIndex];
+                        var imageSequence = BuildImageSequence(product);
+                        var categorySlug = ToCategorySlug(product.Category?.Name);
+                        var (productImageWidth, productImageHeight) = GetImageDimensions(imageSequence[0], 640, 400);
+
+                        <div class="swiper-slide" data-category="@categorySlug">
+                            <a asp-controller="Home"
+                               asp-action="Detail"
+                               asp-route-slug="@product.Slug"
+                               asp-route-id="@product.Id"
+                               class="card-item h-100 materials-card-v2 d-block text-decoration-none text-reset">
+                                <div class="materials-card-media">
+                                    <img src="@imageSequence[0]"
+                                         data-image-sequence="@string.Join("|", imageSequence)"
+                                         data-default-image="@imageSequence[0]"
+                                         alt="@product.Name"
+                                         class="img-fluid w-100 materials-hover-image"
+                                         width="@productImageWidth"
+                                         height="@productImageHeight"
+                                         loading="@(productIndex == 0 ? "eager" : "lazy")"
+                                         decoding="async"
+                                         fetchpriority="@(productIndex == 0 ? "high" : "low")"
+                                         sizes="(max-width: 575.98px) 100vw, (max-width: 991.98px) 50vw, 25vw">
+
+                                    <span class="materials-phone-overlay">@contactInfo.Phone</span>
+
+                                    <span class="materials-badge">
+                                        <i class="bi bi-@(GetCategoryIcon(product.Category?.Name))"></i>
+                                        @(product.Category?.Name ?? "Phế liệu")
+                                    </span>
+                                </div>
+
+                                <div class="materials-card-body">
+                                    <h4 class="card-title">@product.Name</h4>
+                                    <p>@(product.ShortDescription ?? product.Description ?? "Đang cập nhật thông tin sản phẩm.")</p>
+                                    <span class="readmore">Xem chi tiết <i class="bi bi-arrow-right"></i></span>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <div class="materials-products-pagination swiper-pagination"></div>
+            </div>
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Đang cập nhật danh sách sản phẩm...</p>
+            </div>
+        }
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const materialsSwiperElement = document.querySelector('.materials-grid-swiper');
+                let materialsSwiperInstance = null;
+
+                let isDraggingSlides = false;
+                let suppressClickUntil = 0;
+                let pointerDownX = 0;
+                let pointerDownY = 0;
+                let isPointerDownInSwiper = false;
+                let hoverRotationTimers = new WeakMap();
+
+                if (materialsSwiperElement && typeof Swiper !== 'undefined') {
+                    const totalSlides = materialsSwiperElement.querySelectorAll('.swiper-slide:not(.swiper-slide-duplicate)').length;
+
+                    materialsSwiperInstance = new Swiper(materialsSwiperElement, {
+                        speed: 520,
+
+                        loop: totalSlides > 4,
+                        rewind: false,
+                        loopAdditionalSlides: 4,
+                        loopPreventsSliding: false,
+
+                        slidesPerView: 1,
+                        slidesPerGroup: 1,
+                        spaceBetween: 16,
+
+                        grabCursor: true,
+                        allowTouchMove: true,
+                        simulateTouch: true,
+                        followFinger: true,
+
+                        freeMode: {
+                            enabled: true,
+                            momentum: true,
+                            momentumRatio: 0.5,
+                            momentumVelocityRatio: 0.72,
+                            minimumVelocity: 0.02,
+                            momentumBounce: false,
+                            sticky: true
+                        },
+                        centeredSlides: false,
+                        roundLengths: true,
+
+                        touchEventsTarget: 'container',
+                        touchRatio: 1.16,
+                        touchAngle: 28,
+                        threshold: 3,
+
+                        longSwipes: true,
+                        longSwipesRatio: 0.12,
+                        longSwipesMs: 180,
+                        shortSwipes: true,
+
+                        resistance: true,
+                        resistanceRatio: 0.9,
+
+                        preventClicks: true,
+                        preventClicksPropagation: true,
+
+                        touchStartPreventDefault: false,
+                        touchMoveStopPropagation: true,
+                        touchReleaseOnEdges: false,
+
+                        observer: true,
+                        observeParents: true,
+                        updateOnWindowResize: true,
+                        watchOverflow: true,
+
+                        autoplay: false,
+
+                        pagination: {
+                            el: '.materials-products-pagination',
+                            clickable: true
+                        },
+
+                        breakpoints: {
+                            576: {
+                                slidesPerView: 2,
+                                slidesPerGroup: 1,
+                                spaceBetween: 18
+                            },
+                            992: {
+                                slidesPerView: 3,
+                                slidesPerGroup: 1,
+                                spaceBetween: 20
+                            },
+                            1200: {
+                                slidesPerView: 4,
+                                slidesPerGroup: 1,
+                                spaceBetween: 20
+                            }
+                        },
+
+                        on: {
+                            init: function () {
+                                this.update();
+                            },
+
+                            touchStart: function () {
+                                isDraggingSlides = false;
+                                materialsSwiperElement.classList.add('swiper-grabbing');
+                            },
+
+                            sliderFirstMove: function () {
+                                isDraggingSlides = true;
+                                suppressClickUntil = Date.now() + 500;
+                                materialsSwiperElement.classList.add('swiper-grabbing');
+                            },
+
+                            touchEnd: function () {
+                                materialsSwiperElement.classList.remove('swiper-grabbing');
+                                document.body.classList.remove('swiper-grabbing');
+
+                                suppressClickUntil = Date.now() + (isDraggingSlides ? 500 : 0);
+
+                                setTimeout(function () {
+                                    isDraggingSlides = false;
+                                }, 60);
+                            },
+
+                            transitionEnd: function () {
+                                materialsSwiperElement.classList.remove('swiper-grabbing');
+                                document.body.classList.remove('swiper-grabbing');
+                            },
+
+                            resize: function () {
+                                this.update();
+                            }
+                        }
+                    });
+
+                    const forceReleaseDraggingState = function () {
+                        materialsSwiperElement.classList.remove('swiper-grabbing');
+                        document.body.classList.remove('swiper-grabbing');
+
+                        if (materialsSwiperInstance) {
+                            materialsSwiperInstance.allowTouchMove = true;
+                            materialsSwiperInstance.allowClick = true;
+                            materialsSwiperInstance.update();
+                        }
+
+                        setTimeout(function () {
+                            isDraggingSlides = false;
+                        }, 60);
+                    };
+
+                    [
+                        'mouseup',
+                        'pointerup',
+                        'pointercancel',
+                        'touchend',
+                        'touchcancel',
+                        'dragend',
+                        'mouseleave',
+                        'blur'
+                    ].forEach(function (eventName) {
+                        window.addEventListener(eventName, forceReleaseDraggingState, { passive: true });
+                    });
+
+                    [
+                        'mouseup',
+                        'pointerup',
+                        'pointercancel',
+                        'touchend',
+                        'touchcancel',
+                        'mouseleave',
+                        'lostpointercapture'
+                    ].forEach(function (eventName) {
+                        materialsSwiperElement.addEventListener(eventName, forceReleaseDraggingState, { passive: true });
+                    });
+
+                    materialsSwiperElement.addEventListener('pointerdown', function (event) {
+                        pointerDownX = event.clientX;
+                        pointerDownY = event.clientY;
+                        isDraggingSlides = false;
+                        isPointerDownInSwiper = true;
+
+                        hoverRotationTimers = hoverRotationTimers || new WeakMap();
+                        materialsSwiperElement.querySelectorAll('.materials-hover-image').forEach(function (img) {
+                            const timer = hoverRotationTimers.get(img);
+                            if (timer) {
+                                clearInterval(timer);
+                                hoverRotationTimers.delete(img);
+                            }
+                            if (img.dataset.defaultImage) {
+                                img.src = img.dataset.defaultImage;
+                            }
+                        });
+                    }, { passive: true });
+
+                    ['pointerup', 'pointercancel', 'touchend', 'touchcancel', 'lostpointercapture', 'mouseup'].forEach(function (eventName) {
+                        materialsSwiperElement.addEventListener(eventName, function () {
+                            isPointerDownInSwiper = false;
+                        }, { passive: true });
+                    });
+
+                    materialsSwiperElement.addEventListener('pointermove', function (event) {
+                        const dx = Math.abs(event.clientX - pointerDownX);
+                        const dy = Math.abs(event.clientY - pointerDownY);
+
+                        if (dx > 4 && dx > dy) {
+                            isDraggingSlides = true;
+                            suppressClickUntil = Date.now() + 500;
+                        }
+                    }, { passive: true });
+
+                    materialsSwiperElement.querySelectorAll('img, a').forEach(function (node) {
+                        node.setAttribute('draggable', 'false');
+
+                        node.addEventListener('dragstart', function (event) {
+                            event.preventDefault();
+                        });
+                    });
+
+                    materialsSwiperElement.querySelectorAll('a.materials-card-v2').forEach(function (linkElement) {
+                        linkElement.addEventListener('click', function (event) {
+                            if (isDraggingSlides || Date.now() < suppressClickUntil) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                        }, true);
+                    });
+
+                    document.addEventListener('click', function (event) {
+                        const target = event.target;
+
+                        if (!target || !(target instanceof Element)) {
+                            return;
+                        }
+
+                        const inMaterialsCard = target.closest('#materials a.materials-card-v2');
+
+                        if (!inMaterialsCard) {
+                            return;
+                        }
+
+                        if (isDraggingSlides || Date.now() < suppressClickUntil) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                    }, true);
+                }
+
+                const materialsCategorySelect = document.getElementById('materialsCategorySelect');
+
+                if (materialsCategorySelect && materialsSwiperElement) {
+                    const slides = Array.from(materialsSwiperElement.querySelectorAll('.swiper-slide'));
+
+                    const applyCategoryFilter = function () {
+                        const selectedCategory = materialsCategorySelect.value;
+
+                        slides.forEach(function (slideElement) {
+                            const slideCategory = slideElement.getAttribute('data-category') || '';
+                            const shouldShow = !selectedCategory || slideCategory === selectedCategory;
+
+                            slideElement.style.display = shouldShow ? '' : 'none';
+                        });
+
+                        if (materialsSwiperInstance) {
+                            materialsSwiperInstance.update();
+
+                            if (materialsSwiperInstance.params.loop && typeof materialsSwiperInstance.slideToLoop === 'function') {
+                                materialsSwiperInstance.slideToLoop(0, 0);
+                            } else {
+                                materialsSwiperInstance.slideTo(0, 0);
+                            }
+                        }
+                    };
+
+                    materialsCategorySelect.addEventListener('change', applyCategoryFilter);
+                    applyCategoryFilter();
+                }
+
+                document.querySelectorAll('.materials-hover-image').forEach(function (imageElement) {
+                    const sequence = (imageElement.dataset.imageSequence || '')
+                        .split('|')
+                        .filter(Boolean);
+
+                    if (sequence.length <= 1) {
+                        return;
+                    }
+
+                    const defaultImage = imageElement.dataset.defaultImage || sequence[0];
+                    let currentIndex = 0;
+
+                    const stopHoverRotation = function () {
+                        const oldTimer = hoverRotationTimers.get(imageElement);
+
+                        if (oldTimer) {
+                            clearInterval(oldTimer);
+                            hoverRotationTimers.delete(imageElement);
+                        }
+
+                        currentIndex = 0;
+                        imageElement.src = defaultImage;
+                    };
+
+                    const startHoverRotation = function () {
+                        if (hoverRotationTimers.get(imageElement)) {
+                            return;
+                        }
+
+                        currentIndex = sequence.length > 1 ? 1 : 0;
+                        imageElement.src = sequence[currentIndex];
+
+                        const timer = setInterval(function () {
+                            currentIndex = (currentIndex + 1) % sequence.length;
+                            imageElement.src = sequence[currentIndex];
+                        }, 950);
+
+                        hoverRotationTimers.set(imageElement, timer);
+                    };
+
+                    imageElement.addEventListener('mouseenter', function () {
+                        if (isDraggingSlides || Date.now() < suppressClickUntil) {
+                            return;
+                        }
+
+                        startHoverRotation();
+                    });
+
+                    imageElement.addEventListener('mouseleave', stopHoverRotation);
+                    imageElement.addEventListener('touchstart', stopHoverRotation, { passive: true });
+                    imageElement.addEventListener('pointerdown', stopHoverRotation, { passive: true });
+                });
+            });
+        </script>
+
+        @functions {
+            string GetCategoryIcon(string? categoryName)
+            {
+                if (string.IsNullOrWhiteSpace(categoryName)) return "box-seam";
+
+                return categoryName.ToLower() switch
+                {
+                    var c when c.Contains("sắt") || c.Contains("thép") || c.Contains("kim loại") => "building",
+                    var c when c.Contains("đồng") || c.Contains("nhôm") || c.Contains("inox") => "gem",
+                    var c when c.Contains("giấy") || c.Contains("carton") => "box-seam",
+                    var c when c.Contains("máy") || c.Contains("điện") || c.Contains("cáp") => "cpu",
+                    var c when c.Contains("xưởng") || c.Contains("công nghiệp") => "gear-wide-connected",
+                    var c when c.Contains("dân dụng") || c.Contains("gia đình") => "house-door-fill",
+                    var c when c.Contains("nhựa") => "recycle",
+                    _ => "box-seam"
+                };
+            }
+
+            string ToCategorySlug(string? categoryName)
+            {
+                if (string.IsNullOrWhiteSpace(categoryName))
+                {
+                    return "tat-ca";
+                }
+
+                var normalized = categoryName.Trim().ToLowerInvariant().Normalize(System.Text.NormalizationForm.FormD);
+                var builder = new System.Text.StringBuilder();
+
+                foreach (var character in normalized)
+                {
+                    var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(character);
+
+                    if (unicodeCategory == System.Globalization.UnicodeCategory.NonSpacingMark)
+                    {
+                        continue;
+                    }
+
+                    var convertedCharacter = character switch
+                    {
+                        'đ' => 'd',
+                        _ => character
+                    };
+
+                    if (char.IsLetterOrDigit(convertedCharacter))
+                    {
+                        builder.Append(convertedCharacter);
+                    }
+                    else if (builder.Length == 0 || builder[^1] != '-')
+                    {
+                        builder.Append('-');
+                    }
+                }
+
+                return builder.ToString().Trim('-');
+            }
+
+            string NormalizeImagePath(string? imagePath)
+            {
+                if (string.IsNullOrWhiteSpace(imagePath))
+                {
+                    return "/assets/images/products/satdac1.jpg";
+                }
+
+                var normalized = imagePath.Replace("\\", "/").Trim();
+
+                if (normalized.StartsWith("~/"))
+                {
+                    return $"/{normalized[2..]}";
+                }
+
+                if (!normalized.StartsWith('/'))
+                {
+                    normalized = $"/{normalized}";
+                }
+
+                return normalized;
+            }
+
+            string NormalizeAssetPath(string? imagePath)
+            {
+                if (string.IsNullOrWhiteSpace(imagePath))
+                {
+                    return "~/assets/img/satthep.png";
+                }
+
+                var normalized = imagePath.Replace("\\", "/").Trim();
+
+                if (normalized.StartsWith("~/", StringComparison.Ordinal))
+                {
+                    return normalized;
+                }
+
+                if (normalized.StartsWith("/", StringComparison.Ordinal))
+                {
+                    return $"~{normalized}";
+                }
+
+                return $"~/{normalized.TrimStart('/')}";
+            }
+
+            string ResolveHeroActionLink(string? configuredLink, string phoneHref, string zaloHref, string fallback)
+            {
+                if (string.IsNullOrWhiteSpace(configuredLink))
+                {
+                    return fallback;
+                }
+
+                var normalized = configuredLink.Trim();
+                var normalizedLower = normalized.ToLowerInvariant();
+
+                if (normalizedLower.StartsWith("tel:")
+                    || normalizedLower.Contains("gọi")
+                    || normalizedLower.Contains("hotline")
+                    || normalizedLower.Contains("phone"))
+                {
+                    return phoneHref;
+                }
+
+                if (normalizedLower.Contains("zalo")
+                    || normalizedLower.StartsWith("http://zalo.me")
+                    || normalizedLower.StartsWith("https://zalo.me"))
+                {
+                    return zaloHref;
+                }
+
+                return normalized;
+            }
+
+            (int Width, int Height) GetImageDimensions(string imageUrl, int fallbackWidth, int fallbackHeight)
+            {
+                if (string.IsNullOrWhiteSpace(imageUrl))
+                {
+                    return (fallbackWidth, fallbackHeight);
+                }
+
+                var normalized = imageUrl.Split('?')[0].Replace("\\", "/").Trim();
+
+                if (normalized.StartsWith("~/", StringComparison.Ordinal))
+                {
+                    normalized = normalized[2..];
+                }
+                else if (normalized.StartsWith("/", StringComparison.Ordinal))
+                {
+                    normalized = normalized[1..];
+                }
+
+                var physicalPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", normalized.Replace('/', System.IO.Path.DirectorySeparatorChar));
+
+                if (!System.IO.File.Exists(physicalPath))
+                {
+                    return (fallbackWidth, fallbackHeight);
+                }
+
+                try
+                {
+                    var imageInfo = SixLabors.ImageSharp.Image.Identify(physicalPath);
+                    if (imageInfo is null || imageInfo.Width <= 0 || imageInfo.Height <= 0)
+                    {
+                        return (fallbackWidth, fallbackHeight);
+                    }
+
+                    return (imageInfo.Width, imageInfo.Height);
+                }
+                catch
+                {
+                    return (fallbackWidth, fallbackHeight);
+                }
+            }
+
+            string[] BuildImageSequence(WebThuMuaPheLieu.Models.Product product)
+            {
+                var imageSequence = (product.ProductImages ?? new List<WebThuMuaPheLieu.Models.ProductImage>())
+                    .OrderBy(image => image.OrderIndex ?? int.MaxValue)
+                    .Select(image => NormalizeImagePath(image.ImageUrl))
+                    .Where(path => !string.IsNullOrWhiteSpace(path))
+                    .Distinct()
+                    .ToList();
+
+                var primaryImage = NormalizeImagePath(product.PrimaryImage);
+
+                if (!imageSequence.Any())
+                {
+                    imageSequence.Add(primaryImage);
+                }
+                else if (!imageSequence.Any(path => string.Equals(path, primaryImage, StringComparison.OrdinalIgnoreCase)))
+                {
+                    imageSequence.Insert(0, primaryImage);
+                }
+
+                return imageSequence.ToArray();
+            }
+        }
+
+        <div class="referral-highlight" data-aos="fade-up" data-aos-delay="150">
+            <div class="referral-highlight__content">
+                <span class="referral-highlight__eyebrow">
+                    <i class="bi bi-cash-coin"></i> Hoa hồng cho người giới thiệu
+                </span>
+
+                <h3 class="referral-highlight__title">
+                    Có mối phế liệu, <strong>giới thiệu ngay</strong> - nhận hoa
+                    hồng rõ ràng, nhanh gọn và minh bạch theo từng đơn.
+                </h3>
+
+                <p class="referral-highlight__lead">
+                    Nếu bạn quen chủ kho, công trình, nhà xưởng, cửa hàng hoặc doanh
+                    nghiệp có nhu cầu thanh lý phế liệu, chỉ cần gửi thông tin cho chúng tôi. Đội ngũ sẽ khảo sát
+                    tận nơi, báo giá nhanh và chốt đơn chuyên nghiệp để bạn yên tâm giới thiệu.
+                </p>
+
+                <div class="referral-highlight__benefits">
+                    <div class="referral-benefit">
+                        <i class="bi bi-patch-check-fill"></i>
+                        <span>Chính sách <strong>hoa hồng hấp dẫn</strong>, trao đổi rõ trước khi triển khai.</span>
+                    </div>
+
+                    <div class="referral-benefit">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Phản hồi nhanh, khảo sát sớm để không lỡ cơ hội chốt khách cho bạn.</span>
+                    </div>
+
+                    <div class="referral-benefit">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Làm việc uy tín, thanh toán minh bạch để người giới thiệu an tâm lâu dài.</span>
+                    </div>
+
+                    <div class="referral-benefit">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Phù hợp cho môi giới, bảo vệ, quản lý kho, thợ công trình và người có quan hệ khách hàng.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="referral-highlight__aside">
+                <div class="referral-highlight__card">
+                    <span class="referral-highlight__card-label">
+                        <i class="bi bi-lightning-charge-fill"></i> Quy trình cực dễ
+                    </span>
+
+                    <h4>Chỉ cần gửi thông tin khách, phần còn lại để chúng tôi lo.</h4>
+
+                    <p>
+                        Bạn cung cấp số điện thoại, địa chỉ hoặc hình ảnh lô hàng. Chúng tôi chủ động liên hệ, khảo
+                        sát và báo giá. Khi đơn thu mua hoàn tất, hoa hồng sẽ được xác nhận rõ ràng, nhanh chóng.
+                    </p>
+
+                    <div class="referral-highlight__stats">
+                        <div class="referral-stat">
+                            <strong>Khảo sát tận nơi</strong>
+                            <span>Hỗ trợ nhanh tại TP.HCM, Bình Dương, Đồng Nai và khu vực lân cận.</span>
+                        </div>
+
+                        <div class="referral-stat">
+                            <strong>Chốt đơn minh bạch</strong>
+                            <span>Cân đo, báo giá và thanh toán rõ ràng để giữ uy tín cho người giới thiệu.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="referral-highlight__actions">
+                    <a href="@referralPhoneHref" class="referral-btn referral-btn--primary">
+                        <i class="bi bi-telephone-fill"></i> Gọi nhận chính sách hoa hồng
+                    </a>
+
+                    <a href="@referralZaloLink"
+                       class="referral-btn referral-btn--secondary"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        <i class="bi bi-chat-dots-fill"></i> Nhắn Zalo gửi mối ngay
+                    </a>
+
+                    <a href="@referralContactLink" class="referral-btn referral-btn--ghost">
+                        <i class="bi bi-send-fill"></i> Gửi thông tin liên hệ để được tư vấn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
                                                                                                                 @await Component.InvokeAsync("RecentNewsSectionComponent")
 
@@ -811,3 +1200,4 @@
 
                                                                                                                                                                                                                                     @await Component.InvokeAsync("ScrapPurchaseServicesSectionComponent")
                                                                                                                                                                                                                                                                                     </main>
+

@@ -310,19 +310,37 @@
                         <div class="admin-form-grid admin-form-grid--2">
                             <label class="admin-field">
                                 <span>Tên sản phẩm *</span>
-                                <input asp-for="Editor.Name" type="text" placeholder="Ví dụ: Đồng đỏ loại 1" />
+                                <input asp-for="Editor.Name" type="text" maxlength="255" placeholder="Ví dụ: Đồng đỏ loại 1" />
                             </label>
                             <label class="admin-field">
                                 <span>Slug</span>
-                                <input asp-for="Editor.Slug" type="text" placeholder="Tự tạo nếu để trống" />
+                                <input asp-for="Editor.Slug" type="text" maxlength="255" placeholder="Tự tạo nếu để trống" />
                             </label>
                             <label class="admin-field admin-field--full">
                                 <span>Mô tả ngắn</span>
-                                <textarea asp-for="Editor.ShortDescription" rows="3" placeholder="Tóm tắt ngắn gọn để hiển thị trong danh sách"></textarea>
+                                <textarea asp-for="Editor.ShortDescription" rows="3" maxlength="1000" placeholder="Tóm tắt ngắn gọn để hiển thị trong danh sách"></textarea>
                             </label>
                             <label class="admin-field admin-field--full">
                                 <span>Mô tả chi tiết</span>
-                                <textarea asp-for="Editor.Description" rows="5" placeholder="Thông tin chi tiết về sản phẩm"></textarea>
+                                <div class="posts-rich-editor-shell is-loading" data-product-rich-editor-shell>
+                                    <div class="posts-rich-editor-toolbar">
+                                        <strong>Soạn mô tả chi tiết như Word</strong>
+                                        <span data-product-rich-editor-status>Đang tải trình soạn thảo trực quan...</span>
+                                    </div>
+                                    <div class="posts-editor-capabilities" aria-label="Tính năng trình soạn thảo mô tả sản phẩm">
+                                        <span>H1 · H2 · H3</span>
+                                        <span>In đậm / in nghiêng</span>
+                                        <span>Danh sách</span>
+                                        <span>Chèn link</span>
+                                        <span>Chèn ảnh trực tiếp</span>
+                                    </div>
+                                    <textarea asp-for="Editor.Description"
+                                              rows="5"
+                                              maxlength="20000"
+                                              class="posts-textarea posts-textarea--editor"
+                                              placeholder="Thông tin chi tiết về sản phẩm"
+                                              data-product-rich-editor></textarea>
+                                </div>
                             </label>
                         </div>
                     </div>
@@ -388,7 +406,7 @@
                         <label class="admin-upload-dropzone" id="product-upload-dropzone">
                             <input asp-for="Editor.UploadedImages" id="product-upload-input" type="file" accept=".jpg,.jpeg,.png,.webp" multiple />
                             <span class="admin-upload-dropzone__title">Kéo & thả nhiều ảnh vào đây</span>
-                            <span class="admin-upload-dropzone__hint">Hoặc bấm để chọn ảnh. Tên file sẽ tự đổi theo tên sản phẩm không dấu và số thứ tự 1, 2, 3...</span>
+                            <span class="admin-upload-dropzone__hint">Hoặc bấm để chọn ảnh. Tối đa 10 ảnh/sản phẩm, mỗi ảnh ≤ 5MB, tổng mỗi lần upload ≤ 20MB.</span>
                         </label>
 
                         <div class="admin-upload-preview" id="product-upload-preview"></div>
@@ -1317,11 +1335,15 @@
 }
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
         (() => {
             const dropzone = document.getElementById('product-upload-dropzone');
             const input = document.getElementById('product-upload-input');
             const preview = document.getElementById('product-upload-preview');
+            const productDescriptionTextarea = document.querySelector('[data-product-rich-editor]');
+            const productRichEditorShell = document.querySelector('[data-product-rich-editor-shell]');
+            const productRichEditorStatus = document.querySelector('[data-product-rich-editor-status]');
 
             if (!dropzone || !input || !preview) {
                 return;
@@ -1341,7 +1363,48 @@
                 });
             };
 
-            input.addEventListener('change', () => renderFiles(input.files));
+            const validateProductFiles = (files) => {
+                const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+                const maxEach = 5 * 1024 * 1024;
+                const maxTotal = 20 * 1024 * 1024;
+                const maxCount = 10;
+
+                const selected = Array.from(files || []);
+                if (selected.length > maxCount) {
+                    alert('Tối đa 10 ảnh cho mỗi lần chọn.');
+                    return false;
+                }
+
+                const total = selected.reduce((sum, file) => sum + (file.size || 0), 0);
+                if (total > maxTotal) {
+                    alert('Tổng dung lượng ảnh không được vượt quá 20MB.');
+                    return false;
+                }
+
+                for (const file of selected) {
+                    if (!allowedTypes.has(file.type)) {
+                        alert(`File ${file.name} không đúng định dạng JPG/PNG/WEBP.`);
+                        return false;
+                    }
+
+                    if ((file.size || 0) > maxEach) {
+                        alert(`File ${file.name} vượt quá 5MB.`);
+                        return false;
+                    }
+                }
+
+                return true;
+            };
+
+            input.addEventListener('change', () => {
+                if (!validateProductFiles(input.files)) {
+                    input.value = '';
+                    preview.innerHTML = '';
+                    return;
+                }
+
+                renderFiles(input.files);
+            });
 
             ['dragenter', 'dragover'].forEach((eventName) => {
                 dropzone.addEventListener(eventName, (event) => {
@@ -1363,9 +1426,238 @@
                     return;
                 }
 
+                if (!validateProductFiles(files)) {
+                    return;
+                }
+
                 input.files = files;
                 renderFiles(files);
             });
+
+            const showProductEditorStatus = (message, tone) => {
+                if (!productRichEditorShell || !productRichEditorStatus) {
+                    return;
+                }
+
+                productRichEditorStatus.textContent = message;
+                productRichEditorShell.classList.remove('is-loading', 'is-ready', 'has-error');
+
+                if (tone === 'ready') {
+                    productRichEditorShell.classList.add('is-ready');
+                } else if (tone === 'error') {
+                    productRichEditorShell.classList.add('has-error');
+                }
+            };
+
+            const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Không thể đọc file ảnh.'));
+                reader.readAsDataURL(file);
+            });
+
+            const loadImageFromBlob = (blob) => new Promise((resolve, reject) => {
+                const objectUrl = URL.createObjectURL(blob);
+                const image = new Image();
+
+                image.onload = () => {
+                    URL.revokeObjectURL(objectUrl);
+                    resolve(image);
+                };
+
+                image.onerror = () => {
+                    URL.revokeObjectURL(objectUrl);
+                    reject(new Error('Không thể đọc kích thước ảnh.'));
+                };
+
+                image.src = objectUrl;
+            });
+
+            const canvasToBlob = (canvas, mimeType, quality) => new Promise((resolve, reject) => {
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        reject(new Error('Không thể nén ảnh.'));
+                        return;
+                    }
+
+                    resolve(blob);
+                }, mimeType, quality);
+            });
+
+            const optimizeInlineImage = async (fileOrBlob) => {
+                const maxWidth = 1600;
+                const maxHeight = 1600;
+                const targetBytes = 200 * 1024;
+                const minBytes = 100 * 1024;
+                const sourceBlob = fileOrBlob;
+
+                if (!sourceBlob || !sourceBlob.type || !sourceBlob.type.startsWith('image/')) {
+                    return fileOrBlob;
+                }
+
+                const image = await loadImageFromBlob(sourceBlob);
+                const width = image.naturalWidth || image.width;
+                const height = image.naturalHeight || image.height;
+                const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+                const targetWidth = Math.max(1, Math.round(width * ratio));
+                const targetHeight = Math.max(1, Math.round(height * ratio));
+
+                const canvas = document.createElement('canvas');
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+
+                const context = canvas.getContext('2d', { alpha: false });
+                context.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+                const supportsWebp = !!document.createElement('canvas').toDataURL('image/webp').match('data:image/webp');
+                const outputType = supportsWebp ? 'image/webp' : 'image/jpeg';
+                const qualityCandidates = [0.82, 0.76, 0.7, 0.64, 0.58];
+
+                let bestBlob = null;
+
+                for (let i = 0; i < qualityCandidates.length; i++) {
+                    const candidate = await canvasToBlob(canvas, outputType, qualityCandidates[i]);
+                    bestBlob = candidate;
+
+                    if (candidate.size <= targetBytes) {
+                        if (candidate.size < minBytes && i > 0) {
+                            continue;
+                        }
+
+                        break;
+                    }
+                }
+
+                if (!bestBlob || bestBlob.size >= sourceBlob.size) {
+                    return sourceBlob;
+                }
+
+                return bestBlob;
+            };
+
+            const pickInlineImage = (callback) => {
+                const picker = document.createElement('input');
+                picker.type = 'file';
+                picker.accept = 'image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp';
+
+                picker.addEventListener('change', () => {
+                    const file = picker.files && picker.files[0] ? picker.files[0] : null;
+                    if (!file) {
+                        return;
+                    }
+
+                    showProductEditorStatus('Đang tối ưu ảnh trước khi chèn...', 'ready');
+
+                    optimizeInlineImage(file)
+                        .then((optimizedBlob) => readFileAsDataUrl(optimizedBlob))
+                        .then((dataUrl) => {
+                            callback(dataUrl, file);
+                            showProductEditorStatus('Ảnh đã được tối ưu và chèn vào mô tả.', 'ready');
+                        })
+                        .catch(() => {
+                            showProductEditorStatus('Không thể chèn ảnh vừa chọn. Vui lòng thử lại.', 'error');
+                        });
+                });
+
+                picker.click();
+            };
+
+            const initializeProductRichEditor = () => {
+                if (!productDescriptionTextarea) {
+                    return;
+                }
+
+                if (typeof tinymce === 'undefined') {
+                    showProductEditorStatus('Không tải được trình soạn thảo trực quan. Hệ thống đang dùng ô nhập mặc định.', 'error');
+                    return;
+                }
+
+                tinymce.init({
+                    target: productDescriptionTextarea,
+                    promotion: false,
+                    branding: false,
+                    menubar: 'file edit view insert format tools table help',
+                    plugins: 'autolink autoresize charmap code fullscreen image link lists table wordcount',
+                    toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | removeformat code fullscreen',
+                    toolbar_sticky: true,
+                    min_height: 360,
+                    autoresize_bottom_margin: 20,
+                    block_formats: 'Đoạn văn=p; Tiêu đề 1=h1; Tiêu đề 2=h2; Tiêu đề 3=h3',
+                    contextmenu: 'undo redo | bold italic | link image table',
+                    paste_data_images: false,
+                    automatic_uploads: true,
+                    image_title: true,
+                    image_caption: true,
+                    images_file_types: 'jpg,jpeg,png,webp',
+                    file_picker_types: 'image',
+                    file_picker_callback: function (callback, value, meta) {
+                        if (!meta || meta.filetype !== 'image') {
+                            return;
+                        }
+
+                        pickInlineImage(function (dataUrl, file) {
+                            callback(dataUrl, { alt: file.name });
+                        });
+                    },
+                    images_upload_handler: function (blobInfo, progress) {
+                        return new Promise(function (resolve, reject) {
+                            optimizeInlineImage(blobInfo.blob())
+                                .then(function (optimizedBlob) {
+                                    const formData = new FormData();
+                                    const extension = optimizedBlob.type === 'image/png'
+                                        ? '.png'
+                                        : optimizedBlob.type === 'image/webp'
+                                            ? '.webp'
+                                            : '.jpg';
+                                    const fileName = `product-inline-${Date.now()}${extension}`;
+                                    formData.append('file', optimizedBlob, fileName);
+
+                                    return fetch('/admin/products/upload-inline-image', {
+                                        method: 'POST',
+                                        body: formData,
+                                        headers: {
+                                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                                        }
+                                    });
+                                })
+                                .then(function (response) {
+                                    if (!response.ok) {
+                                        throw new Error('Upload ảnh thất bại.');
+                                    }
+
+                                    return response.json();
+                                })
+                                .then(function (json) {
+                                    if (!json || !json.success || !json.url) {
+                                        throw new Error(json?.message || 'Không nhận được URL ảnh hợp lệ.');
+                                    }
+
+                                    showProductEditorStatus('Ảnh đã được upload lên server và chèn bằng URL.', 'ready');
+                                    if (typeof progress === 'function') {
+                                        progress(100);
+                                    }
+
+                                    resolve(json.url);
+                                })
+                                .catch(function (error) {
+                                    reject(error?.message || 'Không thể xử lý ảnh để chèn vào mô tả sản phẩm.');
+                                });
+                        });
+                    },
+                    content_style: 'body { font-family: "Plus Jakarta Sans", Arial, sans-serif; font-size: 16px; line-height: 1.8; color: #1f2937; padding: 18px 22px; } img { max-width: 100%; height: auto; } figure { margin: 1.6rem 0; }',
+                    setup: function (editor) {
+                        editor.on('init', function () {
+                            showProductEditorStatus('Trình soạn thảo đã sẵn sàng. Bạn có thể viết mô tả như Word.', 'ready');
+                        });
+
+                        editor.on('change input undo redo SetContent', function () {
+                            editor.save();
+                        });
+                    }
+                });
+            };
+
+            initializeProductRichEditor();
         })();
     </script>
 }

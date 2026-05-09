@@ -1,6 +1,6 @@
 @inject WebThuMuaPheLieu.helpper.IContactInfoHelper ContactInfoHelper
+@inject WebThuMuaPheLieu.Services.IStructuredDataService StructuredDataService
 @model WebThuMuaPheLieu.ViewModels.ProductDetailViewModel
-@using System.Text.Json
 @{
   Layout = "_HomeLayout";
   ViewData["BodyClass"] = "home-detail-page";
@@ -55,26 +55,7 @@
   ViewData["Description"] = shortDescription;
   ViewData["Canonical"] = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}";
   ViewData["OgType"] = "product";
-
-  var productSchema = new Dictionary<string, object?>
-  {
-    ["@context"] = "https://schema.org",
-    ["@type"] = "Product",
-    ["name"] = heroTitle,
-    ["description"] = shortDescription,
-    ["image"] = galleryImages.Select(img => NormalizeAssetUrl(img.ImageUrl)).DefaultIfEmpty(primaryImage).ToList(),
-    ["sku"] = Model.Product.Id.ToString(),
-    ["category"] = Model.Category?.Name,
-    ["url"] = ViewData["Canonical"],
-    ["offers"] = new Dictionary<string, object?>
-    {
-      ["@type"] = "Offer",
-      ["priceCurrency"] = "VND",
-      ["price"] = Model.Product.PriceValue,
-      ["availability"] = "https://schema.org/InStock"
-    }
-  };
-  var productSchemaJson = JsonSerializer.Serialize(productSchema);
+  var structuredDataJson = StructuredDataService.SerializeSchemas(StructuredDataService.BuildProductDetailSchemas(Context, Model));
   var formattedPrice = !string.IsNullOrWhiteSpace(Model.Product.PriceLabel)
       ? Model.Product.PriceLabel
       : (Model.Product.PriceValue.HasValue
@@ -127,6 +108,10 @@
     trendIcon = "schedule";
     trendText = "Giá mới nhất đã được cập nhật";
   }
+}
+
+@section Head {
+  <partial name="_StructuredData" model="structuredDataJson" />
 }
 @section Styles {
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap"
@@ -1376,6 +1361,3 @@
                                     </section>
                                   </main>
 
-<script type="application/ld+json">
-  @Html.Raw(productSchemaJson)
-</script>

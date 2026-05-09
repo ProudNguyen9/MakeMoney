@@ -2,15 +2,46 @@
 @using WebThuMuaPheLieu.helpper
 @inject IContactInfoHelper ContactInfoHelper
 @inject WebThuMuaPheLieu.Models.AppDbContext DbContext
+
 @{
     var contact = await ContactInfoHelper.GetContactInfoAsync();
-    var footerPhone = !string.IsNullOrWhiteSpace(contact.Phone) ? contact.Phone : "0909 686 889";
+
+    var footerPhone = !string.IsNullOrWhiteSpace(contact.Phone)
+        ? contact.Phone
+        : "0909 686 889";
+
     var footerPhoneDigits = new string(footerPhone.Where(char.IsDigit).ToArray());
-    var footerPhoneHref = string.IsNullOrWhiteSpace(footerPhoneDigits) ? "tel:0909686889" : $"tel:{footerPhoneDigits}";
-    var footerEmail = !string.IsNullOrWhiteSpace(contact.Gmail) ? contact.Gmail : "info@phelieuthanhphat.vn";
-    var footerAddress = !string.IsNullOrWhiteSpace(contact.Address) ? contact.Address : "88 Quốc lộ 1A, P. An Phú Đông, Quận 12, TP. Hồ Chí Minh";
-    var facebookLink = string.IsNullOrWhiteSpace(contact.Facebook) ? "#" : (contact.Facebook.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Facebook.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Facebook : $"https://{contact.Facebook.TrimStart('/')}");
-    var zaloLink = string.IsNullOrWhiteSpace(contact.Zalo) ? "#" : (contact.Zalo.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || contact.Zalo.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ? contact.Zalo : $"https://zalo.me/{contact.Zalo.TrimStart('/')}");
+
+    var footerPhoneHref = string.IsNullOrWhiteSpace(footerPhoneDigits)
+        ? "tel:0909686889"
+        : $"tel:{footerPhoneDigits}";
+
+    var footerEmail = !string.IsNullOrWhiteSpace(contact.Gmail)
+        ? contact.Gmail
+        : "info@phelieuthanhphat.vn";
+
+    var footerAddress = !string.IsNullOrWhiteSpace(contact.Address)
+        ? contact.Address
+        : "Hóc Môn, TP. Hồ Chí Minh";
+
+    var facebookLink = string.IsNullOrWhiteSpace(contact.Facebook)
+        ? "#"
+        : (
+            contact.Facebook.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+            || contact.Facebook.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                ? contact.Facebook
+                : $"https://{contact.Facebook.TrimStart('/')}"
+        );
+
+    var zaloLink = string.IsNullOrWhiteSpace(contact.Zalo)
+        ? "#"
+        : (
+            contact.Zalo.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+            || contact.Zalo.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                ? contact.Zalo
+                : $"https://zalo.me/{contact.Zalo.TrimStart('/')}"
+        );
+
     var featuredProducts = await DbContext.Products
         .AsNoTracking()
         .Where(p => p.Status == "active")
@@ -53,7 +84,10 @@
 
     string BuildBlogUrl(string? slug, int id)
     {
-        var normalizedSlug = !string.IsNullOrWhiteSpace(slug) ? slug.Trim() : id.ToString();
+        var normalizedSlug = !string.IsNullOrWhiteSpace(slug)
+            ? slug.Trim()
+            : id.ToString();
+
         return Url.Action("Detail", "Blog", new { slug = normalizedSlug }) ?? "/Blog";
     }
 }
@@ -66,105 +100,160 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-info">
                         <h3>Phế Liệu Thành Trung</h3>
+
                         <p>
-                            @footerAddress<br><br>
+                            @footerAddress<br>
                             <strong>Hotline:</strong> @footerPhone<br>
                             <strong>Email:</strong> @footerEmail<br>
+
+                            <strong>Địa chỉ:</strong> 28D1 Đường Thới Hoà, Vĩnh Lộc A, Bình Chánh, TP HCM.<br>
+                            <strong>Cơ sở 2:</strong> Đường số 10, KCN Sóng Thần, Bình Dương.<br>
+                            <strong>Cơ sở 3:</strong> Thị trấn Đức Hoà, Tây Ninh.<br>
+
+                            <strong>Website đang chờ đăng ký với BCT</strong>
                         </p>
+
                         <div class="social-links d-flex mt-3">
-                            <a href="@facebookLink" class="d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer"><i
-                                class="bi bi-facebook"></i></a>
-                                <a href="@zaloLink" class="d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer"><i
-                                     class="bi bi-instagram"></i></a>
-                                    <a href="@zaloLink" class="d-flex align-items-center justify-content-center" target="_blank" rel="noopener noreferrer"><i
-                                         class="bi bi-youtube"></i></a>
-                                        <a href="@footerPhoneHref" class="d-flex align-items-center justify-content-center"><i
-                                             class="bi bi-telephone"></i></a>
-                                        </div>
-                                    </div>
-                                </div>
+                            <a href="@facebookLink"
+                               class="d-flex align-items-center justify-content-center"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               aria-label="Facebook">
+                                <i class="bi bi-facebook"></i>
+                            </a>
 
-                                <div class="col-lg-2 col-md-3 footer-links">
-                                    <h4>Liên kết nhanh</h4>
-                                    <ul>
-                                        <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-                                        <li><a asp-controller="Home" asp-action="About">Giới thiệu</a></li>
-                                        <li><a asp-controller="Blog" asp-action="Index" asp-route-categoryName="Dịch vụ">Dịch vụ</a></li>
-                                        <li><a asp-controller="Product" asp-action="Index">Mặt hàng</a></li>
-                                        <li><a asp-controller="Contact" asp-action="Index">Liên hệ</a></li>
-                                    </ul>
-                                </div>
+                            <a href="@zaloLink"
+                               class="d-flex align-items-center justify-content-center"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               aria-label="Zalo">
+                                <i class="bi bi-instagram"></i>
+                            </a>
 
-                                 <div class="col-lg-2 col-md-3 footer-links">
-                                     <h4>Mặt hàng</h4>
-                                     <ul>
-                                         @foreach (var product in featuredProducts)
-                                         {
-                                             <li><a href="@BuildProductUrl(product.Slug, product.Id)">@product.Name</a></li>
-                                         }
-                                     </ul>
-                                 </div>
+                            <a href="@zaloLink"
+                               class="d-flex align-items-center justify-content-center"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               aria-label="Youtube">
+                                <i class="bi bi-youtube"></i>
+                            </a>
 
-                                 <div class="col-lg-2 col-md-3 footer-links">
-                                     <h4>Dịch vụ</h4>
-                                     <ul>
-                                          <li><a asp-controller="Blog" asp-action="Index" asp-route-categoryName="Dịch vụ">Xem tất cả dịch vụ</a></li>
-                                          @foreach (var post in topServicePosts)
-                                          {
-                                              <li><a href="@BuildBlogUrl(post.Slug, post.Id)">@post.Title</a></li>
-                                          }
-                                     </ul>
-                                 </div>
-
-                                <div class="col-lg-2 col-md-3 footer-links">
-                                    <h4>Khu vực phục vụ</h4>
-                                    <ul>
-                                        <li><a asp-controller="Contact" asp-action="Index">TP. Hồ Chí Minh</a></li>
-                                        <li><a asp-controller="Contact" asp-action="Index">Bình Dương</a></li>
-                                        <li><a asp-controller="Contact" asp-action="Index">Đồng Nai</a></li>
-                                        <li><a asp-controller="Contact" asp-action="Index">Long An</a></li>
-                                        <li><a asp-controller="Contact" asp-action="Index">Tây Ninh</a></li>
-                                    </ul>
-                                </div>
-
-                            </div>
+                            <a href="@footerPhoneHref"
+                               class="d-flex align-items-center justify-content-center"
+                               aria-label="Gọi hotline @footerPhone">
+                                <i class="bi bi-telephone"></i>
+                            </a>
                         </div>
-                    </div>
-
-                    <div class="footer-legal text-center position-relative">
-                        <div class="container">
-                            <div class="copyright">
-                                &copy; Copyright <strong><span>Phế Liệu Thành Trung</span></strong>. All Rights Reserved
-                            </div>
-                            <div class="credits">
-                                Giao diện trang chủ đã được chuyển đổi sang mô hình website thu mua phế liệu.
-                            </div>
-                        </div>
-                    </div>
-                </footer>
-
-                <div class="social-button is-open">
-                    <div class="social-button-content">
-                        <a href="@footerPhoneHref" class="call-icon" rel="nofollow" aria-label="Hotline @footerPhone">
-                            <i class="fas fa-phone-alt" aria-hidden="true"></i>
-                            <div class="animated alo-circle"></div>
-                            <div class="animated alo-circle-fill"></div>
-                            <span>Hotline: @footerPhone</span>
-                        </a>
-                        <a href="@facebookLink" class="mes" aria-label="Nhắn tin Facebook" target="_blank" rel="noopener noreferrer">
-                            <i class="fab fa-facebook-messenger" aria-hidden="true"></i>
-                            <div class="animated alo-circle"></div>
-                            <div class="animated alo-circle-fill"></div>
-                            <span>Nhắn tin Facebook</span>
-                        </a>
-                        <a href="@zaloLink" class="zalo" aria-label="Zalo @footerPhone" target="_blank" rel="noopener noreferrer">
-                            <span class="social-button-zalo-text">Zalo</span>
-                            <div class="animated alo-circle"></div>
-                            <div class="animated alo-circle-fill"></div>
-                            <span>Zalo: @footerPhone</span>
-                        </a>
                     </div>
                 </div>
 
+                <div class="col-lg-2 col-md-3 footer-links">
+                    <h4>Liên kết nhanh</h4>
+                    <ul>
+                        <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                        <li><a asp-controller="Home" asp-action="About">Giới thiệu</a></li>
+                        <li><a asp-controller="Blog" asp-action="Index" asp-route-categoryName="Dịch vụ">Dịch vụ</a></li>
+                        <li><a asp-controller="Product" asp-action="Index">Mặt hàng</a></li>
+                        <li><a asp-controller="Contact" asp-action="Index">Liên hệ</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-3 footer-links">
+                    <h4>Mặt hàng</h4>
+                    <ul>
+                        @foreach (var product in featuredProducts)
+                        {
+                            <li>
+                                <a href="@BuildProductUrl(product.Slug, product.Id)">
+                                    @product.Name
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-3 footer-links">
+                    <h4>Dịch vụ</h4>
+                    <ul>
+                        <li>
+                            <a asp-controller="Blog" asp-action="Index" asp-route-categoryName="Dịch vụ">
+                                Xem tất cả dịch vụ
+                            </a>
+                        </li>
+
+                        @foreach (var post in topServicePosts)
+                        {
+                            <li>
+                                <a href="@BuildBlogUrl(post.Slug, post.Id)">
+                                    @post.Title
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="col-lg-2 col-md-3 footer-links">
+                    <h4>Khu vực phục vụ</h4>
+                    <ul>
+                        <li><a asp-controller="Contact" asp-action="Index">TP. Hồ Chí Minh</a></li>
+                        <li><a asp-controller="Contact" asp-action="Index">Bình Dương</a></li>
+                        <li><a asp-controller="Contact" asp-action="Index">Đồng Nai</a></li>
+                        <li><a asp-controller="Contact" asp-action="Index">Long An</a></li>
+                        <li><a asp-controller="Contact" asp-action="Index">Tây Ninh</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-legal text-center position-relative">
+        <div class="container">
+            <div class="copyright">
+                &copy; Copyright <strong><span>Phế Liệu Thành Trung</span></strong>. All Rights Reserved
+            </div>
+
+            <div class="credits">
+                Giao diện trang chủ đã được chuyển đổi sang mô hình website thu mua phế liệu.
+            </div>
+        </div>
+    </div>
+</footer>
+
+<div class="social-button is-open">
+    <div class="social-button-content">
+        <a href="@footerPhoneHref"
+           class="call-icon"
+           rel="nofollow"
+           aria-label="Hotline @footerPhone">
+            <i class="fas fa-phone-alt" aria-hidden="true"></i>
+            <div class="animated alo-circle"></div>
+            <div class="animated alo-circle-fill"></div>
+            <span>Hotline: @footerPhone</span>
+        </a>
+
+        <a href="@facebookLink"
+           class="mes"
+           aria-label="Nhắn tin Facebook"
+           target="_blank"
+           rel="noopener noreferrer">
+            <i class="fab fa-facebook-messenger" aria-hidden="true"></i>
+            <div class="animated alo-circle"></div>
+            <div class="animated alo-circle-fill"></div>
+            <span>Nhắn tin Facebook</span>
+        </a>
+
+        <a href="@zaloLink"
+           class="zalo"
+           aria-label="Zalo @footerPhone"
+           target="_blank"
+           rel="noopener noreferrer">
+            <span class="social-button-zalo-text">Zalo</span>
+            <div class="animated alo-circle"></div>
+            <div class="animated alo-circle-fill"></div>
+            <span>Zalo: @footerPhone</span>
+        </a>
+    </div>
+</div>
 
 <div id="preloader"></div>

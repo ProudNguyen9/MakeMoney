@@ -1,8 +1,12 @@
 using System.Net;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.EntityFrameworkCore;
 using WebThuMuaPheLieu.Models;
+using WebThuMuaPheLieu.Services;
+using WebThuMuaPheLieu.helpper;
 
 namespace WebThuMuaPheLieu.Controllers;
 
@@ -10,19 +14,32 @@ public class BlogController : Controller
 {
     private const string UsefulSessionKeyPrefix = "blog-useful:";
     private static readonly TimeSpan UsefulCooldown = TimeSpan.FromMinutes(10);
+    private static readonly TimeSpan BlogCacheDuration = TimeSpan.FromMinutes(10);
     private readonly AppDbContext _context;
+    private readonly IMemoryCache _memoryCache;
+    private readonly IContactInfoHelper _contactInfoHelper;
+    private readonly IBlogImageProcessor _blogImageProcessor;
 
-    public BlogController(AppDbContext context)
+    public BlogController(
+        AppDbContext context,
+        IMemoryCache memoryCache,
+        IContactInfoHelper contactInfoHelper,
+        IBlogImageProcessor blogImageProcessor)
     {
         _context = context;
+        _memoryCache = memoryCache;
+        _contactInfoHelper = contactInfoHelper;
+        _blogImageProcessor = blogImageProcessor;
     }
 
+    [OutputCache(PolicyName = "BlogList")]
     public async Task<IActionResult> Index(string? searchTerm, string? categoryName, int page = 1)
     {
         var viewModel = await BuildBlogIndexViewModelAsync(page, searchTerm, categoryName);
         return View(viewModel);
     }
 
+    [OutputCache(PolicyName = "BlogDetail")]
     public async Task<IActionResult> Detail(string slug)
     {
         var normalizedSlug = slug?.Trim() ?? string.Empty;
@@ -145,6 +162,7 @@ public class BlogController : Controller
     }
 
     [HttpGet]
+    [OutputCache(PolicyName = "BlogPagedApi")]
     public async Task<IActionResult> GetPagedBlogs(string? searchTerm, string? categoryName, int page = 1)
     {
         var viewModel = await BuildBlogIndexViewModelAsync(page, searchTerm, categoryName);
@@ -157,6 +175,7 @@ public class BlogController : Controller
             totalItems = viewModel.TotalItems,
             searchTerm = viewModel.SearchTerm,
             selectedCategoryName = viewModel.SelectedCategoryName,
+            contactPhone = viewModel.ContactPhone,
             posts = viewModel.Posts.Select(post => new
             {
                 id = post.Id,
@@ -235,6 +254,7 @@ public class BlogController : Controller
             .Where(post => post.Status == "published");
 
         var categoryFilters = await BuildCategoryFiltersAsync(publishedPostsQuery);
+        var contactInfo = await _contactInfoHelper.GetContactInfoAsync();
 
         var query = publishedPostsQuery;
 
@@ -262,55 +282,62 @@ public class BlogController : Controller
                 || EF.Functions.Like(post.Content ?? string.Empty, keywordPattern));
         }
 
-        var posts = await query
-            .OrderByDescending(post => post.PublishedAt ?? post.CreatedAt)
-            .ThenByDescending(post => post.Id)
-            .Select(post => new BlogPostListItem
-            {
-                Id = post.Id,
-                Slug = post.Slug,
-                Title = post.Title,
-                Excerpt = post.Excerpt,
-                Content = post.Content,
-                CoverImage = post.CoverImage,
-                PublishedAt = post.PublishedAt ?? post.CreatedAt,
-                LikeCount = post.LikeCount ?? 0
-            })
-            .ToListAsync();
-
-        var featuredPosts = await publishedPostsQuery
-            .OrderByDescending(post => post.LikeCount ?? 0)
-            .ThenByDescending(post => post.PublishedAt ?? post.CreatedAt)
-            .ThenByDescending(post => post.Id)
-            .Take(5)
-            .Select(post => new BlogPostListItem
-            {
-                Id = post.Id,
-                Slug = post.Slug,
-                Title = post.Title,
-                Excerpt = post.Excerpt,
-                Content = post.Content,
-                CoverImage = post.CoverImage,
-                PublishedAt = post.PublishedAt ?? post.CreatedAt,
-                LikeCount = post.LikeCount ?? 0
-            })
-            .ToListAsync();
-
-        var blogCards = await BuildBlogCardsAsync(posts);
-        var featuredBlogCards = await BuildBlogCardsAsync(featuredPosts);
-        var totalItems = blogCards.Count;
+        var totalItems = await query.CountAsync();
         var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)pageSize));
         var currentPage = Math.Min(Math.Max(page, 1), totalPages);
-        var totalPublishedPosts = await publishedPostsQuery.CountAsync();
 
-        var pagedPosts = blogCards
+        var pagedPosts = await query
+            .OrderByDescending(post => post.PublishedAt ?? post.CreatedAt)
+            .ThenByDescending(post => post.Id)
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
-            .ToList();
+            .Select(post => new BlogPostListItem
+            {
+                Id = post.Id,
+                Slug = post.Slug,
+                Title = post.Title,
+                Excerpt = post.Excerpt,
+                Content = post.Content,
+                CoverImage = post.CoverImage,
+                PublishedAt = post.PublishedAt ?? post.CreatedAt,
+                LikeCount = post.LikeCount ?? 0
+            })
+            .ToListAsync();
+
+        var featuredPosts = await _memoryCache.GetOrCreateAsync(BlogCacheKeys.FeaturedPosts, async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = BlogCacheDuration;
+
+            return await publishedPostsQuery
+                .OrderByDescending(post => post.LikeCount ?? 0)
+                .ThenByDescending(post => post.PublishedAt ?? post.CreatedAt)
+                .ThenByDescending(post => post.Id)
+                .Take(5)
+                .Select(post => new BlogPostListItem
+                {
+                    Id = post.Id,
+                    Slug = post.Slug,
+                    Title = post.Title,
+                    Excerpt = post.Excerpt,
+                    Content = null,
+                    CoverImage = post.CoverImage,
+                    PublishedAt = post.PublishedAt ?? post.CreatedAt,
+                    LikeCount = post.LikeCount ?? 0
+                })
+                .ToListAsync();
+        }) ?? [];
+
+        var blogCards = await BuildBlogCardsAsync(pagedPosts);
+        var featuredBlogCards = await BuildBlogCardsAsync(featuredPosts);
+        var totalPublishedPosts = await _memoryCache.GetOrCreateAsync(BlogCacheKeys.TotalPublishedPosts, async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = BlogCacheDuration;
+            return await publishedPostsQuery.CountAsync();
+        });
 
         return new BlogIndexViewModel
         {
-            Posts = pagedPosts,
+            Posts = blogCards,
             FeaturedPosts = featuredBlogCards,
             Categories = categoryFilters,
             SearchTerm = normalizedSearchTerm,
@@ -319,7 +346,8 @@ public class BlogController : Controller
             CurrentPage = currentPage,
             TotalPages = totalPages,
             PageSize = pageSize,
-            TotalItems = totalItems
+            TotalItems = totalItems,
+            ContactPhone = contactInfo.Phone
         };
     }
 
@@ -382,6 +410,7 @@ public class BlogController : Controller
             {
                 categoryByPostId.TryGetValue(post.Id, out var postCategoryName);
                 var coverImage = NormalizeBlogImagePath(post.CoverImage);
+                coverImage = _blogImageProcessor.ResolveVariantImage(coverImage, BlogImageVariant.Thumbnail);
                 var gallerySequence = imageSequenceByPostId.GetValueOrDefault(post.Id) ?? [];
                 var imageSequence = new List<string>();
 
@@ -418,6 +447,20 @@ public class BlogController : Controller
     }
 
     private async Task<List<BlogCategoryFilterViewModel>> BuildCategoryFiltersAsync(IQueryable<BlogPost>? publishedPostsQuery = null)
+    {
+        if (publishedPostsQuery is null)
+        {
+            return await _memoryCache.GetOrCreateAsync(BlogCacheKeys.CategoryFilters, async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = BlogCacheDuration;
+                return await BuildCategoryFiltersUncachedAsync();
+            }) ?? [];
+        }
+
+        return await BuildCategoryFiltersUncachedAsync(publishedPostsQuery);
+    }
+
+    private async Task<List<BlogCategoryFilterViewModel>> BuildCategoryFiltersUncachedAsync(IQueryable<BlogPost>? publishedPostsQuery = null)
     {
         publishedPostsQuery ??= _context.BlogPosts
             .AsNoTracking()

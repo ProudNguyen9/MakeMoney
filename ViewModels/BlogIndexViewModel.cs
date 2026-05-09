@@ -49,6 +49,8 @@ public class BlogIndexViewModel
     public int PageSize { get; set; }
 
     public int TotalItems { get; set; }
+
+    public string ContactPhone { get; set; } = string.Empty;
 }
 
 public class BlogDetailViewModel

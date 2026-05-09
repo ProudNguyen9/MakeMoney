@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Http;
@@ -6,8 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using WebThuMuaPheLieu.Models;
+using WebThuMuaPheLieu.Services;
 using WebThuMuaPheLieu.ViewModels;
 
 namespace WebThuMuaPheLieu.Controllers;
@@ -27,18 +30,57 @@ public class AdminController : Controller
     private readonly AppDbContext _context;
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<AdminController> _logger;
+    private readonly IBlogImageProcessor _blogImageProcessor;
+    private readonly IProductImageProcessor _productImageProcessor;
+    private readonly IMemoryCache _memoryCache;
 
     private const string BannerActiveFolderRelative = "assets/images/bannersandseos";
     private const string BannerTitleSeparator = "|||";
     private const string MarketingSettingGroup = "marketing";
     private static readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
+    private static readonly HashSet<string> AllowedImageContentTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    };
+    private static readonly byte[][] JpegSignatures =
+    [
+        [0xFF, 0xD8, 0xFF]
+    ];
+    private static readonly byte[][] PngSignatures =
+    [
+        [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
+    ];
+    private static readonly byte[][] WebpSignatures =
+    [
+        [0x52, 0x49, 0x46, 0x46]
+    ];
+    private const int MaxProductImagesPerProduct = 10;
+    private const long MaxSingleProductImageBytes = 5 * 1024 * 1024;
+    private const long MaxTotalProductUploadBytes = 20 * 1024 * 1024;
+    private const int MaxProductNameLength = 255;
+    private const int MaxProductSlugLength = 255;
+    private const int MaxProductShortDescriptionLength = 1000;
+    private const int MaxProductDescriptionHtmlLength = 20000;
+    private const int MaxProductDescriptionPlainTextLength = 8000;
+    private const int ProductSaveThrottleSeconds = 3;
     private const string ProductImageFolder = "assets/images/products";
 
-    public AdminController(AppDbContext context, IWebHostEnvironment environment, ILogger<AdminController> logger)
+    public AdminController(
+        AppDbContext context,
+        IWebHostEnvironment environment,
+        ILogger<AdminController> logger,
+        IBlogImageProcessor blogImageProcessor,
+        IProductImageProcessor productImageProcessor,
+        IMemoryCache memoryCache)
     {
         _context = context;
         _environment = environment;
         _logger = logger;
+        _blogImageProcessor = blogImageProcessor;
+        _productImageProcessor = productImageProcessor;
+        _memoryCache = memoryCache;
     }
 
     [HttpGet("")]
@@ -125,9 +167,53 @@ public class AdminController : Controller
     [RequestSizeLimit(50_000_000)]
     public async Task<IActionResult> SaveProduct(AdminProductEditorViewModel editor)
     {
+        if (!IsProductSaveThrottleAllowed())
+        {
+            TempData["AdminProductsError"] = "Bạn thao tác quá nhanh. Vui lòng chờ vài giây rồi thử lại.";
+            return RedirectToAction(nameof(Products), new { id = editor.Id });
+        }
+
         if (string.IsNullOrWhiteSpace(editor.Name))
         {
             TempData["AdminProductsError"] = "Tên sản phẩm không được để trống.";
+            return RedirectToAction(nameof(Products), new { id = editor.Id });
+        }
+
+        if (editor.Name.Trim().Length > MaxProductNameLength)
+        {
+            TempData["AdminProductsError"] = $"Tên sản phẩm tối đa {MaxProductNameLength} ký tự.";
+            return RedirectToAction(nameof(Products), new { id = editor.Id });
+        }
+
+        if (!string.IsNullOrWhiteSpace(editor.Slug) && editor.Slug.Trim().Length > MaxProductSlugLength)
+        {
+            TempData["AdminProductsError"] = $"Slug sản phẩm tối đa {MaxProductSlugLength} ký tự.";
+            return RedirectToAction(nameof(Products), new { id = editor.Id });
+        }
+
+        if (!string.IsNullOrWhiteSpace(editor.ShortDescription) && editor.ShortDescription.Trim().Length > MaxProductShortDescriptionLength)
+        {
+            TempData["AdminProductsError"] = $"Mô tả ngắn tối đa {MaxProductShortDescriptionLength} ký tự.";
+            return RedirectToAction(nameof(Products), new { id = editor.Id });
+        }
+
+        var sanitizedDescription = SanitizeProductHtml(editor.Description);
+        if (sanitizedDescription.Length > MaxProductDescriptionHtmlLength)
+        {
+            TempData["AdminProductsError"] = $"Mô tả chi tiết tối đa {MaxProductDescriptionHtmlLength} ký tự HTML.";
+            return RedirectToAction(nameof(Products), new { id = editor.Id });
+        }
+
+        var plainDescriptionLength = Regex.Replace(sanitizedDescription, "<[^>]+>", string.Empty).Trim().Length;
+        if (plainDescriptionLength > MaxProductDescriptionPlainTextLength)
+        {
+            TempData["AdminProductsError"] = $"Nội dung mô tả tối đa {MaxProductDescriptionPlainTextLength} ký tự văn bản.";
+            return RedirectToAction(nameof(Products), new { id = editor.Id });
+        }
+
+        if (ContainsInlineBase64Image(sanitizedDescription))
+        {
+            TempData["AdminProductsError"] = "Không cho phép nhúng ảnh base64 trong mô tả. Vui lòng upload ảnh và dùng URL.";
             return RedirectToAction(nameof(Products), new { id = editor.Id });
         }
 
@@ -182,7 +268,7 @@ public class AdminController : Controller
             ? GenerateSlug(cleanedName)
             : GenerateSlug(editor.Slug);
         product.ShortDescription = editor.ShortDescription?.Trim();
-        product.Description = editor.Description?.Trim();
+        product.Description = string.IsNullOrWhiteSpace(sanitizedDescription) ? null : sanitizedDescription;
         product.CategoryId = editor.CategoryId;
         product.PriceValue = editor.PriceValue;
         product.Unit = editor.Unit?.Trim();
@@ -201,6 +287,14 @@ public class AdminController : Controller
         var uploadedFiles = editor.UploadedImages?
             .Where(file => file is { Length: > 0 })
             .ToList() ?? [];
+
+        var existingImageCount = (string.IsNullOrWhiteSpace(product.PrimaryImage) ? 0 : 1) + product.ProductImages.Count;
+        var uploadValidationError = await ValidateProductUploadsAsync(uploadedFiles, existingImageCount);
+        if (!string.IsNullOrWhiteSpace(uploadValidationError))
+        {
+            TempData["AdminProductsError"] = uploadValidationError;
+            return RedirectToAction(nameof(Products), new { id = product.Id });
+        }
 
         if (uploadedFiles.Count > 0)
         {
@@ -223,6 +317,53 @@ public class AdminController : Controller
             : "Đã cập nhật sản phẩm thành công.";
 
         return RedirectToAction(nameof(Products), new { id = product.Id });
+    }
+
+    [HttpPost("products/upload-inline-image")]
+    [ValidateAntiForgeryToken]
+    [RequestSizeLimit(6_000_000)]
+    public async Task<IActionResult> UploadInlineProductImage(IFormFile? file)
+    {
+        if (file is null || file.Length <= 0)
+        {
+            return Json(new { success = false, message = "Không có ảnh để tải lên." });
+        }
+
+        if (file.Length > MaxSingleProductImageBytes)
+        {
+            return Json(new { success = false, message = "Kích thước ảnh vượt quá 5MB." });
+        }
+
+        var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!AllowedImageExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+        {
+            return Json(new { success = false, message = "Định dạng ảnh không hợp lệ." });
+        }
+
+        if (string.IsNullOrWhiteSpace(file.ContentType) || !AllowedImageContentTypes.Contains(file.ContentType))
+        {
+            return Json(new { success = false, message = "MIME type không hợp lệ." });
+        }
+
+        if (!await HasValidImageSignatureAsync(file, extension))
+        {
+            return Json(new { success = false, message = "Chữ ký file không hợp lệ." });
+        }
+
+        var productInlineFolder = Path.Combine(_environment.WebRootPath, "assets", "images", "products", "inline");
+        Directory.CreateDirectory(productInlineFolder);
+
+        var baseName = BuildSafeFileName(Path.GetFileNameWithoutExtension(file.FileName), "productinline");
+        var outputBaseName = $"{baseName}-{Guid.NewGuid():N}";
+
+        var optimized = await _productImageProcessor.ProcessAndSaveAsync(
+            file,
+            productInlineFolder,
+            outputBaseName,
+            HttpContext.RequestAborted);
+
+        var url = optimized.RelativeUrl;
+        return Json(new { success = true, url });
     }
 
     [HttpPost("products/{id:int}/delete")]
@@ -624,18 +765,21 @@ public class AdminController : Controller
             ModelState.AddModelError($"{EditorInputPrefix}.{nameof(AdminPostEditorInputModel.SelectedCategoryIds)}", "Chọn ít nhất một chuyên mục cho bài viết.");
         }
 
-        var existingAuthorIds = await _context.Admins
-            .AsNoTracking()
-            .Select(admin => admin.Id)
-            .ToListAsync();
-
-        if (input.AuthorId.HasValue && !existingAuthorIds.Contains(input.AuthorId.Value))
+        if (input.AuthorId.HasValue)
         {
-            ModelState.AddModelError($"{EditorInputPrefix}.{nameof(AdminPostEditorInputModel.AuthorId)}", "Tác giả được chọn không tồn tại.");
+            var authorExists = await _context.Admins
+                .AsNoTracking()
+                .AnyAsync(admin => admin.Id == input.AuthorId.Value);
+
+            if (!authorExists)
+            {
+                ModelState.AddModelError($"{EditorInputPrefix}.{nameof(AdminPostEditorInputModel.AuthorId)}", "Tác giả được chọn không tồn tại.");
+            }
         }
 
         var existingCategoryIds = await _context.BlogCategories
             .AsNoTracking()
+            .Where(category => input.SelectedCategoryIds.Contains(category.Id))
             .Select(category => category.Id)
             .ToListAsync();
 
@@ -656,6 +800,7 @@ public class AdminController : Controller
 
         var existingProductIds = await _context.Products
             .AsNoTracking()
+            .Where(product => input.SelectedProductIds.Contains(product.Id))
             .Select(product => product.Id)
             .ToListAsync();
 
@@ -792,6 +937,8 @@ public class AdminController : Controller
             await DeleteUnreferencedBlogImageFilesAsync(
                 previousPostImageUrls.Except(currentPostImageUrls, StringComparer.OrdinalIgnoreCase));
 
+            InvalidateBlogCaches(post.Id);
+
             TempData[SuccessTempDataKey] = isNewPost
                 ? "Đã tạo bài viết mới thành công."
                 : "Đã cập nhật bài viết thành công.";
@@ -832,6 +979,45 @@ public class AdminController : Controller
         }
     }
 
+    [HttpPost("posts/upload-inline-image")]
+    [ValidateAntiForgeryToken]
+    [RequestSizeLimit(5_000_000)]
+    public async Task<IActionResult> UploadInlineBlogImage(IFormFile? file)
+    {
+        if (file is null || file.Length <= 0)
+        {
+            return Json(new { success = false, message = "Không có ảnh để tải lên." });
+        }
+
+        var extension = Path.GetExtension(file.FileName);
+        var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".jpg", ".jpeg", ".png", ".webp" };
+        if (!allowed.Contains(extension))
+        {
+            return Json(new { success = false, message = "Định dạng ảnh không hợp lệ." });
+        }
+
+        var inlineFolder = Path.Combine(_environment.WebRootPath, "assets", "images", "blogs", "inline");
+        Directory.CreateDirectory(inlineFolder);
+
+        var baseName = BuildBlogImageFileBaseName(Path.GetFileNameWithoutExtension(file.FileName));
+        var sequence = GetNextAvailableImageSequence(inlineFolder, baseName);
+        var processed = await _blogImageProcessor.ProcessAndSaveAsync(
+            [file],
+            inlineFolder,
+            baseName,
+            sequence,
+            HttpContext.RequestAborted);
+
+        var first = processed.FirstOrDefault();
+        if (first is null)
+        {
+            return Json(new { success = false, message = "Không thể xử lý ảnh." });
+        }
+
+        var url = $"/assets/images/blogs/inline/{Path.GetFileName(first.OriginalPath)}";
+        return Json(new { success = true, url });
+    }
+
     [HttpPost("posts/change-status")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChangePostStatus(int id, string status, string? searchTerm, string? returnStatus, int? returnCategoryId, int? editId, int? returnPage)
@@ -857,6 +1043,7 @@ public class AdminController : Controller
         post.PublishedAt = ResolvePublishedAt(post.PublishedAt, normalizedStatus, post.PublishedAt, DateTime.Now);
         post.UpdatedAt = DateTime.Now;
         await _context.SaveChangesAsync();
+        InvalidateBlogCaches(post.Id);
 
         TempData[SuccessTempDataKey] = $"Đã chuyển bài viết #{post.Id} sang trạng thái {BuildBlogStatusLabel(normalizedStatus).ToLowerInvariant()}.";
         return RedirectToPosts(searchTerm, returnStatus, returnCategoryId, editId == id ? id : editId, returnPage);
@@ -902,6 +1089,7 @@ public class AdminController : Controller
             await transaction.CommitAsync();
 
             await DeleteUnreferencedBlogImageFilesAsync(deletedImageUrls);
+            InvalidateBlogCaches(id);
 
             TempData[SuccessTempDataKey] = $"Đã xoá bài viết #{id} cùng toàn bộ dữ liệu liên quan.";
 
@@ -2131,7 +2319,7 @@ public class AdminController : Controller
         await _context.BlogImages.AddRangeAsync(newImages);
     }
 
-    private static async Task<List<string>> SaveUploadedPostImagesAsync(IReadOnlyList<IFormFile> imageFiles, string uniqueSlug, string categoryFolderName, ICollection<string> savedUploadedFilePaths)
+    private async Task<List<string>> SaveUploadedPostImagesAsync(IReadOnlyList<IFormFile> imageFiles, string uniqueSlug, string categoryFolderName, ICollection<string> savedUploadedFilePaths)
     {
         if (imageFiles.Count == 0)
         {
@@ -2149,25 +2337,35 @@ public class AdminController : Controller
 
         var fileBaseName = BuildBlogImageFileBaseName(uniqueSlug);
         var nextSequence = GetNextAvailableImageSequence(uploadsDirectory, fileBaseName);
-        var uploadedImageUrls = new List<string>();
+        var processedResults = await _blogImageProcessor.ProcessAndSaveAsync(
+            imageFiles,
+            uploadsDirectory,
+            fileBaseName,
+            nextSequence,
+            HttpContext.RequestAborted);
 
-        foreach (var imageFile in imageFiles)
+        foreach (var item in processedResults)
         {
-            var fileExtension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
-            var fileName = $"{fileBaseName}{nextSequence}{fileExtension}";
-            var filePath = Path.Combine(uploadsDirectory, fileName);
-
-            await using (var stream = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-            {
-                await imageFile.CopyToAsync(stream);
-            }
-
-            uploadedImageUrls.Add($"/assets/images/blogs/{normalizedCategoryFolderName}/{fileName}");
-            savedUploadedFilePaths.Add(filePath);
-            nextSequence++;
+            savedUploadedFilePaths.Add(item.OriginalPath);
+            savedUploadedFilePaths.Add(item.MediumPath);
+            savedUploadedFilePaths.Add(item.ThumbPath);
         }
 
-        return uploadedImageUrls;
+        return processedResults
+            .Select(item => $"/assets/images/blogs/{normalizedCategoryFolderName}/{Path.GetFileName(item.OriginalPath)}")
+            .ToList();
+    }
+
+    private void InvalidateBlogCaches(int? postId = null)
+    {
+        _memoryCache.Remove(BlogCacheKeys.CategoryFilters);
+        _memoryCache.Remove(BlogCacheKeys.FeaturedPosts);
+        _memoryCache.Remove(BlogCacheKeys.TotalPublishedPosts);
+
+        if (postId.HasValue && postId.Value > 0)
+        {
+            _memoryCache.Remove(BlogCacheKeys.RelatedPosts(postId.Value));
+        }
     }
 
     private static int GetNextAvailableImageSequence(string uploadsDirectory, string fileBaseName)
@@ -2520,13 +2718,13 @@ public class AdminController : Controller
             baseSlug = "bai-viet";
         }
 
-        var existingSlugs = await _context.BlogPosts
+        var slugAlreadyExists = await _context.BlogPosts
             .AsNoTracking()
-            .Where(post => !excludingPostId.HasValue || post.Id != excludingPostId.Value)
-            .Select(post => post.Slug ?? string.Empty)
-            .ToListAsync();
+            .AnyAsync(post =>
+                (!excludingPostId.HasValue || post.Id != excludingPostId.Value)
+                && (post.Slug ?? string.Empty) == baseSlug);
 
-        if (!existingSlugs.Any(slug => string.Equals(slug, baseSlug, StringComparison.OrdinalIgnoreCase)))
+        if (!slugAlreadyExists)
         {
             return baseSlug;
         }
@@ -2534,8 +2732,13 @@ public class AdminController : Controller
         for (var suffix = 2; suffix < 10000; suffix++)
         {
             var candidate = $"{baseSlug}-{suffix}";
+            var candidateExists = await _context.BlogPosts
+                .AsNoTracking()
+                .AnyAsync(post =>
+                    (!excludingPostId.HasValue || post.Id != excludingPostId.Value)
+                    && (post.Slug ?? string.Empty) == candidate);
 
-            if (!existingSlugs.Any(slug => string.Equals(slug, candidate, StringComparison.OrdinalIgnoreCase)))
+            if (!candidateExists)
             {
                 return candidate;
             }
@@ -3355,20 +3558,26 @@ public class AdminController : Controller
             }
 
             var safeExtension = extension.ToLowerInvariant();
-            var fileName = $"{baseName}{nextIndex}{safeExtension}";
-            while (System.IO.File.Exists(Path.Combine(targetFolderPath, fileName)))
+
+            if (!await HasValidImageSignatureAsync(file, safeExtension))
+            {
+                continue;
+            }
+
+            var outputBaseName = $"{baseName}{nextIndex}";
+            while (System.IO.File.Exists(Path.Combine(targetFolderPath, $"{outputBaseName}.webp")))
             {
                 nextIndex++;
-                fileName = $"{baseName}{nextIndex}{safeExtension}";
+                outputBaseName = $"{baseName}{nextIndex}";
             }
 
-            var physicalPath = Path.Combine(targetFolderPath, fileName);
-            await using (var stream = new FileStream(physicalPath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
+            var optimized = await _productImageProcessor.ProcessAndSaveAsync(
+                file,
+                targetFolderPath,
+                outputBaseName,
+                HttpContext.RequestAborted);
 
-            var relativePath = $"~/{ProductImageFolder}/{fileName}";
+            var relativePath = NormalizeImagePath(optimized.RelativeUrl) ?? $"~/{ProductImageFolder}/{outputBaseName}.webp";
 
             if (string.IsNullOrWhiteSpace(product.PrimaryImage))
             {
@@ -3639,6 +3848,134 @@ public class AdminController : Controller
         }
 
         return builder.Length == 0 ? Guid.NewGuid().ToString("N") : builder.ToString();
+    }
+
+    private async Task<string?> ValidateProductUploadsAsync(List<IFormFile> uploadedFiles, int existingImageCount)
+    {
+        if (uploadedFiles.Count == 0)
+        {
+            return null;
+        }
+
+        if (existingImageCount + uploadedFiles.Count > MaxProductImagesPerProduct)
+        {
+            return $"Mỗi sản phẩm tối đa {MaxProductImagesPerProduct} ảnh (bao gồm ảnh hiện có).";
+        }
+
+        var totalBytes = 0L;
+
+        foreach (var file in uploadedFiles)
+        {
+            totalBytes += file.Length;
+
+            if (file.Length <= 0)
+            {
+                return "Phát hiện file rỗng. Vui lòng chọn lại ảnh hợp lệ.";
+            }
+
+            if (file.Length > MaxSingleProductImageBytes)
+            {
+                return $"Ảnh '{file.FileName}' vượt quá 5MB.";
+            }
+
+            var extension = Path.GetExtension(file.FileName);
+            if (string.IsNullOrWhiteSpace(extension) || !AllowedImageExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
+            {
+                return "Chỉ cho phép định dạng JPG, JPEG, PNG, WEBP.";
+            }
+
+            if (string.IsNullOrWhiteSpace(file.ContentType) || !AllowedImageContentTypes.Contains(file.ContentType))
+            {
+                return "File upload không đúng MIME type ảnh hợp lệ.";
+            }
+
+            if (!await HasValidImageSignatureAsync(file, extension.ToLowerInvariant()))
+            {
+                return $"File '{file.FileName}' không đúng chữ ký nhị phân của ảnh hợp lệ.";
+            }
+        }
+
+        if (totalBytes > MaxTotalProductUploadBytes)
+        {
+            return "Tổng dung lượng ảnh upload mỗi lần không vượt quá 20MB.";
+        }
+
+        return null;
+    }
+
+    private static bool ContainsInlineBase64Image(string? html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+        {
+            return false;
+        }
+
+        return Regex.IsMatch(html, "data\\s*:\\s*image\\/", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+    }
+
+    private static string SanitizeProductHtml(string? html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+        {
+            return string.Empty;
+        }
+
+        var input = html.Trim();
+
+        input = Regex.Replace(input, @"<\s*(script|iframe|object|embed|form|input|button|meta|link|base)\b[^>]*>.*?<\s*/\s*\1\s*>", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        input = Regex.Replace(input, @"<\s*(script|iframe|object|embed|form|input|button|meta|link|base)\b[^>]*\/?>", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        input = Regex.Replace(input, @"\son\w+\s*=\s*(""[^""]*""|'[^']*'|[^\s>]+)", string.Empty, RegexOptions.IgnoreCase);
+        input = Regex.Replace(input, @"\s(href|src)\s*=\s*(""\s*javascript:[^""<>]*""|'\s*javascript:[^'<>]*')", string.Empty, RegexOptions.IgnoreCase);
+        input = Regex.Replace(input, @"\sstyle\s*=\s*(""[\s\S]*?(expression|javascript:|url\s*\(\s*javascript:)[\s\S]*?""|'[\s\S]*?(expression|javascript:|url\s*\(\s*javascript:)[\s\S]*?')", string.Empty, RegexOptions.IgnoreCase);
+        input = Regex.Replace(input, @"\s(href|src)\s*=\s*(""\s*data:[^""<>]*""|'\s*data:[^'<>]*')", string.Empty, RegexOptions.IgnoreCase);
+
+        return input;
+    }
+
+    private async Task<bool> HasValidImageSignatureAsync(IFormFile file, string extension)
+    {
+        if (file.Length <= 0)
+        {
+            return false;
+        }
+
+        byte[] header;
+        await using (var stream = file.OpenReadStream())
+        {
+            header = new byte[12];
+            var read = await stream.ReadAsync(header, 0, header.Length);
+            if (read <= 0)
+            {
+                return false;
+            }
+        }
+
+        bool StartsWith(byte[] candidate)
+            => header.Length >= candidate.Length && header.Take(candidate.Length).SequenceEqual(candidate);
+
+        return extension.ToLowerInvariant() switch
+        {
+            ".jpg" or ".jpeg" => JpegSignatures.Any(StartsWith),
+            ".png" => PngSignatures.Any(StartsWith),
+            ".webp" => WebpSignatures.Any(StartsWith) && header.Length >= 12 && Encoding.ASCII.GetString(header, 8, 4) == "WEBP",
+            _ => false
+        };
+    }
+
+    private bool IsProductSaveThrottleAllowed()
+    {
+        const string key = "Admin.Product.LastSaveUtc";
+        var now = DateTime.UtcNow;
+        var raw = HttpContext.Session.GetString(key);
+
+        if (DateTime.TryParse(raw, null, DateTimeStyles.RoundtripKind, out var last)
+            && (now - last).TotalSeconds < ProductSaveThrottleSeconds)
+        {
+            return false;
+        }
+
+        HttpContext.Session.SetString(key, now.ToString("O", CultureInfo.InvariantCulture));
+        return true;
     }
 
     private static string? NormalizeStatus(string? value)
